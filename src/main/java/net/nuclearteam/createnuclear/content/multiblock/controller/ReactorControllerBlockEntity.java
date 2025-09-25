@@ -223,7 +223,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                             return;
                         }
                     } else {
-                        //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0, false);
+                        this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0, false);
                         return;
                     }
                 }

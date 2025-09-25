@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "createnuclear:cloth"
+    },
+    {
+      "item": "minecraft:light_blue_dye"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "createnuclear:light_blue_cloth"
+  }
+}

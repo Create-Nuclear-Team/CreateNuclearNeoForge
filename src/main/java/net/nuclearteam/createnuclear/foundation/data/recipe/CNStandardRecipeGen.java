@@ -54,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -156,7 +157,7 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         REINFORCED_GLASS = create(CNBlocks.REINFORCED_GLASS)
             .unlockedBy(CNBlocks.REACTOR_CASING::get)
             .viaShaped(b -> b
-                .define('G', CNTags.forgeItemTag("glass"))
+                .define('G', CNTags.forgeItemTag("glass_blocks"))
                 .define('S', CNTags.forgeItemTag("ingots/lead"))
                 .pattern("SGS")
                 .pattern("GSG")
@@ -225,6 +226,55 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1)
     ;
+
+
+    private final Marker SHAPELESS = enterFolder("shapeless");
+    GeneratedRecipe
+            RAW_URANIUM = create(CNItems.RAW_URANIUM).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_uranium"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))),
+
+    RAW_LEAD_SHAPELESS = create(CNItems.RAW_LEAD).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_lead"))),
+
+    LEAD_INGOT = create(CNItems.LEAD_INGOT).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/lead"))),
+
+    LEAD_NUGGET = create(CNItems.LEAD_NUGGET).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/lead"))),
+
+    STEEL_INGOT = create(CNItems.STEEL_INGOT).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/steel"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/steel"))),
+
+    STEEL_NUGGET = create(CNItems.STEEL_NUGGET).returns(9)
+            .withSuffix("_from_decompacting")
+            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/steel"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/steel"))),
+
+    REACTOR_BLUEPRINT_ITEM_CLEAR = clearData(CNItems.REACTOR_BLUEPRINT)
+            ;
+
+    private final Marker SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
+
+    ClothItem.DyeRecipeList CLOTH_CHANGING = new ClothItem.DyeRecipeList(color -> {
+        List<Item> ingredients = new ArrayList<>(Arrays.asList(Items.WHITE_DYE, Items.ORANGE_DYE, Items.MAGENTA_DYE, Items.LIGHT_BLUE_DYE, Items.YELLOW_DYE, Items.LIME_DYE, Items.PINK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE, Items.CYAN_DYE, Items.PURPLE_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.GREEN_DYE, Items.RED_DYE, Items.BLACK_DYE));
+
+        return create(CNItems.CLOTHS.get(color))
+                .unlockedBy(ClothItem.Cloths.WHITE_CLOTH::getItem)
+                .viaShapeless(b -> b
+                        .requires(CNTags.CNItemTags.CLOTH.tag)
+                        .requires(ingredients.get(color.ordinal()))
+                );
+    });
 
 
 
@@ -468,11 +518,11 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         }
 
         private ResourceLocation createSimpleLocation(String recipeType) {
-            return Create.asResource(recipeType + "/" + getRegistryName().getPath() + suffix);
+            return CreateNuclear.asResource(recipeType + "/" + getRegistryName().getPath() + suffix);
         }
 
         private ResourceLocation createLocation(String recipeType) {
-            return Create.asResource(recipeType + "/" + path + "/" + getRegistryName().getPath() + suffix);
+            return CreateNuclear.asResource(recipeType + "/" + path + "/" + getRegistryName().getPath() + suffix);
         }
 
         private ResourceLocation getRegistryName() {

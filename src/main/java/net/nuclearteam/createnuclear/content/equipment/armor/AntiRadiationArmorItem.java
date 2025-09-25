@@ -349,7 +349,9 @@ public class AntiRadiationArmorItem {
         public static boolean isArmored(ItemStack item) {
             return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
                     chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem()));
+                    leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
+                    CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
+                    ;
         }
 
         public static boolean isArmored2(ItemStack item) {

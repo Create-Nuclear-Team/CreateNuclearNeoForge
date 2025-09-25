@@ -7,3 +7,32 @@
 /setblock -357 -47 -536 createnuclear:enriching_fire
 /give Dev minecraft:debug_stick
 /effect give Dev minecraft:resistance infinite 255
+/time set day
+/gamerule doDaylightCycle false
+/tick sprint 1d
+/tick sprint stop
+/tick sprint 1d
+/tick sprint stop
+/tick freeze
+/tick unfreeze
+/tick sprint 1d
+/gamerule doDaylightCycle true
+/tick sprint stop
+/gamemode survival
+/gamerule doMobSpawning false
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival

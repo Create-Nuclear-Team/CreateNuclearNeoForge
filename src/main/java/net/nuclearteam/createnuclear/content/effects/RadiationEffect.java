@@ -72,4 +72,9 @@ public class RadiationEffect extends MobEffect {
         livingEntity.hurt(livingEntity.damageSources().magic(), damage);
         return true;
     }
+
+    @Override
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+        return duration >= 1;
+    }
 }
