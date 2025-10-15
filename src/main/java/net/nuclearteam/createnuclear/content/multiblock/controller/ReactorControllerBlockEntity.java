@@ -73,6 +73,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int maxUraniumPerGraphite = 3;
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
+    public int tmpGraphiteTimer = graphiteTimer;
+    public int tmpUraniumTimer = uraniumTimer;
     public int countUraniumRod;
     public int countGraphiteRod;
     public int heat;
@@ -193,6 +195,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             return;
 
         if (isEmptyConfiguredPattern()) {
+            ReactorBluePrintData data = getReactorBluePrintData();
+            countGraphiteRod = data.countGraphiteRod();
+            countUraniumRod = data.countUraniumRod();
+
             if (!isTotal) {
                 total = calculateProgress();
                 isTotal = true;
@@ -206,13 +212,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 IItemHandler capability = level.getCapability(Capabilities.ItemHandler.BLOCK, be.getBlockPos(), Direction.NORTH.getOpposite());
                 if (capability == null)
                     capability = EmptyItemHandler.INSTANCE;
-
+                if (tmpUraniumTimer >= 0) {
+                    tmpUraniumTimer -= 1 * countUraniumRod;
+                } else {
+                    ItemStack extractItem1 = capability.extractItem(0, 1, false);
+                    tmpUraniumTimer = uraniumTimer;
+                }
+                if (tmpGraphiteTimer >= 0) {
+                    tmpGraphiteTimer -= 1 * countGraphiteRod;
+                } else {
+                    ItemStack extractItem2 = capability.extractItem(1, 1, false);
+                    tmpGraphiteTimer = graphiteTimer;
+                }
 
                 if (!fuelItem.isEmpty() && !coolerItem.isEmpty()) {
                     heat = (int) calculateHeat(inventory.getItem(0));
                     if (updateTimers()) {
-                        ItemStack extractItem1 = capability.extractItem(0, 1, false);
-                        ItemStack extractItem2 = capability.extractItem(1, 1, false);
 
                         if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4, true);
@@ -243,8 +258,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private boolean updateTimers() {
         total -= 1;
-        CreateNuclear.LOGGER.info("updateTimers: " + total);
-        CreateNuclear.LOGGER.info("updateTimersBool: " + String.valueOf(total >= 0));
         return total >= 0;//(total/constTotal) >= 0;
     }
 
