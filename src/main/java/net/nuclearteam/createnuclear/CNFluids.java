@@ -31,7 +31,7 @@ public class CNFluids {
     public static final FluidEntry<BaseFlowingFluid.Flowing> URANIUM =
         CreateNuclear.REGISTRATE.standardFluid("uranium", SolidRenderedPlaceableFluidity.create(0x38FF08, () -> 1f / 32f))
             .lang("Liquid Uranium")
-            .tag(CNFluidTags.URANIUM.tag)
+            //.tag(CNFluidTags.URANIUM.tag)
             .properties(p -> p.viscosity(2500)
                 .density(1600)
                 .canSwim(false)
@@ -46,7 +46,7 @@ public class CNFluids {
             )
             .source(BaseFlowingFluid.Source::new)
             .bucket()
-            .tag(CNTags.forgeItemTag("buckets/uranium"))
+            //.tag(CNTags.forgeItemTag("buckets/uranium"))
             .lang("Uranium Bucket")
             .build()
             .register();
