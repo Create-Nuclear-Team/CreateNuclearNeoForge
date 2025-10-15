@@ -2,9 +2,9 @@
   "type": "create:compacting",
   "ingredients": [
     {
-      "type": "fluid_tag",
+      "type": "fluid_stack",
       "amount": 100,
-      "fluid_tag": "createnuclear:uranium"
+      "fluid": "createnuclear:uranium"
     }
   ],
   "results": [
