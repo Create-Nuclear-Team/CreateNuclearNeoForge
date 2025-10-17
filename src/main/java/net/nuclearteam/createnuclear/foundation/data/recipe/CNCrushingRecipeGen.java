@@ -35,7 +35,10 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
             .output(1f, Blocks.RED_SAND)
         ),
 
-        FIX_RAW_URANIUM_FOR_FORGE = moddedOreCustom(URANIUM, CNItems.URANIUM_POWDER::get,9),
+        CRUSHED_URANIUM_POWDER = create(CreateNuclear.MOD_ID, () -> AllItems.CRUSHED_URANIUM::get, b -> b
+                .duration(255)
+                .output(1, CNItems.URANIUM_POWDER, 9)
+        ),
 
 
         RAW_URANIUM_BLOCK = create(() -> CNBlocks.RAW_URANIUM_BLOCK, b -> b
