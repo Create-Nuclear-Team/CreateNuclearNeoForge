@@ -73,10 +73,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int maxUraniumPerGraphite = 3;
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
+    public int tmpGraphiteTimer = graphiteTimer;
+    public int tmpUraniumTimer = uraniumTimer;
     public int countUraniumRod;
     public int countGraphiteRod;
     public int heat;
     public double total;
+    private boolean isTotal = false;
     public CompoundTag screen_pattern = new CompoundTag();
     public ItemStack configuredPattern;
 
@@ -192,7 +195,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             return;
 
         if (isEmptyConfiguredPattern()) {
+            ReactorBluePrintData data = getReactorBluePrintData();
+            countGraphiteRod = data.countGraphiteRod();
+            countUraniumRod = data.countUraniumRod();
 
+            if (!isTotal) {
+                total = calculateProgress();
+                isTotal = true;
+            }
             BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
 
             if (blockEntity instanceof ReactorInputEntity be) {
@@ -202,14 +212,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 IItemHandler capability = level.getCapability(Capabilities.ItemHandler.BLOCK, be.getBlockPos(), Direction.NORTH.getOpposite());
                 if (capability == null)
                     capability = EmptyItemHandler.INSTANCE;
-
+                if (tmpUraniumTimer >= 0) {
+                    tmpUraniumTimer -= 1 * countUraniumRod;
+                } else {
+                    ItemStack extractItem1 = capability.extractItem(0, 1, false);
+                    tmpUraniumTimer = uraniumTimer;
+                }
+                if (tmpGraphiteTimer >= 0) {
+                    tmpGraphiteTimer -= 1 * countGraphiteRod;
+                } else {
+                    ItemStack extractItem2 = capability.extractItem(1, 1, false);
+                    tmpGraphiteTimer = graphiteTimer;
+                }
 
                 if (!fuelItem.isEmpty() && !coolerItem.isEmpty()) {
                     heat = (int) calculateHeat(inventory.getItem(0));
                     if (updateTimers()) {
-                        ItemStack extractItem1 = capability.extractItem(0, 1, false);
-                        ItemStack extractItem2 = capability.extractItem(1, 1, false);
-                        total = calculateProgress();
 
                         if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4, true);
@@ -220,10 +238,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                             CatnipServices.NETWORK.sendToClientsAround((ServerLevel) level, getBlockPos(), 32, packet);
 
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0, false);
+                            isTotal = false;
                             return;
                         }
                     } else {
                         this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0, false);
+                        isTotal = false;
                         return;
                     }
                 }
@@ -237,9 +257,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private boolean updateTimers() {
-
         total -= 1;
-        return total <= 0;//(total/constTotal) <= 0;
+        return total >= 0;//(total/constTotal) >= 0;
     }
 
     private ReactorBluePrintData getDefaultReactorBluePrintData() {
@@ -265,6 +284,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         double progressUranium  = countUraniumRod > 0
                 ? (double) uraniumTimer   / countUraniumRod
                 : 0.0;
+
+        double tmp = progressGraphite + progressUranium;
 
         return progressGraphite + progressUranium;
     }
