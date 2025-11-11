@@ -1,5 +1,5 @@
-// 1.21.1	2025-10-15T14:58:11.087754	Create's Processing Recipes
-4b595a09c6734c6025d61b55ab04539231c58747 data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
+// 1.21.1	2025-11-11T14:50:58.3719578	Create's Processing Recipes
+d85b9bde5850d362e8e708e56c0d082f0fc3303f data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
 a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal.json
 49a7aa4b43af0c778821d656ec594f80c362fab5 data/createnuclear/recipe/crushing/crushed_raw_uranium.json
 371ca9bbe8682870942f1b41ec361b8a51be2f44 data/createnuclear/recipe/enriched/enriched_yellowcake.json
@@ -7,8 +7,8 @@ fdf6d4fce42373c414542289a73f0e206ff438f2 data/createnuclear/recipe/enriched/enri
 0c8d7d7eae585213bb7b3bb8ca4749dabafc27a3 data/createnuclear/recipe/item_application/reactor_casing_from_steel_and_brass_casing.json
 10d6c0cbf1bb303c25fb266c623577d541047251 data/createnuclear/recipe/item_application/reactor_input_from_hopper_and_reactor_casing.json
 be6e4c7d7a82de8b5398ec0e7b0b193568946f05 data/createnuclear/recipe/item_application/reactor_output_from_shaft_and_reactor_casing.json
-de940baf995ab2567225c0ae60469f3effe0d089 data/createnuclear/recipe/mixing/steel.json
-a732cb4c6296386de28a269aeccb54d137b312e4 data/createnuclear/recipe/mixing/uranium_fluid.json
+93bc6d7a40f2ccb89d8d5703c4b0f6c576d5caf8 data/createnuclear/recipe/mixing/steel.json
+e52ccded5e0955ab39320129fce8f78d50f52250 data/createnuclear/recipe/mixing/uranium_fluid.json
 0ed102f12dff1507a56bebac4c8c312577253a47 data/createnuclear/recipe/pressing/graphene.json
 c1e0e107502e875ee5befc176335cbd1cef7e04d data/create/recipe/crushing/granite.json
 724e99e5db2392644021999b8a694a9b20d8ea0e data/create/recipe/crushing/raw_copper.json

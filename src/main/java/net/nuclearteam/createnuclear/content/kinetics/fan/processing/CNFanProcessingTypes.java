@@ -86,10 +86,10 @@ public class CNFanProcessingTypes {
         @Nullable
         @Override
         public List<ItemStack> process(ItemStack stack, Level level) {
-            Optional<RecipeHolder<Recipe<SingleRecipeInput>>> recipe = CNRecipeTypes.ENRICHED.find(new SingleRecipeInput(stack), level);
-            if (recipe.isPresent())
-                return RecipeApplier.applyRecipeOn(level, stack, recipe.get());
-            return null;
+            return CNRecipeTypes.ENRICHED.find(new SingleRecipeInput(stack), level)
+                    .map(RecipeHolder::value)
+                    .map(r -> RecipeApplier.applyRecipeOn(level, stack, r, true))
+                    .orElse(null);
         }
 
         @Override
