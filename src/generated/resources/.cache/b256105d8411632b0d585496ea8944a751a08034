@@ -1,5 +1,5 @@
-// 1.21.1	2025-10-15T14:58:11.087754	Create's Processing Recipes
-4b595a09c6734c6025d61b55ab04539231c58747 data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
+// 1.21.1	2025-11-11T13:42:45.7875394	Create's Processing Recipes
+d85b9bde5850d362e8e708e56c0d082f0fc3303f data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
 a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal.json
 49a7aa4b43af0c778821d656ec594f80c362fab5 data/createnuclear/recipe/crushing/crushed_raw_uranium.json
 371ca9bbe8682870942f1b41ec361b8a51be2f44 data/createnuclear/recipe/enriched/enriched_yellowcake.json
