@@ -1,4 +1,4 @@
-// 1.21.1	2025-11-11T13:42:45.7824541	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2025-11-11T14:50:58.326102	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -515,17 +515,18 @@ a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/block/storage_blocks/lead.j
 0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/block/storage_blocks/raw_uranium.json
 f8074cdbc6e2b560acb4e9da953b23f9825486a6 data/c/tags/block/storage_blocks/steel.json
 a63487094743744be756ad497f483fcd4d11e9bc data/c/tags/fluid/uranium.json
-7422c4cd9d6dd716f91311faa1fb7e26aa9ac345 data/c/tags/item/armors.json
-fadb3957b979d82146790ef3550e38606760421e data/c/tags/item/boots.json
-0845acff015f78c494df2cd6754c5cff10d77c05 data/c/tags/item/chestplates.json
+fadb3957b979d82146790ef3550e38606760421e data/c/tags/item/armors/boots.json
+0845acff015f78c494df2cd6754c5cff10d77c05 data/c/tags/item/armors/chestplates.json
+b5d23f0bc26a4e3a72cde40f3c6d59c03c818b4d data/c/tags/item/armors/helmets.json
+bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/armors/leggings.json
 25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/coal_dusts.json
-25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/dusts.json
+4c65712ad229579aed33c75220c37f9a70134cb2 data/c/tags/item/dusts.json
+25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/dusts/coal.json
+69b53861489d10b3a836be9812af97c999833470 data/c/tags/item/dusts/uranium.json
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/item/glass.json
-b5d23f0bc26a4e3a72cde40f3c6d59c03c818b4d data/c/tags/item/helmets.json
 81d5270bd69ab7d6ffef70dc7867a498202eb4b4 data/c/tags/item/ingots.json
 30fa647448df4131c1d6460756f18583a493ee31 data/c/tags/item/ingots/lead.json
 24bc6e0cdae825d9e5d1500567ae81d83c15a88d data/c/tags/item/ingots/steel.json
-bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/leggings.json
 3245aa72f5bb5f83632ab05f449e8a2d576ac386 data/c/tags/item/nuggets.json
 41ff866ec94383906342a0d1594554e3063b9d0f data/c/tags/item/nuggets/lead.json
 1ec402fda0c91947be220066973f79f3e522663f data/c/tags/item/nuggets/steel.json
