@@ -31,6 +31,7 @@ import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.DyeItemList;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
+import net.nuclearteam.createnuclear.foundation.item.DyedItemsList;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class CNItems {
             .register()
     ;
 
-    public static final Helmet.DyeItemHelmetList<Helmet> ANTI_RADIATION_HELMETS = new Helmet.DyeItemHelmetList<>(color -> {
+    public static final DyedItemsList<Helmet> ANTI_RADIATION_HELMETS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_helmet", p -> new Helmet(p, color))
             .tag(
@@ -172,7 +173,7 @@ public class CNItems {
 
     });
 
-    public static final Chestplate.DyeItemChestplateList<Chestplate> ANTI_RADIATION_CHESTPLATES = new Chestplate.DyeItemChestplateList<>(color -> {
+    public static final DyedItemsList<Chestplate> ANTI_RADIATION_CHESTPLATES = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();
 
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_chestplate",  p -> new Chestplate(p, color))
@@ -201,7 +202,7 @@ public class CNItems {
 
     });
 
-    public static final Leggings.DyeItemLeggingsList<Leggings> ANTI_RADIATION_LEGGINGS = new Leggings.DyeItemLeggingsList<>(color -> {
+    public static final DyedItemsList<Leggings> ANTI_RADIATION_LEGGINGS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, color))
             .tag(

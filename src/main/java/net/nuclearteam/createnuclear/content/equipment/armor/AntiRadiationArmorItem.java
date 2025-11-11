@@ -1,22 +1,17 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
-import com.simibubi.create.api.data.recipe.BaseRecipeProvider.GeneratedRecipe;
 import com.simibubi.create.content.equipment.armor.BaseArmorItem;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class AntiRadiationArmorItem {
@@ -41,52 +36,6 @@ public class AntiRadiationArmorItem {
             this.color = color;
         }
 
-        public static class DyeItemHelmetList<T extends Helmet> implements Iterable<ItemEntry<T>> {
-            private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-            @SuppressWarnings("unchecked")
-            private final ItemEntry<T>[] entry = (ItemEntry<T>[]) new ItemEntry<?>[COLOR_AMOUNT];
-
-            public DyeItemHelmetList(Function<DyeColor, ItemEntry<? extends T>> filler) {
-                for (DyeColor color : DyeColor.values()) {
-                    entry[color.ordinal()] = (ItemEntry<T>) filler.apply(color);
-                }
-            }
-
-            public ItemEntry<T> get(DyeColor color) {
-                return entry[color.ordinal()];
-            }
-
-            public boolean contains(Item block) {
-                for (ItemEntry<T> entry : entry) {
-                    if (entry.is(block)) return true;
-                }
-                return false;
-            }
-
-            public ItemEntry<T>[] toArray() {
-                return Arrays.copyOf(entry, entry.length);
-            }
-
-            @Override
-            public Iterator<ItemEntry<T>> iterator() {
-                return new Iterator<>() {
-                    private int index = 0;
-
-                    @Override
-                    public boolean hasNext() {
-                        return index < entry.length;
-                    }
-
-                    @Override
-                    public ItemEntry<T> next() {
-                        if (!hasNext()) throw new NoSuchElementException();
-                        return entry[index++];
-                    }
-                };
-            }
-        }
-
         public static TagKey<Item> getHelmetTag(String key) {
             return key.equals("white")
                     ? CNItemTags.ANTI_RADIATION_ARMOR.tag
@@ -107,54 +56,6 @@ public class AntiRadiationArmorItem {
             );
             this.color = color;
 
-        }
-
-
-        public static class DyeItemChestplateList<T extends Chestplate> implements Iterable<ItemEntry<T>> {
-            private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
-
-            public DyeItemChestplateList(Function<DyeColor, ItemEntry<? extends T>> filler) {
-                for (DyeColor color : DyeColor.values()) {
-                    entry[color.ordinal()] = filler.apply(color);
-                }
-            }
-
-            @SuppressWarnings("unchecked")
-            public ItemEntry<T> get(DyeColor color) {
-                return (ItemEntry<T>) entry[color.ordinal()];
-            }
-
-            public boolean contains(Item block) {
-                for (ItemEntry<?> entry : entry) {
-                    if (entry.is(block)) return true;
-                }
-                return false;
-            }
-
-            @SuppressWarnings("unchecked")
-            public ItemEntry<T>[] toArray() {
-                return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
-            }
-
-            @Override
-            public Iterator<ItemEntry<T>> iterator() {
-                return new Iterator<>() {
-                    private int index = 0;
-                    @Override
-                    public boolean hasNext() {
-                        return index < entry.length;
-                    }
-
-                    @SuppressWarnings("unchecked")
-                    @Override
-                    public ItemEntry<T> next() {
-                        if (!hasNext()) throw new NoSuchElementException();
-                        return (ItemEntry<T>) entry[index++];
-                    }
-                };
-            }
         }
 
         public static TagKey<Item> getChestplateTag(String key) {
@@ -178,52 +79,6 @@ public class AntiRadiationArmorItem {
 
         }
 
-        public static class DyeItemLeggingsList<T extends Leggings> implements Iterable<ItemEntry<T>> {
-            private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
-
-            public DyeItemLeggingsList(Function<DyeColor, ItemEntry<? extends T>> filler) {
-                for (DyeColor color : DyeColor.values()) {
-                    entry[color.ordinal()] = filler.apply(color);
-                }
-            }
-
-            @SuppressWarnings("unchecked")
-            public ItemEntry<T> get(DyeColor color) {
-                return (ItemEntry<T>) entry[color.ordinal()];
-            }
-
-            public boolean contains(Item block) {
-                for (ItemEntry<?> entry : entry) {
-                    if (entry.is(block)) return true;
-                }
-                return false;
-            }
-
-            @SuppressWarnings("unchecked")
-            public ItemEntry<T>[] toArray() {
-                return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
-            }
-
-            @Override
-            public Iterator<ItemEntry<T>> iterator() {
-                return new Iterator<>() {
-                    private int index = 0;
-                    @Override
-                    public boolean hasNext() {
-                        return index < entry.length;
-                    }
-
-                    @SuppressWarnings("unchecked")
-                    @Override
-                    public ItemEntry<T> next() {
-                        if (!hasNext()) throw new NoSuchElementException();
-                        return (ItemEntry<T>) entry[index++];
-                    }
-                };
-            }
-        }
 
         public static TagKey<Item> getLeggingsTag(String key) {
             return key.equals("white")
@@ -243,48 +98,6 @@ public class AntiRadiationArmorItem {
         }
     }
 
-    public static class DyeRecipeArmorList implements Iterable<GeneratedRecipe> {
-        private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-        protected final GeneratedRecipe[] recipes = new GeneratedRecipe[getColorCount()];
-
-        public DyeRecipeArmorList(Function<@NotNull DyeColor, GeneratedRecipe> filler) {
-            for (DyeColor color : DyeColor.values()) {
-                recipes[color.ordinal()] = filler.apply(color);
-            }
-        }
-
-        protected int getColorCount() {
-            return COLOR_AMOUNT;
-        }
-
-        public GeneratedRecipe get(@Nullable DyeColor color) {
-            return recipes[color.ordinal()];
-        }
-
-        public GeneratedRecipe[] toArrays() {
-            return Arrays.copyOf(recipes, recipes.length);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<GeneratedRecipe> iterator() {
-            return new Iterator<>() {
-                private int index = 0;
-
-                @Override
-                public boolean hasNext() {
-                    return index < recipes.length;
-                }
-
-                @Override
-                public GeneratedRecipe next() {
-                    if (!hasNext()) throw new NoSuchElementException();
-                    return recipes[index++];
-                }
-            };
-        }
-    }
 
     public enum Armor {
         WHITE_ARMOR(DyeColor.WHITE),

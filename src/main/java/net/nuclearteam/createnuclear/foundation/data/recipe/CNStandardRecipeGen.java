@@ -8,11 +8,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.Create;
-import com.simibubi.create.foundation.data.recipe.CompatMetals;
-import com.simibubi.create.foundation.data.recipe.Mods;
+import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
 import com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.createmod.catnip.registry.RegisteredObjectsHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -21,7 +19,6 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -88,28 +85,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
                 .showNotification(true)
             ),
 
-        ENRICHED_SOUL_SOIL = create(CNBlocks.ENRICHED_SOUL_SOIL).unlockedBy(() -> Items.NETHER_STAR)
-            .viaShaped(b -> b
-                .define('S', Blocks.SOUL_SOIL)
-                .define('O', Blocks.OBSIDIAN)
-                .define('N', Items.NETHER_STAR)
-                .pattern("SOS")
-                .pattern("ONO")
-                .pattern("SOS")
-                .showNotification(true)
-            ),
-
-        ENRICHING_CAMPFIRE = create(CNBlocks.ENRICHING_CAMPFIRE).unlockedBy(CNBlocks.ENRICHED_SOUL_SOIL::get)
-            .viaShaped(b -> b
-                .define('E', CNBlocks.ENRICHED_SOUL_SOIL)
-                .define('L', ItemTags.LOGS)
-                .define('S', Tags.Items.RODS_WOODEN)
-                .pattern(" S ")
-                .pattern("SES")
-                .pattern("LLL")
-                .showNotification(true)
-            ),
-
         LEAD_COMPACTING = metalCompacting(ImmutableList.of(CNItems.LEAD_NUGGET, CNItems.LEAD_INGOT, CNBlocks.LEAD_BLOCK),
             ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/lead"), () -> CNTags.forgeItemTag("ingots/lead"), () -> CNTags.forgeItemTag("storage_blocks/lead"))),
 
@@ -123,57 +98,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1)
     ;
-
-
-    private final Marker SHAPELESS = enterFolder("shapeless");
-    GeneratedRecipe
-            RAW_URANIUM = create(CNItems.RAW_URANIUM).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_uranium"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))),
-
-    RAW_LEAD_SHAPELESS = create(CNItems.RAW_LEAD).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_lead"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_lead"))),
-
-    LEAD_INGOT = create(CNItems.LEAD_INGOT).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/lead"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/lead"))),
-
-    LEAD_NUGGET = create(CNItems.LEAD_NUGGET).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/lead"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/lead"))),
-
-    STEEL_INGOT = create(CNItems.STEEL_INGOT).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/steel"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/steel"))),
-
-    STEEL_NUGGET = create(CNItems.STEEL_NUGGET).returns(9)
-            .withSuffix("_from_decompacting")
-            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/steel"))
-            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/steel"))),
-
-    REACTOR_BLUEPRINT_ITEM_CLEAR = clearData(CNItems.REACTOR_BLUEPRINT)
-            ;
-
-    private final Marker SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
-
-    ClothItem.DyeRecipeList CLOTH_CHANGING = new ClothItem.DyeRecipeList(color -> {
-        List<Item> ingredients = new ArrayList<>(Arrays.asList(Items.WHITE_DYE, Items.ORANGE_DYE, Items.MAGENTA_DYE, Items.LIGHT_BLUE_DYE, Items.YELLOW_DYE, Items.LIME_DYE, Items.PINK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE, Items.CYAN_DYE, Items.PURPLE_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.GREEN_DYE, Items.RED_DYE, Items.BLACK_DYE));
-
-        return create(CNItems.CLOTHS.get(color))
-                .unlockedBy(ClothItem.Cloths.WHITE_CLOTH::getItem)
-                .viaShapeless(b -> b
-                        .requires(CNTags.CNItemTags.CLOTH.tag)
-                        .requires(ingredients.get(color.ordinal()))
-                );
-    });
-
-
 
     static class Marker {
     }
@@ -211,20 +135,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
                 .viaCooking(ingredient)
                 .rewardXP(.1f)
                 .inBlastFurnace();
-    }
-
-    GeneratedRecipe blastModdedCrushedMetal(ItemEntry<? extends Item> ingredient, CompatMetals metal) {
-        for (Mods mod : metal.getMods()) {
-            String metalName = metal.getName(mod);
-            ResourceLocation ingot = mod.ingotOf(metalName);
-            String modId = mod.getId();
-            create(ingot).withSuffix("_compat_" + modId)
-                    .whenModLoaded(modId)
-                    .viaCooking(ingredient::get)
-                    .rewardXP(.1f)
-                    .inBlastFurnace();
-        }
-        return null;
     }
 
     GeneratedRecipe recycleGlass(BlockEntry<? extends Block> ingredient) {
@@ -302,7 +212,7 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
+    protected void buildRecipes(RecipeOutput output, HolderLookup.Provider holderLookup) {
         all.forEach(c -> c.register(output));
         Create.LOGGER.info("{} registered {} recipe{}", getName(), all.size(), all.size() == 1 ? "" : "s");
     }
