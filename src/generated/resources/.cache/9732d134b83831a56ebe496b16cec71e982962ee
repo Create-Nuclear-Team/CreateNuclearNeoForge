@@ -1,4 +1,4 @@
-// 1.21.1	2025-11-11T14:50:58.326102	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2025-11-12T19:19:13.4700373	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -428,7 +428,7 @@ fd535efce0c108d879e5a1f13aface5586fc3127 data/createnuclear/recipe/crafting/lead
 c9dce33293c71961aea5c4ca04ca837449b87ac7 data/createnuclear/recipe/crafting/raw_lead_from_decompacting.json
 a8368b7ba6ad28c6073653978c11a17b8e61c009 data/createnuclear/recipe/crafting/raw_uranium_block.json
 9a0f17a6a4970542ecf42b775fdcea11f0617c74 data/createnuclear/recipe/crafting/raw_uranium_from_decompacting.json
-47dcf964b5cebea1ee8d9aa60b243a70aa16b1c0 data/createnuclear/recipe/crafting/reactor/reinforced_glass.json
+ed745f567cc3683a58121f3d617ed9d0971a7681 data/createnuclear/recipe/crafting/reactor/reinforced_glass.json
 57ce2170813201b6a6c6de35ca8e901c8563894d data/createnuclear/recipe/crafting/reactor_blueprint_item.json
 000385de7b8a84be8a42ecbc2e486e47978593e6 data/createnuclear/recipe/crafting/steel_ingot_from_decompacting.json
 6f664e863b1a0333d16c20d3aacddd54e6f785fb data/createnuclear/recipe/crafting/steel_nugget_from_decompacting.json
@@ -504,7 +504,7 @@ c5587bb72c54f59e9f9a4cd2c3e6bedb78ee198d data/createnuclear/tags/item/fuel.json
 53e435b1776a11737c64eac604fda6cd48acfc4e data/createnuclear/tags/item/stone_types/autunite.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/item/uranium_ores.json
 d8d6ad7a4fc31fd68a98b368207c359fb610f417 data/create/tags/block/safe_nbt.json
-75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/block/glass.json
+75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/block/glass_blocks.json
 38aa0fddd24ec7dde10f1e2804328660a2019ac8 data/c/tags/block/ores.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/c/tags/block/ores/lead.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/c/tags/block/ores/uranium.json
@@ -523,7 +523,7 @@ bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/armors/leggings.json
 4c65712ad229579aed33c75220c37f9a70134cb2 data/c/tags/item/dusts.json
 25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/dusts/coal.json
 69b53861489d10b3a836be9812af97c999833470 data/c/tags/item/dusts/uranium.json
-75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/item/glass.json
+75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/item/glass_blocks.json
 81d5270bd69ab7d6ffef70dc7867a498202eb4b4 data/c/tags/item/ingots.json
 30fa647448df4131c1d6460756f18583a493ee31 data/c/tags/item/ingots/lead.json
 24bc6e0cdae825d9e5d1500567ae81d83c15a88d data/c/tags/item/ingots/steel.json
