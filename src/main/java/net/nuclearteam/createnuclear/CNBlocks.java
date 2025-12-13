@@ -185,10 +185,10 @@ public class CNBlocks {
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_GLASS)))
         .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_GLASS)))
         .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
-        .tag(CNTags.forgeBlockTag("glass"), BlockTags.IMPERMEABLE)
+        .tag(CNTags.forgeBlockTag("glass_blocks"), BlockTags.IMPERMEABLE)
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
                 .unlockedBy("has_reactor_casing", RegistrateRecipeProvider.has(CNBlocks.REACTOR_CASING.get()))
-                .define('G', CNTags.forgeItemTag("glass"))
+                .define('G', CNTags.forgeItemTag("glass_blocks"))
                 .define('S', CNTags.forgeItemTag("ingots/lead"))
                 .pattern("SGS")
                 .pattern("GSG")
@@ -205,7 +205,7 @@ public class CNBlocks {
         )
         .addLayer(() -> RenderType::translucent)
         .item()
-        .tag(CNTags.forgeItemTag("glass"))
+        .tag(CNTags.forgeItemTag("glass_blocks"))
         .build()
         .register();
 
