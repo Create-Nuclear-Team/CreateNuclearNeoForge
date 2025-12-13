@@ -1,4 +1,4 @@
-// 1.21.1	2025-11-12T19:19:13.4700373	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2025-12-13T13:14:00.8908781	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -519,7 +519,6 @@ fadb3957b979d82146790ef3550e38606760421e data/c/tags/item/armors/boots.json
 0845acff015f78c494df2cd6754c5cff10d77c05 data/c/tags/item/armors/chestplates.json
 b5d23f0bc26a4e3a72cde40f3c6d59c03c818b4d data/c/tags/item/armors/helmets.json
 bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/armors/leggings.json
-25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/coal_dusts.json
 4c65712ad229579aed33c75220c37f9a70134cb2 data/c/tags/item/dusts.json
 25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/dusts/coal.json
 69b53861489d10b3a836be9812af97c999833470 data/c/tags/item/dusts/uranium.json
