@@ -94,7 +94,7 @@ public class CNItems {
 
         COAL_DUST = CreateNuclear.REGISTRATE
             .item("coal_dust", Item::new)
-            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("coal_dusts"), CNTags.forgeItemTag("dusts/coal"))
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/coal"))
             .register(),
 
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
