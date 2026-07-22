@@ -31,6 +31,8 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
@@ -99,7 +101,6 @@ public class CNBlocks {
         CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(3F).destroyTime(2F))
-            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate((c, p) ->
@@ -145,7 +146,6 @@ public class CNBlocks {
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
-            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorInputGenerator()::generate)
@@ -200,10 +200,10 @@ public class CNBlocks {
                 .withExistingParent("reinforced_glass",ResourceLocation.withDefaultNamespace("block/cube_all"))
                 .texture("all", p.modLoc("block/reactor/reinforced/glass"))
                 .texture("particle", p.modLoc("block/reactor/reinforced/glass"))
+                .renderType("translucent")
             )
             .build())
         )
-        .addLayer(() -> RenderType::translucent)
         .item()
         .tag(CNTags.forgeItemTag("glass_blocks"))
         .build()
@@ -220,7 +220,6 @@ public class CNBlocks {
             .properties(EnrichingFireBlock.getLight())
             .tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_ENRICHED.tag)
             .loot((lt, b) -> lt.add(b, BlockLootSubProvider.noDrop()))
-            .addLayer(() -> RenderType::cutout)
             .blockstate((c, p) -> {
                 String baseFolder = "block/enriching/fire/";
                 ModelFile Floor0 = p.models().getExistingFile(p.modLoc(baseFolder + "floor0"));
@@ -281,7 +280,6 @@ public class CNBlocks {
                 .lightLevel(EnrichingCampfireBlock::getLight))
             .properties(Properties::noOcclusion)
             .properties(Properties::ignitedByLava)
-            .addLayer(() -> RenderType::cutoutMipped)
             .transform(axeOrPickaxe())
             .tag(BlockTags.CAMPFIRES)
             .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get())
@@ -484,6 +482,124 @@ public class CNBlocks {
                 CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
+
+    public static final BlockEntry<Block> THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("thorium_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            lt.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
+                                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
+                                            .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/thorium")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> DEEPSLATE_THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("deepslate_thorium_ore", Block::new)
+                    .initialProperties(() -> Blocks.DIAMOND_ORE)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            lt.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
+                                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
+                                            .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 5))
+                                    ))))
+                    .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
+                            CNTags.forgeBlockTag("ores/thorium")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> NITRATE_ORE =
+            CreateNuclear.REGISTRATE.block("nitrate_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            lt.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                                            .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))
+                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/nitrate")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/nitrate"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> DEEPSLATE_NITRATE_ORE =
+            CreateNuclear.REGISTRATE.block("deepslate_nitrate_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            lt.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                                            .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))
+                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
+                            CNTags.forgeBlockTag("ores/nitrate")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/nitrate"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> RAW_THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .tag(CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
+                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
+                            .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/thorium")))
+                            .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
+                            .pattern("RRR")
+                            .pattern("RRR")
+                            .pattern("RRR")
+                            .save(p, CreateNuclear.asResource("crafting/raw/" + c.getName())))
+                    .item()
+                    .tag(CNTags.forgeItemTag("storage_blocks/raw_thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            lt.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                                            .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))))))
+                    .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                            BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/thorium"),
+                            CNBlockTags.THORIUM_ORES.tag)
+                    .item()
+                    .tag(CNItemTags.THORIUM_ORES.tag,
+                            CNTags.forgeItemTag("ores/thorium"),
+                            CNTags.forgeItemTag("storage_blocks/thorium"))
+                    .build()
+                    .register();
 
     public static final BlockEntry<Block> STEEL_BLOCK =
         CreateNuclear.REGISTRATE.block("steel_block", Block::new)

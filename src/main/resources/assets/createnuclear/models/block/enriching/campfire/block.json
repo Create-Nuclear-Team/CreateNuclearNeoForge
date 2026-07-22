@@ -1,4 +1,5 @@
 {
+  "render_type": "cutout_mipped",
   "parent": "minecraft:block/template_campfire",
   "textures": {
     "fire": "createnuclear:block/enriching/campfire/enriching_flame",
