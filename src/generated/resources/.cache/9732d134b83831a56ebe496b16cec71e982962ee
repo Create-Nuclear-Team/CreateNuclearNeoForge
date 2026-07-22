@@ -531,11 +531,11 @@ bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/armors/leggings.json
 1ec402fda0c91947be220066973f79f3e522663f data/c/tags/item/nuggets/steel.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/c/tags/item/ores/lead.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/c/tags/item/ores/uranium.json
-cdebf2b4eabcf71ee4566b7fbf22f18990a4e06b data/c/tags/item/raw_materials.json
+1aa9c7015bf0c1b0cad3c78a9a1b25b478263136 data/c/tags/item/raw_materials.json
 610ed700de0886bcb4b1c90100c35f3034c53940 data/c/tags/item/raw_materials/lead.json
 03a88f0d9f44d3c338b82bf92b22a14dec490bef data/c/tags/item/raw_materials/uranium.json
-cdebf2b4eabcf71ee4566b7fbf22f18990a4e06b data/c/tags/item/raw_ores.json
-c1ad472460350e6abd024de7785cd870dad05cd9 data/c/tags/item/rods.json
+1aa9c7015bf0c1b0cad3c78a9a1b25b478263136 data/c/tags/item/raw_ores.json
+0de43042eff813280569bb08573a9417d1cb6b58 data/c/tags/item/rods.json
 a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/item/storage_blocks/lead.json
 2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/c/tags/item/storage_blocks/raw_lead.json
 0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/item/storage_blocks/raw_uranium.json

@@ -1,0 +1,28 @@
+{
+  "parent": "createnuclear:t2",
+  "criteria": {
+    "0": {
+      "trigger": "createnuclear:t3_builtin"
+    }
+  },
+  "display": {
+    "description": {
+      "color": "#DBA213",
+      "translate": "advancement.createnuclear.t3.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "createnuclear:reactor_controller"
+    },
+    "title": {
+      "translate": "advancement.createnuclear.t3"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

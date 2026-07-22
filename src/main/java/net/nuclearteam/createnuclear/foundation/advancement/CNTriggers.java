@@ -1,28 +1,23 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
-import com.simibubi.create.foundation.advancement.CriterionTriggerBase;
-import com.simibubi.create.foundation.advancement.SimpleCreateTrigger;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.nuclearteam.createnuclear.CreateNuclear;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Supplier;
 
 public class CNTriggers {
-    private static final List<CriterionTriggerBase<?>> triggers = new LinkedList<>();
+    public static final DeferredRegister<CriterionTrigger<?>> TRIGGERS = DeferredRegister.create(Registries.TRIGGER_TYPE, CreateNuclear.MOD_ID);
 
-    public static SimpleCreateTrigger addSimple(String id) {
-        return add(new SimpleCreateTrigger(id));
+    public static SimpleCreateNuclearTrigger addSimple(String id) {
+        SimpleCreateNuclearTrigger trigger = new SimpleCreateNuclearTrigger();
+        TRIGGERS.register(id, () -> trigger);
+        return trigger;
     }
 
-    private static <T extends CriterionTriggerBase<?>> T add(T instance) {
-        triggers.add(instance);
-        return instance;
-    }
-
-    public static void register() {
-        triggers.forEach(trigger -> {
-            Registry.register(BuiltInRegistries.TRIGGER_TYPES, trigger.getId(), trigger);
-        });
+    public static void register(IEventBus modEventBus) {
+        TRIGGERS.register(modEventBus);
     }
 }

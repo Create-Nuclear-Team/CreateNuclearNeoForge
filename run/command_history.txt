@@ -38,3 +38,4 @@
 /gamemode survival
 /gamemode creative
 /time set day
+/advancement grant Dev everything

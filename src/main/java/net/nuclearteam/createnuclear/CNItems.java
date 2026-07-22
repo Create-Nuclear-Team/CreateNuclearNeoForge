@@ -81,8 +81,7 @@ public class CNItems {
             .item("uranium_rod", p -> new RadiationItem(p, 100))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register();
-
-
+    
     public static final ItemEntry<Item>
         RAW_LEAD = CreateNuclear.REGISTRATE
             .item("raw_lead", Item::new)
@@ -93,12 +92,6 @@ public class CNItems {
                         .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
                 )
             .register(),
-
-
-
-
-
-
 
         STEEL_INGOT = CreateNuclear.REGISTRATE
             .item("steel_ingot", Item::new)
@@ -139,8 +132,6 @@ public class CNItems {
                         .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
                 )
             .register(),
-
-
 
         LEAD_NUGGET = CreateNuclear.REGISTRATE
             .item("lead_nugget", Item::new)
