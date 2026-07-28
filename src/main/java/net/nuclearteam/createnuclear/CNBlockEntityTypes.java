@@ -33,9 +33,9 @@ public class CNBlockEntityTypes {
                     .validBlocks(CNBlocks.REACTOR_INPUT)
                     .register();
 
-    public static final BlockEntityEntry<ReactorFluidInputEntity> REACTOR_LIQUID_INPUT =
-            CreateNuclear.REGISTRATE.blockEntity("reactor_liquid_input", ReactorFluidInputEntity::new)
-                    .validBlocks(CNBlocks.REACTOR_LIQUID_INPUT)
+    public static final BlockEntityEntry<ReactorFluidInputEntity> REACTOR_FLUID_INPUT =
+            CreateNuclear.REGISTRATE.blockEntity("reactor_fluid_input", ReactorFluidInputEntity::new)
+                    .validBlocks(CNBlocks.REACTOR_FLUID_INPUT)
                     .register();
 
     public static final BlockEntityEntry<ReactorOutputEntity> REACTOR_OUTPUT =

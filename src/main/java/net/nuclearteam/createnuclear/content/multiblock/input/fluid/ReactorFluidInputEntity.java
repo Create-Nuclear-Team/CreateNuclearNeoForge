@@ -6,7 +6,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.fluid.SmartFluidTank;
 import net.createmod.catnip.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -22,7 +21,6 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
                 Capabilities.FluidHandler.BLOCK,
-                CNBlockEntityTypes.REACTOR_LIQUID_INPUT.get(),
+                CNBlockEntityTypes.REACTOR_FLUID_INPUT.get(),
                 (be, context) -> be.capabilityHandler
         );
     }

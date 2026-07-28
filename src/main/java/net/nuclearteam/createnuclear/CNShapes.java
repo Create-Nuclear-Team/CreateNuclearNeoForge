@@ -17,7 +17,7 @@ public class CNShapes {
     public static final VoxelShaper
             REACTOR_OUTPUT = shape(0, 0, 0, 16, 14, 16).forDirectional(),
             REACTOR_INPUT = shape(0,0,0,16,16,16).forDirectional(),
-            REACTOR_LIQUID_INPUT = shape(0,0,0,16,16,16).forDirectional()
+            REACTOR_FLUID_INPUT = shape(0,0,0,16,16,16).forDirectional()
     ;
 
     private static Builder shape(VoxelShape shape) {

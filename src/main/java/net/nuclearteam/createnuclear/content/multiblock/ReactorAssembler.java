@@ -74,7 +74,7 @@ public final class ReactorAssembler {
 
         final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
         final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
-        final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+        final Block reactorInputFluidBlock = CNBlocks.REACTOR_FLUID_INPUT.get();
         //final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
         final Block reactorFrameBlock = CNBlocks.REACTOR_FRAME.get();
 

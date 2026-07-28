@@ -9,7 +9,6 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -46,8 +45,8 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
@@ -155,16 +154,16 @@ public class CNBlocks {
             .transform(customItemModel("reactor", "input", "item"))
             .register();
 
-    public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
-            CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::new)
+    public static final BlockEntry<ReactorFluidInput> REACTOR_FLUID_INPUT =
+            CreateNuclear.REGISTRATE.block("reactor_fluid_input", ReactorFluidInput::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.explosionResistance(6F))
                     .properties(p -> p.destroyTime(2F))
                     .transform(pickaxeOnly())
                     .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-                    .blockstate(new ReactorLiquidInputGenerator()::generate)
+                    .blockstate(new ReactorFluidInputGenerator()::generate)
                     .item()
-                    .transform(customItemModel("reactor", "liquid_input", "item"))
+                    .transform(customItemModel("reactor", "fluid_input", "item"))
                     .register();
 
     public static final BlockEntry<ReactorOutput> REACTOR_OUTPUT =
