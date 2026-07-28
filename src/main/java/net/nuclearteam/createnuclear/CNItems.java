@@ -26,6 +26,8 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
@@ -145,7 +147,74 @@ public class CNItems {
 
         GRAPHENE = CreateNuclear.REGISTRATE
             .item("graphene", Item::new)
-            .register();
+            .register(),
+
+        ENRICHED_YELLOWCAKE = CreateNuclear.REGISTRATE
+            .item("enriched_yellowcake", Item::new)
+            .register(),
+
+        RAW_THORIUM = CreateNuclear.REGISTRATE
+            .item("raw_thorium", Item::new)
+            .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/thorium"))
+            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                    .unlockedBy("has_storage_blocks_raw_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_thorium")))
+                    .requires(CNTags.forgeItemTag("storage_blocks/raw_thorium"))
+                    .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+            )
+            .register(),
+
+        THORIUM_DUST = CreateNuclear.REGISTRATE
+            .item("thorium_dust", Item::new)
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/thorium"))
+            .register(),
+
+        THORIUM_NUGGET = CreateNuclear.REGISTRATE
+                .item("thorium_nugget", Item::new)
+                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_nugget")))
+                .tag(CNTags.forgeItemTag("nuggets"), CNTags.forgeItemTag("nuggets/thorium"))
+                .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNTags.forgeItemTag("ingots/thorium")))
+                .requires(CNTags.forgeItemTag("ingots/thorium"))
+                .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+                )
+                .register(),
+
+        THORIUM_INGOT = CreateNuclear.REGISTRATE
+            .item("thorium_ingot", Item::new)
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_ingot")))
+            .tag(CNTags.forgeItemTag("ingots"), CNTags.forgeItemTag("ingots/thorium"))
+            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                    .unlockedBy("has_storage_blocks_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/thorium")))
+                    .requires(CNTags.forgeItemTag("storage_blocks/thorium"))
+                    .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+            )
+            .register(),
+
+        THORIUM_ROD = CreateNuclear.REGISTRATE
+            .item("thorium_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                    .rodTimer(3600)
+                    .baseRodHeat(16)
+                    .proximityRodHeat(8)
+                    .fuelRodType()))
+            .tag(CNTags.forgeItemTag("rods"))
+            .register(),
+
+        NITRATE = CreateNuclear.REGISTRATE
+                .item("nitrate", Item::new)
+                .lang("Nitrate")
+                .register(),
+
+        NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
+                .item("nitrogen_concentrate", Item::new)
+                .lang("Nitrogen Concentrate")
+                .register(),
+
+        COOLED_NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
+                .item("cooled_nitrogen_concentrate", Item::new)
+                .lang("Cooled Nitrogen Concentrate")
+                .register()
+    ;
 
     public static final DyedItemsList<Helmet> ANTI_RADIATION_HELMETS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();

@@ -38,4 +38,4 @@
 /gamemode survival
 /gamemode creative
 /time set day
-/advancement grant Dev everything
+/effect give @a minecraft:night_vision infinite
