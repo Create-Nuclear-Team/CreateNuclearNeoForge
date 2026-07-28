@@ -33,6 +33,7 @@ import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.DyeItemList;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
+import net.nuclearteam.createnuclear.content.radiation.RadiationItem;
 import net.nuclearteam.createnuclear.foundation.item.DyedItemsList;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 
@@ -47,9 +48,9 @@ public class CNItems {
         CreateNuclear.REGISTRATE.setCreativeTab(CNCreativeModeTabs.MAIN);
     }
 
-    public static final ItemEntry<Item>
+    public static final ItemEntry<RadiationItem>
         YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("yellowcake", Item::new)
+            .item("yellowcake", p -> new RadiationItem(p, 4))
             .properties(p -> p.food(new FoodProperties.Builder()
                 .nutrition(20)
                 .saturationModifier(0.3F)
@@ -59,6 +60,31 @@ public class CNItems {
             )
             .register(),
 
+        ENRICHED_YELLOWCAKE = CreateNuclear.REGISTRATE
+            .item("enriched_yellowcake", p -> new RadiationItem(p, 2))
+            .register(),
+
+        RAW_URANIUM = CreateNuclear.REGISTRATE
+            .item("raw_uranium", p -> new RadiationItem(p, 3))
+            .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
+            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                    .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_uranium")))
+                    .requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
+                    .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+            )
+            .register(),
+
+        URANIUM_POWDER = CreateNuclear.REGISTRATE
+            .item("uranium_powder", p -> new RadiationItem(p, 2))
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/uranium"))
+            .register(),
+
+        URANIUM_ROD = CreateNuclear.REGISTRATE
+            .item("uranium_rod", p -> new RadiationItem(p, 100))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
+            .register();
+    
+    public static final ItemEntry<Item>
         RAW_LEAD = CreateNuclear.REGISTRATE
             .item("raw_lead", Item::new)
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/lead"))
@@ -67,21 +93,6 @@ public class CNItems {
                         .requires(CNTags.forgeItemTag("storage_blocks/raw_lead"))
                         .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
                 )
-            .register(),
-
-        RAW_URANIUM = CreateNuclear.REGISTRATE
-            .item("raw_uranium", Item::new)
-            .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
-                .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                        .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_uranium")))
-                        .requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
-                        .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
-                )
-            .register(),
-
-        URANIUM_POWDER = CreateNuclear.REGISTRATE
-            .item("uranium_powder", Item::new)
-            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/uranium"))
             .register(),
 
         STEEL_INGOT = CreateNuclear.REGISTRATE
@@ -122,11 +133,6 @@ public class CNItems {
                         .requires(CNTags.forgeItemTag("ingots/steel"))
                         .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
                 )
-            .register(),
-
-        URANIUM_ROD = CreateNuclear.REGISTRATE
-            .item("uranium_rod", Item::new)
-            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
 
         LEAD_NUGGET = CreateNuclear.REGISTRATE

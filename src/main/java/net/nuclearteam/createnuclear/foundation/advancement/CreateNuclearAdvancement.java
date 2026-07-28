@@ -1,14 +1,11 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
-import com.simibubi.create.Create;
-import com.simibubi.create.foundation.advancement.AllAdvancements;
-import com.simibubi.create.foundation.advancement.AllTriggers;
-import com.simibubi.create.foundation.advancement.CreateAdvancement;
-import com.simibubi.create.foundation.advancement.SimpleCreateTrigger;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
-import net.minecraft.advancements.*;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementType;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.*;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,41 +17,46 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 @SuppressWarnings("unused")
 public class CreateNuclearAdvancement {
 
-    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/block/steel_block.png");
+    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/gui/advancements/backgrounds/background_advancement.png");
     static final String LANG = "advancement." + CreateNuclear.MOD_ID + ".";
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
-    private final Advancement.Builder mcBuilder = Advancement.Builder.advancement();
-    private SimpleCreateTrigger builtinTrigger;
+    private final Advancement.Builder builder;
+    private SimpleCreateNuclearTrigger builtinTrigger;
     private CreateNuclearAdvancement parent;
-    private final Builder createBuilder = new Builder();
 
     AdvancementHolder datagenResult;
 
-    private final String id;
+    final String id;
     private String title;
     private String description;
 
 
     public CreateNuclearAdvancement(String id, UnaryOperator<Builder> b) {
+        this.builder = Advancement.Builder.advancement();
         this.id = id;
 
-        b.apply(createBuilder);
+        Builder t = new Builder();
+        b.apply(t);
 
-        if (!createBuilder.externalTrigger) {
+        if (!t.externalTrigger) {
             builtinTrigger = CNTriggers.addSimple(id + "_builtin");
-            mcBuilder.addCriterion("0", builtinTrigger.createCriterion(builtinTrigger.instance()));
+            builder.addCriterion("0", builtinTrigger.instance());
         }
 
-        if (createBuilder.type == CreateNuclearAdvancement.TaskType.SECRET)
+        builder.display(t.icon, Component.translatable(titleKey()),
+                Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
+                id.equals("root") ? BACKGROUND : null, t.type.frame, t.type.toast, t.type.announce, t.type.hide);
+
+        if (t.type == TaskType.SECRET)
             description += SECRET_SUFFIX;
 
         CNAdvancement.ENTRIES.add(this);
@@ -90,19 +92,10 @@ public class CreateNuclearAdvancement {
         builtinTrigger.trigger(sp);
     }
 
-    void save(Consumer<AdvancementHolder> t, HolderLookup.Provider registries) {
+    void save(Consumer<AdvancementHolder> t) {
         if (parent != null)
-            mcBuilder.parent(parent.datagenResult);
-
-        if (createBuilder.func != null)
-            createBuilder.icon(createBuilder.func.apply(registries));
-
-        mcBuilder.display(createBuilder.icon, Component.translatable(titleKey()),
-                Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
-                id.equals("root") ? BACKGROUND : null, createBuilder.type.advancementType, createBuilder.type.toast,
-                createBuilder.type.announce, createBuilder.type.hide);
-
-        datagenResult = mcBuilder.save(t, CreateNuclear.asResource(id).toString());
+            builder.parent(CreateNuclear.asResource(parent.id));
+        datagenResult = builder.save(t, CreateNuclear.asResource(id).toString());
     }
 
     void provideLang(BiConsumer<String, String> consumer) {
@@ -120,13 +113,13 @@ public class CreateNuclearAdvancement {
 
         ;
 
-        private final AdvancementType advancementType;
+        private final AdvancementType frame;
         private final boolean toast;
         private final boolean announce;
         private final boolean hide;
 
-        TaskType(AdvancementType advancementType, boolean toast, boolean announce, boolean hide) {
-            this.advancementType = advancementType;
+        TaskType(AdvancementType frame, boolean toast, boolean announce, boolean hide) {
+            this.frame = frame;
             this.toast = toast;
             this.announce = announce;
             this.hide = hide;
@@ -139,7 +132,6 @@ public class CreateNuclearAdvancement {
         private boolean externalTrigger;
         private int keyIndex;
         private ItemStack icon;
-        private Function<HolderLookup.Provider, ItemStack> func;
 
         Builder special(TaskType type) {
             this.type = type;
@@ -161,11 +153,6 @@ public class CreateNuclearAdvancement {
 
         Builder icon(ItemStack stack) {
             icon = stack;
-            return this;
-        }
-
-        Builder icon(Function<HolderLookup.Provider, ItemStack> func) {
-            this.func = func;
             return this;
         }
 
@@ -197,8 +184,7 @@ public class CreateNuclearAdvancement {
         }
 
         Builder whenItemCollected(TagKey<Item> tag) {
-            return externalTrigger(InventoryChangeTrigger.TriggerInstance
-                    .hasItems(ItemPredicate.Builder.item().of(tag).build()));
+            return externalTrigger(InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(tag).build()));
         }
 
         Builder awardedForFree() {
@@ -206,12 +192,11 @@ public class CreateNuclearAdvancement {
         }
 
         Builder externalTrigger(Criterion<?> trigger) {
-            mcBuilder.addCriterion(String.valueOf(keyIndex), trigger);
+            builder.addCriterion(String.valueOf(keyIndex), trigger);
             externalTrigger = true;
             keyIndex++;
             return this;
         }
 
     }
-
 }

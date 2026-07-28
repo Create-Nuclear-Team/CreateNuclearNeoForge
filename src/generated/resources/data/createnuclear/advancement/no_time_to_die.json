@@ -1,0 +1,28 @@
+{
+  "parent": "createnuclear:reactor_controller",
+  "criteria": {
+    "0": {
+      "trigger": "createnuclear:no_time_to_die_builtin"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "color": "#DBA213",
+      "translate": "advancement.createnuclear.no_time_to_die.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "createnuclear:autunite"
+    },
+    "title": {
+      "translate": "advancement.createnuclear.no_time_to_die"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
