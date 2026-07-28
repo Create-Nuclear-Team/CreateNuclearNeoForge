@@ -1,0 +1,29 @@
+{
+  "parent": "createnuclear:absolute_zero",
+  "criteria": {
+    "0": {
+      "trigger": "createnuclear:cryogenic_baptism_builtin"
+    }
+  },
+  "display": {
+    "description": {
+      "color": "#DBA213",
+      "translate": "advancement.createnuclear.cryogenic_baptism.desc"
+    },
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "createnuclear:nitrogen_bucket"
+    },
+    "title": {
+      "translate": "advancement.createnuclear.cryogenic_baptism"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

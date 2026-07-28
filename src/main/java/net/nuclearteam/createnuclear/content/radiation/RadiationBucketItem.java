@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 public class RadiationBucketItem extends BucketItem implements IRadiationSource {
     private final double radiation;
 
-    public RadiationBucketItem(Supplier<? extends Fluid> supplier, Properties builder, double radiation) {
-        super(supplier, builder);
+    public RadiationBucketItem(Fluid fluid, Properties builder, double radiation) {
+        super(fluid, builder);
         this.radiation = radiation;
     }
 

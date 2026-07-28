@@ -88,9 +88,7 @@ public class InventoryHashUtil {
         long h = Item.getId(stack.getItem());
         h = 31 * h + stack.getCount();
 
-        if (stack.hasTag()) {
-            h = 31 * h + stack.getTag().hashCode();
-        }
+        h = 31 * h + stack.getComponents().hashCode();
 
         return h;
     }

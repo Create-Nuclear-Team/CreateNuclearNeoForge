@@ -22,6 +22,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.SoundActions;
@@ -39,6 +40,8 @@ import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
 
 import java.util.List;
 import java.util.function.Supplier;
+
+import net.nuclearteam.createnuclear.content.radiation.RadiationBucketItem;
 
 public class CNFluids {
     private static final double URANIUM_FLUID_DOSE = 5.0D;
@@ -60,7 +63,7 @@ public class CNFluids {
                             .explosionResistance(100f)
                     )
                     .source(BaseFlowingFluid.Source::new)
-                    .bucket((s, p) -> new RadiationBucketItem(s, p, 20))
+                    .bucket((s, p) -> new RadiationBucketItem(s instanceof Fluid ? (Fluid) s : ((java.util.function.Supplier<? extends Fluid>) s).get(), p, 20))
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
                     .tag(CNTags.forgeItemTag("buckets/uranium"))
                     .lang("Uranium Bucket")

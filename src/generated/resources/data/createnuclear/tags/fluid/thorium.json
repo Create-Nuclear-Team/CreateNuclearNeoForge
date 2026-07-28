@@ -1,3 +1,6 @@
 {
-  "values": []
+  "values": [
+    "createnuclear:flowing_thorium",
+    "createnuclear:thorium"
+  ]
 }
