@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock.input;
+package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 
 import net.minecraft.world.item.ItemStack;

@@ -21,10 +21,18 @@ public class CNConfigs {
 
     private static CNCClient client;
     private static CNCCommon common;
-    private static CNCServer server;
+    public static CNCServer server;
+
+    public static CNCClient client() {
+        return client;
+    }
 
     public static CNCCommon common() {
         return common;
+    }
+
+    public static CNCServer server() {
+        return server;
     }
 
     public static ConfigBase byType(ModConfig.Type type) {
@@ -45,7 +53,9 @@ public class CNConfigs {
     }
 
     public static void register(ModLoadingContext context, ModContainer container) {
+        client = register(CNCClient::new, ModConfig.Type.CLIENT);
         common = register(CNCCommon::new, ModConfig.Type.COMMON);
+        server = register(CNCServer::new, ModConfig.Type.SERVER);
 
         for (Entry<ModConfig.Type, ConfigBase> pair : CONFIGS.entrySet())
             container.registerConfig(pair.getKey(), pair.getValue().specification);
