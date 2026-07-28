@@ -1,0 +1,15 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    {
+      "type": "neoforge:tag",
+      "amount": 200,
+      "tag": "createnuclear:thorium"
+    }
+  ],
+  "results": [
+    {
+      "id": "createnuclear:thorium_ingot"
+    }
+  ]
+}

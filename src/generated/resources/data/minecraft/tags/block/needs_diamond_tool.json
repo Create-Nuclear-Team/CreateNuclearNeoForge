@@ -10,6 +10,8 @@
     "createnuclear:raw_uranium_block",
     "createnuclear:enriched_soul_soil",
     "createnuclear:deepslate_uranium_ore",
-    "createnuclear:uranium_ore"
+    "createnuclear:uranium_ore",
+    "createnuclear:deepslate_thorium_ore",
+    "createnuclear:thorium_block"
   ]
 }
