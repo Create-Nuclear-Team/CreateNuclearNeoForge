@@ -187,8 +187,8 @@ public class CNAdvancement implements DataProvider {
             .description("Swim in the liquid nitrogen for the first time")
             .after(ABSOLUTE_ZERO)
             .special(SECRET)
-    ),
-    */
+    ),*/
+
 
     COAL_DUST = create("coal_dust", b -> b.icon(CNItems.COAL_DUST)
             .title("Coal Dust")

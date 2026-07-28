@@ -149,10 +149,6 @@ public class CNItems {
             .item("graphene", Item::new)
             .register(),
 
-        ENRICHED_YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("enriched_yellowcake", Item::new)
-            .register(),
-
         RAW_THORIUM = CreateNuclear.REGISTRATE
             .item("raw_thorium", Item::new)
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/thorium"))
