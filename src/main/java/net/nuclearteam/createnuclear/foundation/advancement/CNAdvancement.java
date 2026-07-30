@@ -116,7 +116,6 @@ public class CNAdvancement implements DataProvider {
             .whenIconCollected()
     ),
 
-    /*
     RAW_THORIUM = create("raw_thorium", b -> b.icon(CNItems.RAW_THORIUM)
             .title("Thorium's Glow")
             .description("Mine thorium ore to obtain raw thorium for further processing")
@@ -151,9 +150,7 @@ public class CNAdvancement implements DataProvider {
             .after(THORIUM_INGOT)
             .whenIconCollected()
     ),
-    */
 
-    /* 
     CHEMISTRY_101 = create("chemistry_101", b -> b.icon(CNItems.NITRATE)
             .title("Crushing It")
             .description("Mine nitrate ore or crush limestone to obtain nitrate")
@@ -187,7 +184,7 @@ public class CNAdvancement implements DataProvider {
             .description("Swim in the liquid nitrogen for the first time")
             .after(ABSOLUTE_ZERO)
             .special(SECRET)
-    ),*/
+    ),
 
 
     COAL_DUST = create("coal_dust", b -> b.icon(CNItems.COAL_DUST)
