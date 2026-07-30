@@ -39,4 +39,5 @@
 /gamemode creative
 /time set day
 /effect give @a minecraft:night_vision infinite
-/time set day
+/gamemode survival
+/gamemode creative

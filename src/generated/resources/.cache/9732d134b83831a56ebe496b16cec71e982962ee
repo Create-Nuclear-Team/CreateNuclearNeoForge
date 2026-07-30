@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-28T18:41:33.4309057	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-07-28T15:27:40.454156	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -20,6 +20,7 @@ f6b762b1e80656d932e990210b43e4bfb209e4d8 assets/createnuclear/blockstates/enrich
 f10bbdbab6112c58bebf2d98dc0ed3eb9370c09c assets/createnuclear/blockstates/lead_block.json
 300b8a29d6a440a60320133481041671dde65448 assets/createnuclear/blockstates/lead_ore.json
 c8479fd99df3917545c86ee3ea9bfe981bf762e7 assets/createnuclear/blockstates/nitrate_ore.json
+539751a5a2a28445f570cb61b89b16c31e7d5ad0 assets/createnuclear/blockstates/nitrogen.json
 1eed8de7f7b90d46d3e4fb6a0e7e9abf10a8a78f assets/createnuclear/blockstates/polished_cut_autunite.json
 462d22ea4a021cc368721fdb841c8a9b9176c06d assets/createnuclear/blockstates/polished_cut_autunite_slab.json
 76a9a39503654b94cbe01e249292ed280446bbb6 assets/createnuclear/blockstates/polished_cut_autunite_stairs.json
@@ -41,12 +42,13 @@ d4df48b7d5c38d7cf0b9347c196024e11497ca00 assets/createnuclear/blockstates/small_
 b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_autunite_brick_stairs.json
 7407bdb3685a15929a770b144d50cdc67c9c776f assets/createnuclear/blockstates/small_autunite_brick_wall.json
 57c846a957e9250bc45f2f1091bf3f78b2a77344 assets/createnuclear/blockstates/steel_block.json
+3134eef054a6f9f461bf774630241414614a9109 assets/createnuclear/blockstates/thorium.json
 3c5ff75a6dc4ba05ac94e0f2435e88821cd848ee assets/createnuclear/blockstates/thorium_block.json
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-4290a45e6fc47ad4673d96438e910b8a71eeb1e8 assets/createnuclear/lang/en_ud.json
-71bb423f173435cc6b0661b651be2cda8142ee10 assets/createnuclear/lang/en_us.json
+ec0b4fa9b99c97e1812fbf1d2e7c21f17a3cf2ca assets/createnuclear/lang/en_ud.json
+d79b3c4818d54f51162b121c29f4ef1d6375131c assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -80,6 +82,7 @@ e1b8fdc0555a1fdabda54f66cca868e444d1110b assets/createnuclear/models/block/enric
 fd642aefed8f59f5575c96ad1a0251e7773f3909 assets/createnuclear/models/block/lead_block.json
 c9757e3fd9841ee17366b1d88563df6ea8106513 assets/createnuclear/models/block/lead_ore.json
 ed7fef54fcaf191778ffdb588ed62fa72ec892b4 assets/createnuclear/models/block/nitrate_ore.json
+20a57f470b6d6ce6822c61da93e09e95bad6deee assets/createnuclear/models/block/nitrogen.json
 460e9ac2c0a90607b74afc5823b737a2867a35e3 assets/createnuclear/models/block/polished_cut_autunite.json
 8d0e97cda9e4098e0aa8dca93445d3b52150dcfa assets/createnuclear/models/block/polished_cut_autunite_slab.json
 4fa87093074c0a325ea50ab2d3c9725a90a11e1c assets/createnuclear/models/block/polished_cut_autunite_slab_double.json
@@ -104,6 +107,7 @@ b9b18c9a633527a817ba9745a818980ff35836b5 assets/createnuclear/models/block/small
 072d33301f6734db5108d78731686fc34b32c6c3 assets/createnuclear/models/block/small_autunite_brick_stairs_inner.json
 f99b30bd0cb3a8b78ed88a3a17b35b512c69ee06 assets/createnuclear/models/block/small_autunite_brick_stairs_outer.json
 47f627eaccbd07bf81d1c45f95ebcc88994ad757 assets/createnuclear/models/block/steel_block.json
+9333acc5ef34d03e00e0eaf24a3b48f2704a15c1 assets/createnuclear/models/block/thorium.json
 9d2613725484de94788ba5075854eb225eaa4936 assets/createnuclear/models/block/thorium_block.json
 e27878149b45eefa8673f2b86b6f491e2ed7a80f assets/createnuclear/models/block/thorium_ore.json
 d234edb3b6bc81b7300ee65722973b66db0b82d9 assets/createnuclear/models/block/uranium.json
@@ -179,6 +183,7 @@ e02c005625f9ab199ba04201152973e016b16831 assets/createnuclear/models/item/magent
 4799138766c26496b41807407a4b1ce2106cf7b7 assets/createnuclear/models/item/magenta_cloth.json
 94fbc4170e0aebba53f00f5828089a25bf683c4c assets/createnuclear/models/item/nitrate.json
 1e42471def4f88f8bb4b40755c72f5f713a19f30 assets/createnuclear/models/item/nitrate_ore.json
+55e956c815f423e5a94d1f113ba7301199f272f5 assets/createnuclear/models/item/nitrogen_bucket.json
 126657f82888c7b7b9e2338dfec05a7f80b1080d assets/createnuclear/models/item/nitrogen_concentrate.json
 626c65938b0109839ff3f48fecabe659fe38a657 assets/createnuclear/models/item/orange_anti_radiation_chestplate.json
 72af25b71ba1417c58137fce1070c09cc65a61b5 assets/createnuclear/models/item/orange_anti_radiation_helmet.json
@@ -224,6 +229,7 @@ b7a56e4ac63519df8fcefb9b18a2583991bd9f34 assets/createnuclear/models/item/red_an
 bcb30dce2419ce1ec2e043eaff83df82ac8a4bec assets/createnuclear/models/item/steel_ingot.json
 4b0492cf73c071f13538ce485419e46a164c99c7 assets/createnuclear/models/item/steel_nugget.json
 d4ec5a600b482636195c7ba0c915ed5d78e8c880 assets/createnuclear/models/item/thorium_block.json
+9712377d41a7153cb07638e33dd02e880609d249 assets/createnuclear/models/item/thorium_bucket.json
 b636be722a513137e6ca68bdc6510c4a56a2296d assets/createnuclear/models/item/thorium_dust.json
 6c63ff92f764da7ce92a99149bf2bf43c23e3727 assets/createnuclear/models/item/thorium_ingot.json
 fe44d1ed2b4100ec32dda43274a085166706485d assets/createnuclear/models/item/thorium_nugget.json
@@ -531,8 +537,9 @@ a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/block/enriching
 baae2dfd7e19770072d6261ec68ce157a32be80c data/createnuclear/tags/block/thorium_ores.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/block/uranium_ores.json
 e8b97836e0a934f9023ba18e6ad44e60dca4532d data/createnuclear/tags/entity_type/irradiated_immune.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/fluid/thorium.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/fluid/uranium.json
+410aa6d101788f25baa176741887c6f314006f29 data/createnuclear/tags/fluid/nitrogen.json
+dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluid/thorium.json
+bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluid/uranium.json
 7422c4cd9d6dd716f91311faa1fb7e26aa9ac345 data/createnuclear/tags/item/all_anti_radiation_armors.json
 e3fe4325aafb669d287c17b5b30953e4fb709110 data/createnuclear/tags/item/anti_radiation_armor.json
 fadb3957b979d82146790ef3550e38606760421e data/createnuclear/tags/item/anti_radiation_boots_dye.json
@@ -568,6 +575,9 @@ fadb3957b979d82146790ef3550e38606760421e data/c/tags/item/armors/boots.json
 0845acff015f78c494df2cd6754c5cff10d77c05 data/c/tags/item/armors/chestplates.json
 b5d23f0bc26a4e3a72cde40f3c6d59c03c818b4d data/c/tags/item/armors/helmets.json
 bebad856ee0f047735060f28544eb6149d8c2b20 data/c/tags/item/armors/leggings.json
+419d05292cb4947015b5320c991500e5a51f5466 data/c/tags/item/buckets/nitrogen.json
+c53aa7c19dc2c02afdab4bc7e3188ca2b2224af6 data/c/tags/item/buckets/thorium.json
+9ac9f967f480bbbe186815331a7e1771c8feea57 data/c/tags/item/buckets/uranium.json
 349b8e846393ae82a9117cd0534323bd79fc8f01 data/c/tags/item/dusts.json
 25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/c/tags/item/dusts/coal.json
 d6176bfd8cf296e3d5b5601ff2da8fc59620a092 data/c/tags/item/dusts/thorium.json

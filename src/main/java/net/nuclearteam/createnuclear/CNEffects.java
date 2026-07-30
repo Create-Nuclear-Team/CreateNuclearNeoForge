@@ -2,13 +2,12 @@ package net.nuclearteam.createnuclear;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.nuclearteam.createnuclear.content.effects.RadiationEffect;
+import net.nuclearteam.createnuclear.content.radiation.RadiationEffect;
 
 public class CNEffects {
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, CreateNuclear.MOD_ID);
