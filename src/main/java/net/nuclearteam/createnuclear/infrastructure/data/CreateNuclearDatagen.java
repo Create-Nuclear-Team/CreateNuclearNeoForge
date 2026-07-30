@@ -12,6 +12,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNMechanicalCraftingRecipeGen;
@@ -51,6 +52,7 @@ public class CreateNuclearDatagen {
 
 
         generator.addProvider(event.includeClient(), new CNAdvancement(output, lookupProvider));
+        generator.addProvider(event.includeClient(), CNSoundEvents.provider(generator));
 
         if (event.includeServer()) {
             CNRecipeProvider.registerAllProcessing(generator, output, lookupProvider);
@@ -68,6 +70,7 @@ public class CreateNuclearDatagen {
             provideDefaultLang("tooltips", langConsumer);
             provideDefaultLang("reactor", langConsumer);
             CNAdvancement.provideLang(langConsumer);
+            CNSoundEvents.provideLang(langConsumer);
             providePonderLang(langConsumer);
         });
     }
