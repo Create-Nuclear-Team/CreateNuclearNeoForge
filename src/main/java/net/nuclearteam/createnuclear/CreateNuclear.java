@@ -65,7 +65,7 @@ public class CreateNuclear {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-
+        CNSoundEvents.prepare();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -103,6 +103,7 @@ public class CreateNuclear {
     }
 
     public static void onRegister(final RegisterEvent event) {
+        CNSoundEvents.register(event);
         CNFanProcessingTypes.register();
 
         if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {

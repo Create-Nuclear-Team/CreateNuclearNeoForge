@@ -1,10 +1,13 @@
 package net.nuclearteam.createnuclear.content.multiblock;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
 
 public class MultiblockHelpers {
@@ -58,5 +61,15 @@ public class MultiblockHelpers {
         }
 
         return null;
+    }
+
+    public static void handleAdvancedPlacedBy(BlockPos pos, Level level, @Nullable LivingEntity entity) {
+        if (entity == null) return;
+
+        ReactorControllerBlockEntity controller = getControllerForPart(level, pos);
+
+        if (controller != null) {
+            CNAdvancementBehaviour.setPlacedBy(level, controller.getBlockPos(), entity);
+        }
     }
 }
