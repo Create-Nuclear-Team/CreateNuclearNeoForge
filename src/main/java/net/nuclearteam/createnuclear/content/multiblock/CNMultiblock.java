@@ -22,7 +22,7 @@ public class CNMultiblock {
 
     static {
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor",
-                TypeMultiblock.REACTOR,
+                TypeMultiblock.REACTOR_T1,
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAAAA)
                         .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)

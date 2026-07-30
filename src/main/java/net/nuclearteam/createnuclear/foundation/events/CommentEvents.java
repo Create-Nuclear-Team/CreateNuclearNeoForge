@@ -7,7 +7,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.nuclearteam.createnuclear.CNPotions;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class CommentEvents {
@@ -21,6 +22,7 @@ public class CommentEvents {
         @SubscribeEvent
         public static void registerCapabilities(RegisterCapabilitiesEvent event) {
             ReactorInputEntity.registerCapabilities(event);
+            ReactorFluidInputEntity.registerCapabilities(event);
         }
     }
 

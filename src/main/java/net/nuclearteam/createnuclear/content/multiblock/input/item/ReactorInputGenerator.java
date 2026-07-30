@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock.input;
+package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 import com.simibubi.create.foundation.data.SpecialBlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;

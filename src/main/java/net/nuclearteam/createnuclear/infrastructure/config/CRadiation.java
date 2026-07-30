@@ -4,7 +4,6 @@ import net.createmod.catnip.config.ConfigBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
-
 import java.util.List;
 
 @MethodsReturnNonnullByDefault

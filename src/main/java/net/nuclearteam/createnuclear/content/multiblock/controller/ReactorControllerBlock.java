@@ -148,7 +148,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public void Verify(BlockState state, BlockPos pos, Level level, List<? extends Player> players, boolean create){
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos); // control the pattern
+        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, this.getBlockEntity(level, pos)); // control the pattern
         if (result != null) { // the pattern is correct
 
             for (Player player : players) {

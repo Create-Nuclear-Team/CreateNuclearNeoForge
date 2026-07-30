@@ -1,13 +1,12 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
-import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
-import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -15,32 +14,41 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.PatternData;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
@@ -99,12 +107,221 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
+    /*
+    FORGE ARGUMENTS PART
+     */
 
+    private final ReactorPattern pattern = new ReactorPattern();
+    private int explosionCountdown = 0;
+    private boolean isExploding = false;
 
+    //private final ConsumptionCycleManager cycleManager = new ConsumptionCycleManager();
+    private double liquidLife;
+
+    private BigItemStack bigFuelItem;
+    private BigItemStack bigCoolerItem;
+    private List<BigFluidStack> bigFluidStack;
+
+    private int reactorSize = 0;
+    private String reactorFacing = "null";
+    // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
+    private int[] reactorPos;
+    // Vertical span (block Y) of the reactor frame columns, used to map the
+    // fluid fill ratio onto the liquid actually drawn in the frame windows.
+    private int frameColumnMinY = Integer.MAX_VALUE;
+    private int frameColumnMaxY = Integer.MIN_VALUE;
+    // Per-tick cache for the fluid drawn in the frame windows. Recomputed from the
+    // live (synced) input tanks so the displayed fluid and its fill ratio always
+    // come from the same source and stay consistent for every fluid type.
+    private long frameFluidCacheTick = -1;
+    private FluidStack frameFluidCache = FluidStack.EMPTY;
+    private float frameFluidFillRatioCache = 0f;
+    private boolean needsToResolveEntities = false;
+    private double fluidBuffer = 0.0;
+
+    private CNAdvancementBehaviour advancement;
+
+    private final ReactorInputManagerI inputManager;
+    private final ReactorOutputManagerI outputManager;
+    private final ReactorInputFluidManagerI inputFluidManager;
+    private final ReactorAlarmManagerI alarmManager;
+
+    // Client Display Data (Synced via NBT)
+    private Map<Item, Integer> clientDisplayItems = new HashMap<>();
+    private List<BigFluidStack> clientDisplayFluids = new ArrayList<>();
+    private long clientMaxFluidCapacity = 0;
+
+    // services (dependencies) - abstracted behind interfaces to follow DIP
+    //private final IHeatService heatService;
+    //private final IPersistenceService persistenceService;
+
+    // service fields are injected; implementations live in separate classes
+
+    // --- Accessors used by external services (persistence) ---
+    public ReactorControllerInventory getInventoryObject() {
+        return this.inventory;
+    }
+
+    /*public void deserializeInventory(CompoundTag tag) {
+        this.inventory.deserializeNBT(tag);
+    }
+
+    public CompoundTag serializeInventory() {
+        return this.inventory.serializeNBT();
+    }*/
+
+    public ItemStack getConfiguredPattern() {
+        return this.configuredPattern;
+    }
+
+    public void setConfiguredPattern(ItemStack stack) {
+        this.configuredPattern = stack;
+    }
+
+    public CompoundTag getConfiguredPatternTag() {
+        return this.configuredPattern.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+    }
+
+    public int[] getMultiblockPos() {
+        return this.reactorPos;
+    }
+
+    public BigItemStack getBigFuelItem() {
+        return this.bigFuelItem;
+    }
+
+    public void setBigFuelItem(BigItemStack b) {
+        this.bigFuelItem = b;
+    }
+
+    public BigItemStack getBigCoolerItem() {
+        return this.bigCoolerItem;
+    }
+
+    public void setBigCoolerItem(BigItemStack b) {
+        this.bigCoolerItem = b;
+    }
+
+    public List<BigFluidStack> getBigFluidStack() {
+        return this.bigFluidStack;
+    }
+
+    public void setBigFluidStack(List<BigFluidStack> b) {
+        this.bigFluidStack = b;
+    }
+
+    private void refreshFrameFluidCache() {
+        if (level == null) return;
+        long now = level.getGameTime();
+        if (now == frameFluidCacheTick) return;
+        frameFluidCacheTick = now;
+
+        long amount = 0;
+        long capacity = 0;
+        FluidStack fluid = FluidStack.EMPTY;
+        for (IFluidHandler handler : inputFluidManager.getFuildHandlers(level)) {
+            int tanks = handler.getTanks();
+            for (int t = 0; t < tanks; t++) {
+                FluidStack stack = handler.getFluidInTank(t);
+                capacity += handler.getTankCapacity(t);
+                amount += stack.getAmount();
+                if (fluid.isEmpty() && !stack.isEmpty()) fluid = stack.copy();
+            }
+        }
+
+        frameFluidCache = fluid;
+        frameFluidFillRatioCache = capacity > 0 ? Math.min(1f, (float) amount / (float) capacity) : 0f;
+    }
+
+    public FluidStack getDisplayedFluid() {
+        refreshFrameFluidCache();
+        return frameFluidCache;
+    }
+
+    /**
+     * How full the reactor's fluid input is, in the range {@code [0, 1]}, used by
+     * the frame renderer to size the visible liquid column.
+     */
+    public float getDisplayedFluidFillRatio() {
+        refreshFrameFluidCache();
+        return frameFluidFillRatioCache;
+    }
+
+    /** Records the lowest and highest frame block-Y of the assembled reactor. */
+    public void setFrameColumn(int minY, int maxY) {
+        if (this.frameColumnMinY == minY && this.frameColumnMaxY == maxY) return;
+        this.frameColumnMinY = minY;
+        this.frameColumnMaxY = maxY;
+        notifyUpdate();
+    }
+
+    /** @return the lowest frame block-Y, or {@link Integer#MAX_VALUE} if unknown. */
+    public int getFrameColumnMinY() {
+        return frameColumnMinY;
+    }
+
+    /** @return the highest frame block-Y, or {@link Integer#MIN_VALUE} if unknown. */
+    public int getFrameColumnMaxY() {
+        return frameColumnMaxY;
+    }
+
+    public boolean hasFrameColumn() {
+        return frameColumnMinY != Integer.MAX_VALUE && frameColumnMaxY != Integer.MIN_VALUE
+                && frameColumnMaxY >= frameColumnMinY;
+    }
+
+    public int getMultiblockSize() {
+        return this.reactorSize;
+    }
+
+    public void setMultiblockSize(int s) {
+        this.reactorSize = s;
+    }
+
+    public String getMultiblockFacing() {
+        return this.reactorFacing;
+    }
+
+    public void setMultiblockFacing(String f) {
+        this.reactorFacing = f;
+    }
+
+    public CNAdvancementBehaviour getAdvancement() {
+        return this.advancement;
+    }
+
+    public void setMultiblockStructure(int[] p) {
+        this.reactorPos = p;
+    }
+
+    public double getLiquidLife() {
+        return this.liquidLife;
+    }
+
+    public void setLiquidLife(double l) {
+        this.liquidLife = l;
+    }
+
+    /**
+     * Main constructor allowing dependency injection for testability and DIP
+     * compliance.
+     */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        inventory = new ReactorControllerInventory(this);
-        configuredPattern = ItemStack.EMPTY;
+        this.inventory = new ReactorControllerInventory(this);
+        this.configuredPattern = ItemStack.EMPTY;
+
+        this.inputManager = new ReactorInputManager();
+        this.outputManager = new ReactorOutputManager();
+        this.inputFluidManager = new ReactorInputFluidManager();
+        this.alarmManager = new ReactorAlarmManager();
+
+        this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigFluidStack = new ArrayList<>();
+
+        //this.heatService = new DefaultHeatService(new HeatManager());
+        //this.persistenceService = new DefaultPersistenceService();
     }
 
     @Override
@@ -182,6 +399,23 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         compound.putDouble("total", Double.isNaN(total) ? total : calculateProgress());
         compound.putInt("heat", heat);
         super.write(compound, registries, clientPacket);
+    }
+
+    public boolean isAssembled() {
+        if (level == null)
+            return false;
+        try {
+            return level.getBlockState(worldPosition).getValue(ASSEMBLED);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void setAssembled(boolean assembled) {
+        if (level == null)
+            return;
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
+        this.setChanged();
     }
 
     public enum State {
@@ -446,5 +680,189 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 entity.updateGeneratedRotation();
             }
         }
+    }
+
+    @Deprecated
+    public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
+        int[] northOffsets5x5 = new int[] { -2, 2, -3, 3, 0, 4 };
+        int[] northOffsets7x7 = new int[] { -3, 3, -4, 4, 0, 6 };
+        int[] northOffsets9x9 = new int[] { -4, 4, -5, 5, 0, 8 };
+
+        int[] eastOffsets5x5 = new int[] { -4, 0, -3, 3, -2, 2 };
+        int[] eastOffsets7x7 = new int[] { -6, 0, -4, 4, -3, 3 };
+        int[] eastOffsets9x9 = new int[] { -8, 0, -5, 5, -4, 4 };
+
+        int[] southOffsets5x5 = new int[] { -2, 2, -3, 3, -4, 0 };
+        int[] southOffsets7x7 = new int[] { -3, 3, -4, 4, -6, 0 };
+        int[] southOffsets9x9 = new int[] { -4, 4, -5, 5, -8, 0 };
+
+        int[] westOffsets5x5 = new int[] { 0, 4, -3, 3, -2, 2 };
+        int[] westOffsets7x7 = new int[] { 0, 6, -4, 4, -3, 3 };
+        int[] westOffsets9x9 = new int[] { 0, 8, -5, 5, -4, 4 };
+
+        switch (facing) {
+            case "north":
+                switch (structureSize) {
+                    case 5:
+                        return applyOffset(startPos, northOffsets5x5);
+                    case 7:
+                        return applyOffset(startPos, northOffsets7x7);
+                    case 9:
+                        return applyOffset(startPos, northOffsets9x9);
+                }
+            case "east":
+                switch (structureSize) {
+                    case 5:
+                        return applyOffset(startPos, eastOffsets5x5);
+                    case 7:
+                        return applyOffset(startPos, eastOffsets7x7);
+                    case 9:
+                        return applyOffset(startPos, eastOffsets9x9);
+                }
+            case "south":
+                switch (structureSize) {
+                    case 5:
+                        return applyOffset(startPos, southOffsets5x5);
+                    case 7:
+                        return applyOffset(startPos, southOffsets7x7);
+                    case 9:
+                        return applyOffset(startPos, southOffsets9x9);
+                }
+            case "west":
+                switch (structureSize) {
+                    case 5:
+                        return applyOffset(startPos, westOffsets5x5);
+                    case 7:
+                        return applyOffset(startPos, westOffsets7x7);
+                    case 9:
+                        return applyOffset(startPos, westOffsets9x9);
+                }
+            default:
+                return new int[] { 0, 0, 0, 0, 0, 0 };
+        }
+    }
+
+    @Deprecated
+    private int[] applyOffset(BlockPos pos, int[] offset) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        return new int[] { x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5] };
+    }
+
+    public void addInput(BlockPos inputPos) {
+        this.inputManager.addBlock(inputPos);
+        this.setChanged();
+    }
+
+    public void removeInput(BlockPos inputPos) {
+        this.inputManager.removeBlock(inputPos);
+        this.setChanged();
+    }
+
+    public void addOutput(BlockPos outputPos) {
+        this.outputManager.addBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeOutput(BlockPos outputPos) {
+        this.outputManager.removeBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void addInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.addBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.removeBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void addAlarm(BlockPos alarmPos) {
+        this.alarmManager.addBlock(alarmPos);
+        this.setChanged();
+    }
+
+    public void removeAlarm(BlockPos alarmPos) {
+        this.alarmManager.removeBlock(alarmPos);
+        this.setChanged();
+    }
+
+    public void removeIOAll() {
+        this.inputManager.clearInvalid(level);
+        this.outputManager.clearInvalid(level);
+        this.inputFluidManager.clearInvalid(level);
+        this.alarmManager.clearInvalid(level);
+        this.setChanged();
+    }
+
+    /** Try to lock this controller to the given Fluid. Returns true if allowed. */
+    public boolean tryLockFluid(Fluid fluid) {
+        // server-persistent approach (preferred): use PersistentFluidLocks when on
+        // server
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).tryLock(getBlockPos(), fluid);
+        }
+        // fallback to in-memory manager (single-server-run)
+        return FluidLockManager.tryLock(getBlockPos(), fluid);
+    }
+
+    /** Returns whether the given FluidStack is acceptable for this controller. */
+    public boolean canAcceptFluid(FluidStack stack) {
+        if (stack == null || stack.isEmpty())
+            return true;
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).canAccept(getBlockPos(), stack.getFluid());
+        }
+        return FluidLockManager.canAccept(getBlockPos(), stack);
+    }
+
+    /** Force-clear the lock on this controller. */
+    public void clearLock() {
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            PersistentFluidLocks.get(serverLevel).clearLock(getBlockPos());
+        } else {
+            FluidLockManager.clearLock(getBlockPos());
+        }
+        setChanged();
+        sendData();
+    }
+
+    public void clearLockIfAllInputsEmpty() {
+        if (level == null || level.isClientSide)
+            return;
+
+        final int SCAN_RADIUS = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data()
+                .getSize(); // adapte selon la taille max du multiblock
+        BlockPos center = getBlockPos();
+        boolean anyNonEmpty = false;
+
+        for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS && !anyNonEmpty; dx++) {
+            for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS && !anyNonEmpty; dy++) {
+                for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS && !anyNonEmpty; dz++) {
+                    BlockPos p = center.offset(dx, dy, dz);
+                    BlockEntity be = level.getBlockEntity(p);
+                    if (!(be instanceof ReactorFluidInputEntity))
+                        continue;
+
+                    IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, p, null);
+                    if (handler == null)
+                        continue;
+
+                    for (int t = 0; t < handler.getTanks(); t++) {
+                        if (!handler.getFluidInTank(t).isEmpty()) {
+                            anyNonEmpty = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!anyNonEmpty)
+            clearLock();
     }
 }
