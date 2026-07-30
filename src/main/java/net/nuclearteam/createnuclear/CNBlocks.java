@@ -37,6 +37,7 @@ import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
@@ -51,7 +52,7 @@ import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
+import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 
@@ -190,6 +191,14 @@ public class CNBlocks {
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
+
+    public static final BlockEntry<ReactorAlarm> REACTOR_ALARM =
+            CreateNuclear.REGISTRATE.block("reactor_alarm", ReactorAlarm::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .item()
+                    .build()
+                    .register();
 
     public static final BlockEntry<ReinforcedGlassBlock> REINFORCED_GLASS = CreateNuclear.REGISTRATE
         .block("reinforced_glass", ReinforcedGlassBlock::new)

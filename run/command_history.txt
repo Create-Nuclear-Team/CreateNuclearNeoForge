@@ -41,3 +41,4 @@
 /effect give @a minecraft:night_vision infinite
 /gamemode survival
 /gamemode creative
+/playsound createnuclear:a

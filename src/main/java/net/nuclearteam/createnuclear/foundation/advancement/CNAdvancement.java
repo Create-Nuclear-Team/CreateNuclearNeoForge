@@ -267,13 +267,13 @@ public class CNAdvancement implements DataProvider {
             .whenIconCollected()
     ),
 
-    /*
+
     SILENCE_THE_CORE = create("silence_the_core", b -> b.icon(CNBlocks.REACTOR_ALARM.asItem())
             .title("It Makes So Much Noise !")
             .description("sound the alarm for the first time")
             .after(REACTOR_CASING)
     ),
-    */
+
 
     REACTOR_CONTROLLER = create("reactor_controller", b -> b.icon(CNBlocks.REACTOR_CONTROLLER)
             .title("Controller Of The Core")

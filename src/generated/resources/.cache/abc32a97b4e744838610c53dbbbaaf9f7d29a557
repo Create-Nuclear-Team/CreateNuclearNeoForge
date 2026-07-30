@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-28T15:27:40.4526221	Create Nuclear Advancements
+// 1.21.1	2026-07-30T13:57:00.8895508	Create Nuclear Advancements
 ebf411a60f05043ea055e71f3ca186f1594c1dba data/createnuclear/advancement/absolute_zero.json
 22f2184726b7c4cb7be266711edcf91d10125308 data/createnuclear/advancement/automatic_uranium.json
 9846c243f0268eedba554e27d99c6fa8e2e6f5aa data/createnuclear/advancement/chemistry_101.json
@@ -24,6 +24,7 @@ a36b76d7a5379c24a5ad9ca303c5bb9d5d077e4a data/createnuclear/advancement/raw_uran
 36156f60d09a48852295fc7b7dbe9006d5ff597a data/createnuclear/advancement/reactor_frame.json
 b60fb4eda3db03e754d26377940f0e28780cae25 data/createnuclear/advancement/reinforced_glass.json
 0288ebaaf2a637ea12d9b4746f57046a9d1ef43b data/createnuclear/advancement/root.json
+911aa5207efe7ab395259ca59c3ab6c6fc90c407 data/createnuclear/advancement/silence_the_core.json
 fd962b874a6c7e2bf406eee4d9509372af2563e0 data/createnuclear/advancement/steel_ingot.json
 94d885bd7fa5b5614c3fcfba95019712591919be data/createnuclear/advancement/t1.json
 75f1ed25a0b82120229268f0368391cc57f743fc data/createnuclear/advancement/t2.json
