@@ -35,7 +35,11 @@ import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.PatternData;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
@@ -145,6 +149,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
     private final ReactorAlarmManagerI alarmManager;
+
+    private ReactorDisplayState displayState = ReactorDisplayState.EMPTY;
+
+    //private final IReactorHeatUpdateCoordinator heatCoordinator;
 
     // Client Display Data (Synced via NBT)
     private Map<Item, Integer> clientDisplayItems = new HashMap<>();
@@ -302,6 +310,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.liquidLife = l;
     }
 
+    public void setDisplayState(ReactorDisplayState state) {
+        this.displayState = state;
+    }
+
+    public ReactorDisplayState getDisplayState() {
+        return this.displayState;
+    }
+
     /**
      * Main constructor allowing dependency injection for testability and DIP
      * compliance.
@@ -336,26 +352,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if(!configuredPattern.isEmpty()) {
-            CreateLang.translate("gui.gauge.info_header").style(ChatFormatting.GRAY).forGoggles(tooltip);
-            IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
+        CompoundTag patternTag = this.getConfiguredPatternTag();
 
-            IHeat.HeatLevel.getFormattedHeatText(heat).forGoggles(tooltip);
-
-            if (fuelItem.isEmpty()) {
-                // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
-                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true).forGoggles(tooltip);
-            } else {
-                IHeat.HeatLevel.getFormattedItemText(fuelItem, false).forGoggles(tooltip);
-            }
-
-            if (fuelItem.isEmpty()) {
-                // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
-                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.GRAPHITE_ROD.asItem(), 1), true).forGoggles(tooltip);
-            } else {
-                IHeat.HeatLevel.getFormattedItemText(coolerItem, false).forGoggles(tooltip);
-            }
+        if (patternTag == null || patternTag.isEmpty()) {
+            return false;
         }
+
+        ReactorGoggleTooltipRenderer.render(tooltip, displayState, patternTag.getInt("heat"), isPlayerSneaking, reactorSize);
 
         return true;
     }
@@ -422,6 +425,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         ON, OFF
     }
 
+    private void updateReactorStateVisibility() {
+        if (level == null || level.isClientSide) return;
+
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof ReactorControllerBlock)) return;
+
+        boolean currentActive = state.getValue(ReactorControllerBlock.ACTIVE);
+
+        // The reactor is "ACTIVE" (ON) only if it is assembled AND has the resources required to run
+        /*boolean targetActive = isAssembled() && heatCoordinator.canRun(getConfiguredPattern(), getDisplayState(), getInputFluidManager(), level, getAssembled());
+
+        if (currentActive != targetActive) {
+            level.setBlock(worldPosition, state.setValue(ReactorControllerBlock.ACTIVE, targetActive), 3);
+        }*/
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -481,6 +500,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                         return;
                     }
                 }
+
+                ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
+                this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
+
                 this.notifyUpdate();
             }
         }

@@ -36,6 +36,7 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorControllerBlockEntity> {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public ReactorControllerBlock(Properties properties) {
         super(properties);
