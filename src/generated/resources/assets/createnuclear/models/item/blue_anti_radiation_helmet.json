@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "createnuclear:item/armors/helmets/blue_anti_radiation_helmet"
+    "layer0": "createnuclear:item/armors/default_anti_radiation_helmet"
   }
 }

@@ -99,9 +99,9 @@ public class AntiRadiationArmorItem {
     }
 
     public static boolean isArmored(ItemStack item) {
-        return item.is(CNItems.ANTI_RADIATION_HELMETS.get())
-                || item.is(CNItems.ANTI_RADIATION_CHESTPLATES.get())
-                || item.is(CNItems.ANTI_RADIATION_LEGGINGS.get())
+        return CNItems.ANTI_RADIATION_HELMETS.contains(item.getItem())
+                || CNItems.ANTI_RADIATION_CHESTPLATES.contains(item.getItem())
+                || CNItems.ANTI_RADIATION_LEGGINGS.contains(item.getItem())
                 || item.is(CNItems.ANTI_RADIATION_BOOTS.get());
     }
 }

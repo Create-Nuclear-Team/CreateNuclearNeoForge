@@ -234,7 +234,7 @@ public class CNItems {
 
             .properties(p -> p.durability(CNArmorMaterials.durabilityForType(ArmorItem.Type.HELMET)))
             .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Helmet")
-            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/helmets/" + colorName + "_anti_radiation_helmet")))
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_helmet")))
             .register();
 
     });
@@ -262,7 +262,7 @@ public class CNItems {
 
             .properties(p -> p.durability(CNArmorMaterials.durabilityForType(ArmorItem.Type.CHESTPLATE)))
             .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Chestplate")
-            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/chestplates/" + colorName + "_anti_radiation_chestplate")))
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_chestplate")))
             .register();
 
     });
@@ -288,13 +288,13 @@ public class CNItems {
 
             .properties(p -> p.durability(CNArmorMaterials.durabilityForType(ArmorItem.Type.LEGGINGS)))
             .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Leggings")
-            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/leggings/" + colorName + "_anti_radiation_leggings")))
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_leggings")))
             .register();
 
     });
 
     public static final ItemEntry<? extends AntiRadiationArmorItem.Boot>
-        ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE.item("anti_radiation_boots", Boot::new)
+        ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE.item("anti_radiation_boots", p -> new Boot(p, net.minecraft.world.item.DyeColor.WHITE))
             .tag(
                 CNTags.forgeItemTag("armors/boots"),
                 CNItemTags.ANTI_RADIATION_BOOTS_DYE.tag,
@@ -311,7 +311,7 @@ public class CNItems {
                     .showNotification(true)
                     .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
             .properties(p -> p.durability(CNArmorMaterials.durabilityForType(ArmorItem.Type.BOOTS)))
-            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/anti_radiation_boots")))
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_boots")))
             .register();
 
     public static final DyeItemList<ClothItem> CLOTHS = new ClothItem.DyeItemList<>(color -> {
