@@ -2,19 +2,16 @@ package net.nuclearteam.createnuclear;
 
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
-import com.simibubi.create.infrastructure.data.CreateDatagen;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -26,6 +23,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -78,7 +76,7 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
-        net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability.register(modEventBus);
+        RadiationCapability.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
 

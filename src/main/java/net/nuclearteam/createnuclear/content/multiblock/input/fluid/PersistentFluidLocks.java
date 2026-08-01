@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.input.fluid;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -85,7 +86,7 @@ public class PersistentFluidLocks extends SavedData {
     }
 
     @Override
-    public @NotNull CompoundTag save(@NotNull CompoundTag nbt, net.minecraft.core.HolderLookup.@NotNull Provider registries) {
+    public @NotNull CompoundTag save(@NotNull CompoundTag nbt, @NotNull HolderLookup.Provider registries) {
         ListTag list = new ListTag();
         locks.forEach((pos, fluid) -> {
             CompoundTag e = new CompoundTag();

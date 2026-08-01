@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-30T14:03:01.2075638	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-01T14:10:48.7035066	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -48,8 +48,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-09dc7483c6b71e8aefc4647f44569bc420152a92 assets/createnuclear/lang/en_ud.json
-5d908cb5aa387bbee56d2ac8d319eef7799502b6 assets/createnuclear/lang/en_us.json
+707ab41cb5e36e9bd57ae679e8057c822990cc06 assets/createnuclear/lang/en_ud.json
+ea5c29651d21e136a8324f02326dae5637673e33 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -612,7 +612,7 @@ a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/item/storage_blocks/lead.js
 f8074cdbc6e2b560acb4e9da953b23f9825486a6 data/c/tags/item/storage_blocks/steel.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/c/tags/item/storage_blocks/thorium.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/azalea_root_replaceable.json
-af9bc48c0e6af58ad85da029e03b09d0c14c3b24 data/minecraft/tags/block/campfires.json
+e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/block/campfires.json
 3206babfa42429478935375acd710b4028884941 data/minecraft/tags/block/dragon_transparent.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/dripstone_replaceable_blocks.json
 3206babfa42429478935375acd710b4028884941 data/minecraft/tags/block/fire.json
