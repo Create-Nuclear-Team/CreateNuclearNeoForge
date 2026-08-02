@@ -1,3 +1,6 @@
 {
-  "values": []
+  "values": [
+    "createnuclear:enriching_fire",
+    "createnuclear:enriching_campfire"
+  ]
 }

@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-01T17:32:25.0970522	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-02T08:58:02.5904496	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -612,7 +612,7 @@ a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/item/storage_blocks/lead.js
 f8074cdbc6e2b560acb4e9da953b23f9825486a6 data/c/tags/item/storage_blocks/steel.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/c/tags/item/storage_blocks/thorium.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/azalea_root_replaceable.json
-af9bc48c0e6af58ad85da029e03b09d0c14c3b24 data/minecraft/tags/block/campfires.json
+e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/block/campfires.json
 3206babfa42429478935375acd710b4028884941 data/minecraft/tags/block/dragon_transparent.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/dripstone_replaceable_blocks.json
 3206babfa42429478935375acd710b4028884941 data/minecraft/tags/block/fire.json
