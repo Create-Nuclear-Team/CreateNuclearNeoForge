@@ -1,9 +1,12 @@
 package net.nuclearteam.createnuclear;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
@@ -60,10 +63,31 @@ public class CNDataComponents {
         b -> b.persistent(StringRepresentable.fromEnum(Cloths::values)).networkSynchronized(NeoForgeStreamCodecs.enumCodec(Cloths.class))
     );
 
-    public static final DataComponentType<ItemStack> CLOTH_ITEM = register(
+    public static final DataComponentType<ClothItemStack> CLOTH_ITEM = register(
         "cloth_item",
-        b -> b.persistent(ItemStack.CODEC).networkSynchronized(ItemStack.STREAM_CODEC)
+        b -> b.persistent(ClothItemStack.CODEC).networkSynchronized(ClothItemStack.STREAM_CODEC)
     );
+
+    /**
+     * Wraps an ItemStack with content-based equals/hashCode, since ItemStack itself only offers
+     * identity equality and NeoForge requires data component values to implement both properly.
+     */
+    public record ClothItemStack(ItemStack stack) {
+        public static final Codec<ClothItemStack> CODEC = ItemStack.CODEC.xmap(ClothItemStack::new, ClothItemStack::stack);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClothItemStack> STREAM_CODEC = ItemStack.STREAM_CODEC.map(ClothItemStack::new, ClothItemStack::stack);
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof ClothItemStack(
+                    ItemStack stack1
+            ) && ItemStack.isSameItemSameComponents(this.stack, stack1);
+        }
+
+        @Override
+        public int hashCode() {
+            return ItemStack.hashItemAndComponents(this.stack);
+        }
+    }
 
     private static <T> DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {
         DataComponentType<T> type = builder.apply(DataComponentType.builder()).build();

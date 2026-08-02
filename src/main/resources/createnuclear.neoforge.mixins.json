@@ -5,7 +5,8 @@
   "package": "net.nuclearteam.createnuclear.foundation.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BaseFireBlockMixin"
+    "BaseFireBlockMixin",
+    "SmithingTransformRecipeMixin"
   ],
   "client": [
     "client.RadiationHeartMixin",

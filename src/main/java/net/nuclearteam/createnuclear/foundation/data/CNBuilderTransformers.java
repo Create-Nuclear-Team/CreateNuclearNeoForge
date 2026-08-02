@@ -45,7 +45,7 @@ public class CNBuilderTransformers {
                 String colorName = color.getSerializedName();
                 ItemModelBuilder child = p.withExistingParent("item/colored/" + colorName + "_anti_radiation_" + slot, baseParent);
                 for (String key : textureKeys) {
-                    child.texture(key, "item/armors/" + colorName + "_anti_radiation_suit");
+                    child.texture(key, "models/armor/" + colorName + "_anti_radiation_suit");
                 }
                 outer.override()
                         .predicate(CreateNuclear.asResource("cloth_color"), (color.getId() + 1) / 16f)
