@@ -89,14 +89,6 @@ public class CNCreativeModeTabs {
                 }
             }
 
-            for (DyeColor color : DyeColor.values()) {
-                if (color != DyeColor.WHITE) {
-                    exclusions.add(CNItems.ANTI_RADIATION_HELMETS.get(color).asItem());
-                    exclusions.add(CNItems.ANTI_RADIATION_CHESTPLATES.get(color).asItem());
-                    exclusions.add(CNItems.ANTI_RADIATION_LEGGINGS.get(color).asItem());
-                }
-            }
-
             return exclusions::contains;
         }
 

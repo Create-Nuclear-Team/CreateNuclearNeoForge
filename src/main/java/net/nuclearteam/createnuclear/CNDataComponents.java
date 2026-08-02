@@ -1,13 +1,17 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.Create;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -49,6 +53,16 @@ public class CNDataComponents {
     public static final DataComponentType<Integer> COUNT_URANIUM_ROD = register(
             "count_uranium_rod",
             builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
+    );
+
+    public static final DataComponentType<Cloths> CLOTH_COLOR = register(
+        "cloth_color",
+        b -> b.persistent(StringRepresentable.fromEnum(Cloths::values)).networkSynchronized(NeoForgeStreamCodecs.enumCodec(Cloths.class))
+    );
+
+    public static final DataComponentType<ItemStack> CLOTH_ITEM = register(
+        "cloth_item",
+        b -> b.persistent(ItemStack.CODEC).networkSynchronized(ItemStack.STREAM_CODEC)
     );
 
     private static <T> DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {

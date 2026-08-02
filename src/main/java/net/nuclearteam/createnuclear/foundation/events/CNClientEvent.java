@@ -5,11 +5,14 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorClientExtensions;
 import net.nuclearteam.createnuclear.foundation.events.overlay.IrradiatedOverlayRendererVision;
 
-@EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = CreateNuclear.MOD_ID, value = Dist.CLIENT)
 public class CNClientEvent {
     private static final HudRenderer HUD_RENDERER = new HudRenderer();
 
@@ -19,5 +22,15 @@ public class CNClientEvent {
         event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, CreateNuclear.asResource("irradiated_vision"), IrradiatedOverlayRendererVision::renderOverlay);
     }
 
+    @SubscribeEvent
+    public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
+        AntiRadiationArmorClientExtensions extensions = new AntiRadiationArmorClientExtensions();
+        event.registerItem(extensions,
+                CNItems.ANTI_RADIATION_HELMETS.get(),
+                CNItems.ANTI_RADIATION_CHESTPLATES.get(),
+                CNItems.ANTI_RADIATION_LEGGINGS.get(),
+                CNItems.ANTI_RADIATION_BOOTS.get()
+        );
+    }
 
 }

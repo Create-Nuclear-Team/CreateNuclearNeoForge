@@ -46,3 +46,4 @@ run/logs
 run/schematics
 run/server
 run/downloads/log.json
+run/command_history.txt

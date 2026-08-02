@@ -72,7 +72,6 @@ public class CNTags {
     public enum CNBlockTags {
         FAN_PROCESSING_CATALYSTS_ENRICHED(MOD, "fan_processing_catalysts/enriched"),
         ENRICHING_FIRE_BASE_BLOCKS,
-        ALL_CAMPFIRES(MINECRAFT, "all/campfires"),
         THORIUM_ORES,
         URANIUM_ORES,
         LEAD_ORES
@@ -128,15 +127,8 @@ public class CNTags {
         COOLER,
         URANIUM_ORES,
         LEAD_ORES,
-        ANTI_RADIATION_HELMET_DYE,
-        ANTI_RADIATION_CHESTPLATE_DYE,
-        ANTI_RADIATION_LEGGINGS_DYE,
-        ANTI_RADIATION_BOOTS_DYE,
         ANTI_RADIATION_ARMOR,
-        ALL_ANTI_RADIATION_ARMORS,
         ANTI_RADIATION_HELMET_FULL_DYE,
-        ANTI_RADIATION_CHESTPLATE_FULL_DYE,
-        ANTI_RADIATION_LEGGINGS_FULL_DYE,
         THORIUM_ORES,
         ;
 

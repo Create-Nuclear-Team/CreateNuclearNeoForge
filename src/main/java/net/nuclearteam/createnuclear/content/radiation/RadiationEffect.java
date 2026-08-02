@@ -53,12 +53,12 @@ public class RadiationEffect extends MobEffect {
 
         // Check if the entity is wearing any anti-radiation armor
         boolean isWearingAntiRadiationArmor = false;
-        for (ItemStack armor : livingEntity.getArmorSlots()) {
-            if (AntiRadiationArmorItem.isArmored(armor)) {
-                isWearingAntiRadiationArmor = true;
-                break;
-            }
-        }
+//        for (ItemStack armor : livingEntity.getArmorSlots()) {
+//            if (AntiRadiationArmorItem.isArmored(armor)) {
+//                isWearingAntiRadiationArmor = true;
+//                break;
+//            }
+//        }
 
         // If protected by armor, do not apply damage
         if (isWearingAntiRadiationArmor) {

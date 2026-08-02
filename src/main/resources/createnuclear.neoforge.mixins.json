@@ -8,7 +8,8 @@
     "BaseFireBlockMixin"
   ],
   "client": [
-    "client.RadiationHeartMixin"
+    "client.RadiationHeartMixin",
+    "client.AntiRadiationArmorTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

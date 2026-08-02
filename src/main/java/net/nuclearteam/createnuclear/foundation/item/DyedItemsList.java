@@ -1,10 +1,8 @@
 package net.nuclearteam.createnuclear.foundation.item;
 
-import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -13,12 +11,11 @@ import java.util.function.Function;
 
 public class DyedItemsList<T extends Item> implements Iterable<ItemEntry<T>> {
     private static final int COLOR_AMOUNT = DyeColor.values().length;
-
     private final ItemEntry<?>[] values = new ItemEntry<?>[COLOR_AMOUNT];
 
-    public DyedItemsList(Function<DyeColor, ItemEntry<? extends T>> filler) {
+    public DyedItemsList(Function<DyeColor, ItemEntry<? extends T>> filter) {
         for (DyeColor color : DyeColor.values()) {
-            values[color.ordinal()] = filler.apply(color);
+            values[color.ordinal()] = filter.apply(color);
         }
     }
 
@@ -54,8 +51,7 @@ public class DyedItemsList<T extends Item> implements Iterable<ItemEntry<T>> {
             @SuppressWarnings("unchecked")
             @Override
             public ItemEntry<T> next() {
-                if (!hasNext())
-                    throw new NoSuchElementException();
+                if (!hasNext()) throw new NoSuchElementException();
                 return (ItemEntry<T>) values[index++];
             }
         };
