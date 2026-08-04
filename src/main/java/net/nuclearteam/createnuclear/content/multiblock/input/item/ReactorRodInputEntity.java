@@ -24,15 +24,15 @@ import java.util.List;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
-public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider {
+public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvider {
     protected BlockPos block;
 
-    public ReactorInputInventory inventory;
+    public ReactorRodInputInventory inventory;
 
 
-    public ReactorInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public ReactorRodInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        inventory = new ReactorInputInventory(this);
+        inventory = new ReactorRodInputInventory(this);
     }
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -85,7 +85,7 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
                 .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
                 .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
                 .where('O', a -> a.getState().is(CNBlocks.REACTOR_OUTPUT.get()))
-                .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
+                .where('I', a -> a.getState().is(CNBlocks.REACTOR_ROD_INPUT.get()))
                 .getDistanceController(character);
     }
 
@@ -97,7 +97,7 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return ReactorInputMenu.create(i, inventory, this);
+        return ReactorRodInputMenu.create(i, inventory, this);
     }
 
     @Override

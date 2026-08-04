@@ -9,7 +9,7 @@ import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEnti
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputRenderer;
 
@@ -29,9 +29,9 @@ public class CNBlockEntityTypes {
                     .validBlocks(CNBlocks.REACTOR_CORE)
                     .register();
 
-    public static final BlockEntityEntry<ReactorInputEntity> REACTOR_INPUT =
-            CreateNuclear.REGISTRATE.blockEntity("reactor_input", ReactorInputEntity::new)
-                    .validBlocks(CNBlocks.REACTOR_INPUT)
+    public static final BlockEntityEntry<ReactorRodInputEntity> REACTOR_INPUT =
+            CreateNuclear.REGISTRATE.blockEntity("reactor_input", ReactorRodInputEntity::new)
+                    .validBlocks(CNBlocks.REACTOR_ROD_INPUT)
                     .register();
 
     public static final BlockEntityEntry<ReactorFluidInputEntity> REACTOR_FLUID_INPUT =

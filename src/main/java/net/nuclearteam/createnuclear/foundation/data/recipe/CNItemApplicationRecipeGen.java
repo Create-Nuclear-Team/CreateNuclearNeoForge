@@ -31,7 +31,7 @@ public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
     GeneratedRecipe REACTOR_INPUT = itemApplication("reactor_input_from_hopper_and_reactor_casing",
             Items.HOPPER,
             CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_INPUT.get()
+            CNBlocks.REACTOR_ROD_INPUT.get()
     );
 
     protected GeneratedRecipe itemApplication(String name, Ingredient ingredient, ItemLike input, ItemLike output) {

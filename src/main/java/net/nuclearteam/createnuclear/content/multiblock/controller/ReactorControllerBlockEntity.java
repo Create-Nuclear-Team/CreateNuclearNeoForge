@@ -39,7 +39,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -439,7 +439,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             }
             BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
 
-            if (blockEntity instanceof ReactorInputEntity be) {
+            if (blockEntity instanceof ReactorRodInputEntity be) {
                 fuelItem = be.inventory.getStackInSlot(0);
                 coolerItem = be.inventory.getStackInSlot(1);
 
@@ -606,7 +606,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         for (int[] direction : directions) {
             BlockPos newPos = posController.offset(direction[0], direction[1], direction[2]);
-            if (level.getBlockState(newPos).is(CNBlocks.REACTOR_INPUT.get())) {
+            if (level.getBlockState(newPos).is(CNBlocks.REACTOR_ROD_INPUT.get())) {
                 posInput = newPos;
                 break;
             }
@@ -649,7 +649,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
                 .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
                 .where('O', a -> a.getState().is(CNBlocks.REACTOR_OUTPUT.get()))
-                .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
+                .where('I', a -> a.getState().is(CNBlocks.REACTOR_ROD_INPUT.get()))
                 .getDistanceController(character);
     }
 

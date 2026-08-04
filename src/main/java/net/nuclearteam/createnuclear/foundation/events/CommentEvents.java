@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNPotions;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
@@ -25,7 +25,7 @@ public class CommentEvents {
     public static class ModBusEvents {
         @SubscribeEvent
         public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-            ReactorInputEntity.registerCapabilities(event);
+            ReactorRodInputEntity.registerCapabilities(event);
             ReactorFluidInputEntity.registerCapabilities(event);
         }
     }

@@ -14,19 +14,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
 
-public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
+public class ReactorRodInputMenu extends MenuBase<ReactorRodInputEntity> {
 
 
-    public ReactorInputMenu(MenuType<?> type, int id, Inventory inv, RegistryFriendlyByteBuf extraData) {
+    public ReactorRodInputMenu(MenuType<?> type, int id, Inventory inv, RegistryFriendlyByteBuf extraData) {
         super(type, id, inv, extraData);
     }
 
-    public ReactorInputMenu(MenuType<?> type, int id, Inventory inv, ReactorInputEntity contentHolder) {
+    public ReactorRodInputMenu(MenuType<?> type, int id, Inventory inv, ReactorRodInputEntity contentHolder) {
         super(type, id, inv, contentHolder);
     }
 
-    public static ReactorInputMenu create(int id, Inventory inv, ReactorInputEntity contentHolder) {
-        return new ReactorInputMenu(CNMenus.SLOT_ITEM_STORAGE.get(), id, inv, contentHolder);
+    public static ReactorRodInputMenu create(int id, Inventory inv, ReactorRodInputEntity contentHolder) {
+        return new ReactorRodInputMenu(CNMenus.SLOT_ITEM_STORAGE.get(), id, inv, contentHolder);
     }
 
     @Override
@@ -42,11 +42,11 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
 
 
     @Override
-    protected ReactorInputEntity createOnClient(RegistryFriendlyByteBuf extraData) {
+    protected ReactorRodInputEntity createOnClient(RegistryFriendlyByteBuf extraData) {
         ClientLevel world = Minecraft.getInstance().level;
         BlockEntity blockEntity = world.getBlockEntity(extraData.readBlockPos());
 
-        if (blockEntity instanceof ReactorInputEntity reactorInput) {
+        if (blockEntity instanceof ReactorRodInputEntity reactorInput) {
             reactorInput.readClient(extraData.readNbt(), extraData.registryAccess());
             return reactorInput;
         }
@@ -54,7 +54,7 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
     }
 
     @Override
-    protected void initAndReadInventory(ReactorInputEntity contentHolder) {
+    protected void initAndReadInventory(ReactorRodInputEntity contentHolder) {
 
     }
 
@@ -81,7 +81,7 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
     }
 
     @Override
-    protected void saveData(ReactorInputEntity contentHolder) {
+    protected void saveData(ReactorRodInputEntity contentHolder) {
     }
 
     @Override
