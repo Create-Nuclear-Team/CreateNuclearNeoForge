@@ -1,13 +1,20 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.Create;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -50,6 +57,37 @@ public class CNDataComponents {
             "count_uranium_rod",
             builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
     );
+
+    public static final DataComponentType<Cloths> CLOTH_COLOR = register(
+        "cloth_color",
+        b -> b.persistent(StringRepresentable.fromEnum(Cloths::values)).networkSynchronized(NeoForgeStreamCodecs.enumCodec(Cloths.class))
+    );
+
+    public static final DataComponentType<ClothItemStack> CLOTH_ITEM = register(
+        "cloth_item",
+        b -> b.persistent(ClothItemStack.CODEC).networkSynchronized(ClothItemStack.STREAM_CODEC)
+    );
+
+    /**
+     * Wraps an ItemStack with content-based equals/hashCode, since ItemStack itself only offers
+     * identity equality and NeoForge requires data component values to implement both properly.
+     */
+    public record ClothItemStack(ItemStack stack) {
+        public static final Codec<ClothItemStack> CODEC = ItemStack.CODEC.xmap(ClothItemStack::new, ClothItemStack::stack);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClothItemStack> STREAM_CODEC = ItemStack.STREAM_CODEC.map(ClothItemStack::new, ClothItemStack::stack);
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof ClothItemStack(
+                    ItemStack stack1
+            ) && ItemStack.isSameItemSameComponents(this.stack, stack1);
+        }
+
+        @Override
+        public int hashCode() {
+            return ItemStack.hashItemAndComponents(this.stack);
+        }
+    }
 
     private static <T> DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {
         DataComponentType<T> type = builder.apply(DataComponentType.builder()).build();

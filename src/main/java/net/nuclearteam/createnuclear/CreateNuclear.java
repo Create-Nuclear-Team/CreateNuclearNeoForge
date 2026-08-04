@@ -76,6 +76,7 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
+        CNAttributes.register(modEventBus);
         RadiationCapability.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
