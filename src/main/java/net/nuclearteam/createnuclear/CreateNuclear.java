@@ -84,6 +84,8 @@ public class CreateNuclear {
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
+        CNParticleTypes.register(modEventBus);
+        CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
 
         modEventBus.addListener(CreateNuclear::init);

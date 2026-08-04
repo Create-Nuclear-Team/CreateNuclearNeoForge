@@ -1,0 +1,15 @@
+/gamemode creative
+/particle createnuclear:irradiated_particles
+/particle create:air
+/particle create:air_flow
+/particle
+/particle createnuclear:irradiated_particles ~ ~1 ~ 0 0 0 0 104
+/particle minecraft:flame ~ ~1 ~ 0 0 0 0 10
+/give Dev minecraft:command_block
+/summon createnuclear:irradiated_cat
+/particle create:soul_expanding_perimeter
+/particle minecraft:small_flame
+/particle createnuclear:irradiated_particles
+/particle createnuclear:nuclear_mushroom_cloud_explosion
+/particle createnuclear:nuclear_mushroom_cloud_smoke
+/summon createnuclear:nuclear_explosion
