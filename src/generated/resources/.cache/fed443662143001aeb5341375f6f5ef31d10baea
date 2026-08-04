@@ -1,4 +1,6 @@
-// 1.21.1	2026-07-22T15:03:47.0002755	CreateNuclear Generated Registry Entries
+// 1.21.1	2026-08-02T17:06:27.1975466	CreateNuclear Generated Registry Entries
+74de56c37a28ab632a6ffc161475bcec85de68e2 data/createnuclear/damage_type/fan_radiation.json
+dfb5a22341ff4202e85ca8cdf9b6ec95c6e280d1 data/createnuclear/damage_type/radiation.json
 5b42761cb26db47a6ad47ff3c84820f9fd541477 data/createnuclear/neoforge/biome_modifier/lead_ore.json
 11b96fb02b86323e62801eb592485cd110c6ad8d data/createnuclear/neoforge/biome_modifier/nitrate_ore.json
 2ab7262c3d16fb07daf01cf4ca7d07a04f2238b8 data/createnuclear/neoforge/biome_modifier/striated_ores_overworld.json

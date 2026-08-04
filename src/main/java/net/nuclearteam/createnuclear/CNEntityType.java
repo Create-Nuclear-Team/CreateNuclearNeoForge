@@ -18,6 +18,13 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.Irradi
 
 public class CNEntityType {
 
+    public static final EntityEntry<net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity> NUCLEAR_EXPLOSION = CreateNuclear.REGISTRATE
+        .entity("nuclear_explosion", net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity::new, MobCategory.MISC)
+        .properties(p -> p.sized(1.0f, 1.0f))
+        .lang("Nuclear Explosion")
+        .renderer(() -> net.minecraft.client.renderer.entity.NoopRenderer::new)
+        .register();
+
    public static final EntityEntry<IrradiatedCat> IRRADIATED_CAT = CreateNuclear.REGISTRATE
         .entity("irradiated_cat", IrradiatedCat::new, MobCategory.CREATURE)
         .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
