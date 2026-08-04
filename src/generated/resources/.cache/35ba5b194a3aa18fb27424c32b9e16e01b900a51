@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-02T15:06:33.0458328	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-04T14:27:49.7614332	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -35,8 +35,8 @@ f628f8c7aa1e150ad2b5a3ce87dbe7f00b462e74 assets/createnuclear/blockstates/polish
 3cced3f7d35371f1881b0485ee324788adcd2c74 assets/createnuclear/blockstates/reactor_core.json
 0d8ab9ccc729b8e78539a2fab7b52b6be0afb24b assets/createnuclear/blockstates/reactor_fluid_input.json
 ff68065029f7d47434aaf3f60e5ec3319302d2d8 assets/createnuclear/blockstates/reactor_frame.json
-797bb3045272b742be75c5dc1a511a1c2acaa877 assets/createnuclear/blockstates/reactor_input.json
 36ee5c127b0548502d15bc16a638a5bac40df1b6 assets/createnuclear/blockstates/reactor_output.json
+daa6730e5e83972faea54e62eb1cf0fe36aaef0a assets/createnuclear/blockstates/reactor_rod_input.json
 f7504d5f748fe938bf07d2eb5d0ba46bbfa0499d assets/createnuclear/blockstates/reinforced_glass.json
 664db32ecb461bb1a8774d71d4d7168cfa56803c assets/createnuclear/blockstates/small_autunite_bricks.json
 d4df48b7d5c38d7cf0b9347c196024e11497ca00 assets/createnuclear/blockstates/small_autunite_brick_slab.json
@@ -48,8 +48,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-71a515f06177053403298868801e6dd69e0a4f49 assets/createnuclear/lang/en_ud.json
-cd3f14bfb6ed106f76874710c90664bddd82fb8e assets/createnuclear/lang/en_us.json
+1d6840f8e6d2bfd2fdcc840bf56cab5b01a914e6 assets/createnuclear/lang/en_ud.json
+5fedcd974b8eb135b4c27d1bfd73c8478951e79b assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -245,8 +245,8 @@ ee9b06de6d4e5f722543a83e5d9f7564ac6d7f70 assets/createnuclear/models/item/reacto
 7e444d9dc776530d017fc28fe18dad0fabeedcdc assets/createnuclear/models/item/reactor_core.json
 3e46c3ff9c6fc0b276549f7f63be2b4690cd3d62 assets/createnuclear/models/item/reactor_fluid_input.json
 6726831326d47e5e416216e0ec1d3fd214110e89 assets/createnuclear/models/item/reactor_frame.json
-18dc2031fd8aeba588d92e43093fb76e78b2bbe4 assets/createnuclear/models/item/reactor_input.json
 69e464d730b826a0c28ed3cfeab28c4c561ec1b0 assets/createnuclear/models/item/reactor_output.json
+08b156175821e1ce7820783f2f1ba92924e54a7d assets/createnuclear/models/item/reactor_rod_input.json
 4db93da70d6a7549155201b7d9d68355449652ac assets/createnuclear/models/item/red_cloth.json
 78a9e80073512a111cb936a516d290a824846ff2 assets/createnuclear/models/item/reinforced_glass.json
 9b008029869830da5e8b8b2701e80a3a50945382 assets/createnuclear/models/item/small_autunite_bricks.json
@@ -442,8 +442,8 @@ e76c0b96c978e266f39eca8e46cd5ba2388e1749 data/createnuclear/loot_table/blocks/re
 daa4fad27f07fd72cb25a524464edea9efe771b7 data/createnuclear/loot_table/blocks/reactor_core.json
 1f0c66a193aaddb26626967d16cd8112e18b7383 data/createnuclear/loot_table/blocks/reactor_fluid_input.json
 576b0bf970ddbdd11ec06963e1d65e08e63d69e1 data/createnuclear/loot_table/blocks/reactor_frame.json
-be48e04b069441c8593aab5e9bf78f4edc2dd249 data/createnuclear/loot_table/blocks/reactor_input.json
 37af2b0b5eacf53995703344a45fb3f4d0efe1f9 data/createnuclear/loot_table/blocks/reactor_output.json
+4d10dc9daa7551a1c4879edbc22f63a8f1d84c73 data/createnuclear/loot_table/blocks/reactor_rod_input.json
 03f05a92cf4e1565fe3482f763a1be9e9dd7f088 data/createnuclear/loot_table/blocks/reinforced_glass.json
 48c0d8d35932fe1cdb00e5055caa6c1969a8e4cd data/createnuclear/loot_table/blocks/small_autunite_bricks.json
 d51f9b307f2986ac086d32f48bd41e6dc4024348 data/createnuclear/loot_table/blocks/small_autunite_brick_slab.json
@@ -669,10 +669,10 @@ e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/block/campfires.jso
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/minecraft/tags/block/impermeable.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/lush_ground_replaceable.json
 e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/block/mineable/axe.json
-e157f9a29d5f2cab865a1d039c5279dc8f1166ba data/minecraft/tags/block/mineable/pickaxe.json
+9734eb7069a3fb4e51274940242141a6df5291ce data/minecraft/tags/block/mineable/pickaxe.json
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/minecraft/tags/block/mineable/shovel.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/moss_replaceable.json
-961afc2c39807be594410138543936c9a634ba52 data/minecraft/tags/block/needs_diamond_tool.json
+6c5ca238a1785d2e1633817d6d2c51188b008581 data/minecraft/tags/block/needs_diamond_tool.json
 174f191424a76fd10ade17e07a142cf28ef891cf data/minecraft/tags/block/needs_iron_tool.json
 70955c444f864b4cf76dc7494195b95cec0c0775 data/minecraft/tags/block/slabs.json
 f730ea13c5c0e367d6108fee0d47d10e8c39f3f7 data/minecraft/tags/block/stairs.json

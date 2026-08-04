@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -24,17 +25,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNShapes;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ReactorInput extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
+public class ReactorRodInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorRodInputEntity> {
 
-    public ReactorInput(Properties properties) {
+    public ReactorRodInput(Properties properties) {
         super(properties);
     }
 
@@ -62,8 +65,13 @@ public class ReactorInput extends HorizontalDirectionalReactorBlock implements I
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addInput);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, pPlacer, stack);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
     // @Override // ! may be useless
@@ -119,20 +127,21 @@ public class ReactorInput extends HorizontalDirectionalReactorBlock implements I
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
-                .setValue(FACING, context.getHorizontalDirection().getOpposite());
+                .setValue(FACING, context.getNearestLookingDirection().getOpposite());
     }
+
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return CNShapes.REACTOR_INPUT.get(state.getValue(FACING));
     }
 
     @Override
-    public Class<ReactorInputEntity> getBlockEntityClass() {
-        return ReactorInputEntity.class;
+    public Class<ReactorRodInputEntity> getBlockEntityClass() {
+        return ReactorRodInputEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends ReactorInputEntity> getBlockEntityType() {
+    public BlockEntityType<? extends ReactorRodInputEntity> getBlockEntityType() {
         return CNBlockEntityTypes.REACTOR_INPUT.get();
     }
 }

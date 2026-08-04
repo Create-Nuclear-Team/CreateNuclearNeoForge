@@ -6,10 +6,10 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.nuclearteam.createnuclear.CNItems;
 import org.jetbrains.annotations.NotNull;
 
-public class ReactorInputInventory extends ItemStackHandler {
-    private final ReactorInputEntity be;
+public class ReactorRodInputInventory extends ItemStackHandler {
+    private final ReactorRodInputEntity be;
 
-    public ReactorInputInventory(ReactorInputEntity be) {
+    public ReactorRodInputInventory(ReactorRodInputEntity be) {
         super(2);
         this.be = be;
     }

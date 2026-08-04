@@ -9,8 +9,12 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNParticleRegistry;
+import net.nuclearteam.createnuclear.CNParticleTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorClientExtensions;
+import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParticle;
+import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
 import net.nuclearteam.createnuclear.foundation.events.overlay.IrradiatedOverlayRendererVision;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, value = Dist.CLIENT)

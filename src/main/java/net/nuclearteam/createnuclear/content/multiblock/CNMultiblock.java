@@ -37,7 +37,7 @@ public class CNMultiblock {
                         .where('D', stateIs(CNBlocks.REACTOR_COOLER.get()))
                         .where('*', stateIs(CNBlocks.REACTOR_CONTROLLER.get()))
                         .where('O', stateIs(CNBlocks.REACTOR_OUTPUT.get()))
-                        .where('I', stateIs(CNBlocks.REACTOR_INPUT.get()))
+                        .where('I', stateIs(CNBlocks.REACTOR_ROD_INPUT.get()))
                         .build()
         );
     }

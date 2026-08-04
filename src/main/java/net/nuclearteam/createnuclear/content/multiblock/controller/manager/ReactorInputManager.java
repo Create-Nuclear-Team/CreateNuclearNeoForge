@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 
 import java.util.ArrayList;
@@ -188,7 +188,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         List<BlockPos> positions = new ArrayList<>();
 
         for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorInputEntity) positions.add(p);
+            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) positions.add(p);
         }
         return List.copyOf(positions);
     }
