@@ -23,6 +23,13 @@ public class CNPotions {
     public static final Holder<Potion> POTION_2 = CN_POTIONS.register("potion_of_radiation_2",
         () -> new Potion(new MobEffectInstance(CNEffects.RADIATION.getDelegate(), 410, 1)));
 
+    public static final Holder<Potion> POTION_1_IODINE = CN_POTIONS.register("potion_of_iodine",
+            () -> new Potion(new MobEffectInstance(CNEffects.IODINE.getDelegate(), 900))
+    );
+    public static final Holder<Potion> POTION_AUGMENT_1_IODINE = CN_POTIONS.register("potion_of_iodine_augment",
+            () -> new Potion(new MobEffectInstance(CNEffects.IODINE.getDelegate(), 1800))
+    );
+
     public static void register(IEventBus eventBus) {
         CN_POTIONS.register(eventBus);
     }
@@ -33,5 +40,8 @@ public class CNPotions {
         builder.addMix(Potions.AWKWARD, CNItems.ENRICHED_YELLOWCAKE.get(), POTION_1);
         builder.addMix(POTION_1, Items.REDSTONE, POTION_AUGMENT_1);
         builder.addMix(POTION_1, Items.GLOWSTONE_DUST, POTION_2);
+
+        builder.addMix(Potions.AWKWARD, Items.DRIED_KELP, POTION_1_IODINE);
+        builder.addMix(POTION_1_IODINE, Items.REDSTONE, POTION_AUGMENT_1_IODINE);
     }
 }

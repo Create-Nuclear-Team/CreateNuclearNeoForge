@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.nuclearteam.createnuclear.content.effects.IodineEffect;
 import net.nuclearteam.createnuclear.content.radiation.RadiationEffect;
 
 public class CNEffects {
@@ -17,6 +18,9 @@ public class CNEffects {
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED,
                             CreateNuclear.asResource("radiation"), -0.25f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
+    public static final Holder<MobEffect> IODINE = EFFECTS.register("iodine", IodineEffect::new);
+
     public static void register(IEventBus eventBus) {
         EFFECTS.register(eventBus);
     }}

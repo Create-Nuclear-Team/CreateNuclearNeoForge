@@ -76,7 +76,6 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
-        CNAttributes.register(modEventBus);
         RadiationCapability.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
@@ -87,6 +86,7 @@ public class CreateNuclear {
         CNParticleTypes.register(modEventBus);
         CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
+        CNAttributes.register(modEventBus);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);

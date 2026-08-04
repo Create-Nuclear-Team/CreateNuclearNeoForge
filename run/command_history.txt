@@ -13,3 +13,13 @@
 /particle createnuclear:nuclear_mushroom_cloud_explosion
 /particle createnuclear:nuclear_mushroom_cloud_smoke
 /summon createnuclear:nuclear_explosion
+/time set day
+/
+/time set day
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/effect give Dev createnuclear:iodine
+/gamemode creative
+/gamemode survival
+/gamemode creative
