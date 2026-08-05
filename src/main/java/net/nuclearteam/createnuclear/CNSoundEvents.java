@@ -33,96 +33,121 @@ public class CNSoundEvents {
     public static final Map<ResourceLocation, SoundEntry> ALL = new HashMap<>();
 
     public static final SoundEntry
-        REACTOR_ACTIVATION = create("reacteur/activation")
-                .subtitle("Reactor Activation")
-                .category(SoundSource.BLOCKS)
-                .build(),
+            REACTOR_CASING_BREAK = create("reacteur/casing", "break")
+            .subtitle("Break Reactor Casing")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        REACTOR_RUNNING = create("reacteur/running")
-                .subtitle("Reactor Running")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    REACTOR_CASING_STEP = create("reacteur/casing", "step")
+            .subtitle("Step on Reactor Casing")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        REACTOR_SHUT_OFF = create("reacteur/shut_off")
-                .subtitle("Reactor Shut Off")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    REACTOR_CASING_PLACE = create("reacteur/casing", "place")
+            .subtitle("Place Reactor Casing")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        REACTOR_ALARM_ONESHOT = create("alarm/reactor", "alarm")
-                .subtitle("Reactor Alarm")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    REACTOR_CASING_HIT = create("reacteur/casing", "hit")
+            .subtitle("Hit Reactor Casing")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        REACTOR_ALARM_LOOP = create("alarm/alarm")
-                .subtitle("Reactor Alarm Loop")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    REACTOR_CASING_FALL = create("reacteur/casing", "fall")
+            .subtitle("Reactor Casing Fall")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        NUCLEAR_EXPLOSION = create("explosion/nuclear_explosion")
-                .subtitle("Nuclear Explosion")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    REACTOR_ACTIVATION = create("reacteur/activation")
+            .subtitle("Reactor Activation")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        NUCLEAR_EXPLOSION_LARGE = create("explosion/large_nuclear_explosion")
-                .subtitle("Large Nuclear Explosion")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    REACTOR_RUNNING = create("reacteur/running")
+            .subtitle("Reactor Running")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        NUCLEAR_EXPLOSION_RINGING = create("explosion/ringing")
-                .subtitle("Nuclear Explosion Ringing")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    REACTOR_SHUT_OFF = create("reacteur/shut_off")
+            .subtitle("Reactor Shut Off")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        NUCLEAR_EXPLOSION_RUMBLE = create("explosion/nuclear_explosion_rumble")
-                .subtitle("Nuclear Explosion Rumble")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    REACTOR_ALARM_ONESHOT = create("alarm/reactor", "alarm")
+            .subtitle("Reactor Alarm")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
-                .subtitle("Motor Assemble")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    REACTOR_ALARM_LOOP = create("alarm/alarm")
+            .subtitle("Reactor Alarm Loop")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
-                .subtitle("Motor Disassemble")
-                .category(SoundSource.BLOCKS)
-                .build(),
+    NUCLEAR_EXPLOSION = create("explosion/nuclear_explosion")
+            .subtitle("Nuclear Explosion")
+            .category(SoundSource.AMBIENT)
+            .build(),
 
-        NUCLEAR_EXPLOSION_RUMBLE_2 = create("explosion/rumble")
-                .subtitle("Nuclear Explosion Rumble")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    NUCLEAR_EXPLOSION_LARGE = create("explosion/large_nuclear_explosion")
+            .subtitle("Large Nuclear Explosion")
+            .category(SoundSource.AMBIENT)
+            .build(),
 
-        NUCLEAR_EXPLOSION_MAIN = create("explosion/main")
-                .subtitle("Nuclear Explosion Main")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    NUCLEAR_EXPLOSION_RINGING = create("explosion/ringing")
+            .subtitle("Nuclear Explosion Ringing")
+            .category(SoundSource.AMBIENT)
+            .build(),
 
-        NUCLEAR_EXPLOSION_SHOCKWAVE = create("explosion/shockwave")
-                .subtitle("Nuclear Explosion Shockwave")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    NUCLEAR_EXPLOSION_RUMBLE = create("explosion/nuclear_explosion_rumble")
+            .subtitle("Nuclear Explosion Rumble")
+            .category(SoundSource.AMBIENT)
+            .build(),
 
-        GEIGER_HIGH = create("geiger/high")
-                .subtitle("Geiger High")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
+            .subtitle("Motor Assemble")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        GEIGER_LOW = create("geiger/low")
-                .subtitle("Geiger Low")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
+            .subtitle("Motor Disassemble")
+            .category(SoundSource.BLOCKS)
+            .build(),
 
-        GEIGER_MEDIUM = create("geiger/medium")
-                .subtitle("Geiger Medium")
-                .category(SoundSource.AMBIENT)
-                .build(),
+    NUCLEAR_EXPLOSION_RUMBLE_2 = create("explosion/rumble")
+            .subtitle("Nuclear Explosion Rumble")
+            .category(SoundSource.AMBIENT)
+            .build(),
 
-        BIOME_WASTELAND = create("biomes/wasteland")
-                .subtitle("Wasteland")
-                .category(SoundSource.AMBIENT)
-                .build()
-                ;
+    NUCLEAR_EXPLOSION_MAIN = create("explosion/main")
+            .subtitle("Nuclear Explosion Main")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+    NUCLEAR_EXPLOSION_SHOCKWAVE = create("explosion/shockwave")
+            .subtitle("Nuclear Explosion Shockwave")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+    GEIGER_HIGH = create("geiger/high")
+            .subtitle("Geiger High")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+    GEIGER_LOW = create("geiger/low")
+            .subtitle("Geiger Low")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+    GEIGER_MEDIUM = create("geiger/medium")
+            .subtitle("Geiger Medium")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+    BIOME_WASTELAND = create("biomes/wasteland")
+            .subtitle("Wasteland")
+            .category(SoundSource.AMBIENT)
+            .build()
+            ;
 
     private static SoundEntryBuilder create(String... pathParts) {
         String name = String.join("_", pathParts);
