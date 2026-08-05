@@ -12,17 +12,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-//import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
 
 import java.util.List;
 
-public class BiomeIrradationExtractorItem extends Item {
+public class BiomeIrradiationExtractorItem extends Item {
     public static final String TAG = "biome_restore";
     private static final int CHARGE_PER_CLICK = 1;
 
-    public BiomeIrradationExtractorItem(Properties pProperties) {
+    public BiomeIrradiationExtractorItem(Properties pProperties) {
         super(pProperties);
     }
 
@@ -34,10 +35,16 @@ public class BiomeIrradationExtractorItem extends Item {
             return InteractionResultHolder.success(stack);
         }
 
-        if (getCharge(stack) >= getMaxCharge()) return InteractionResultHolder.pass(stack);
+        if (getCharge(stack) >= getMaxCharge())
+        {
+            return InteractionResultHolder.pass(stack);
+        }
 
-        //boolean restored = BiomeIrradiationService.restoreArea(serverLevel, player.blockPosition());
-        //if (!restored) return InteractionResultHolder.pass(stack);
+        boolean restored = BiomeIrradiationService.restoreArea(serverLevel, player.blockPosition());
+        if (!restored)
+        {
+            return InteractionResultHolder.pass(stack);
+        }
 
         ItemStack charged = stack.copyWithCount(1);
         addCharge(charged, CHARGE_PER_CLICK);
@@ -66,8 +73,7 @@ public class BiomeIrradationExtractorItem extends Item {
 
     @Override
     public int getMaxStackSize(ItemStack stack) {
-        // return getCharge(stack) > 0 ? 1 : this.getMaxStackSize();
-        return 8;
+        return getCharge(stack) > 0 ? 1 : this.getDefaultMaxStackSize();
     }
 
     @Override
@@ -85,8 +91,7 @@ public class BiomeIrradationExtractorItem extends Item {
     }
 
     public static int getMaxCharge() {
-        //return CNConfigs.server().biomeRestore.maxCharge.get();
-        return 1;
+        return CNConfigs.server().biomeRestore.maxCharge.get();
     }
 
     public static void addCharge(ItemStack stack, int amount) {

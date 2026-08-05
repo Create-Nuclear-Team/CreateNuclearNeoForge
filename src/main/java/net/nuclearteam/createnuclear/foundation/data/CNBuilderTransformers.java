@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -80,7 +80,7 @@ public class CNBuilderTransformers {
                         .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
 
                 outer.override()
-                        .predicate(CreateNuclear.asResource(BiomeIrradationExtractorItem.TAG), tier.threshold())
+                        .predicate(CreateNuclear.asResource(BiomeIrradiationExtractorItem.TAG), tier.threshold())
                         .model(child)
                         .end();
             }

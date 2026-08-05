@@ -12,10 +12,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -23,7 +20,7 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
-import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
@@ -35,7 +32,6 @@ import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
@@ -413,8 +409,8 @@ public class CNItems {
             .properties(p -> p.stacksTo(16))
             .register();
 
-    public static final ItemEntry<BiomeIrradationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
-            .item("biome_irradiation_extractor", BiomeIrradationExtractorItem::new)
+    public static final ItemEntry<BiomeIrradiationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
+            .item("biome_irradiation_extractor", BiomeIrradiationExtractorItem::new)
             .lang("Biome Irradiation Extractor")
             .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
                     .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
