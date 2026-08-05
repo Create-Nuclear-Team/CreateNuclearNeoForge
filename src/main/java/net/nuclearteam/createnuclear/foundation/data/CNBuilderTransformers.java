@@ -12,7 +12,9 @@ import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class CNBuilderTransformers {
@@ -61,29 +63,29 @@ public class CNBuilderTransformers {
      * Overrides must stay ascending by predicate value (vanilla resolves to the last match <= value),
      * and the thresholds here must match the ratio returned by {@code biomeRestoreItemProperties}.
      */
-//    public static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> biomeRestoreModel() {
-//        return (c, p) -> {
-//            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_irradiation_extractor/empty"));
-//
-//            record Tier(String name, float threshold) {}
-//            List<Tier> tiers = List.of(
-//                    new Tier("quarter", 0.25f),
-//                    new Tier("half", 0.5f),
-//                    new Tier("three_quarters", 0.75f),
-//                    new Tier("full", 1.0f)
-//            );
-//
-//            for (Tier tier : tiers) {
-//                ItemModelBuilder child = p.withExistingParent("item/biome_irradiation_extractor/" + tier.name(), p.mcLoc("item/generated"))
-//                        .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
-//
-//                outer.override()
-//                        .predicate(CreateNuclear.asResource(BiomeIrradationExtractorItem.TAG), tier.threshold())
-//                        .model(child)
-//                        .end();
-//            }
-//        };
-//    }
+    public static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> biomeRestoreModel() {
+        return (c, p) -> {
+            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_irradiation_extractor/empty"));
+
+            record Tier(String name, float threshold) {}
+            List<Tier> tiers = List.of(
+                    new Tier("quarter", 0.25f),
+                    new Tier("half", 0.5f),
+                    new Tier("three_quarters", 0.75f),
+                    new Tier("full", 1.0f)
+            );
+
+            for (Tier tier : tiers) {
+                ItemModelBuilder child = p.withExistingParent("item/biome_irradiation_extractor/" + tier.name(), p.mcLoc("item/generated"))
+                        .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
+
+                outer.override()
+                        .predicate(CreateNuclear.asResource(BiomeIrradationExtractorItem.TAG), tier.threshold())
+                        .model(child)
+                        .end();
+            }
+        };
+    }
 
     public static ItemEntry<DeferredSpawnEggItem> spawnEgg(String name, Supplier<? extends EntityType<? extends Mob>> entity, int backgroundColor, int highlightColor, String nameItems) {
         return CreateNuclear.REGISTRATE

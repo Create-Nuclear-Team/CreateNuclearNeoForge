@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear;
 
 import static net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.*;
+import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.biomeRestoreModel;
 import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.coloredArmorModel;
 
 import com.simibubi.create.AllBlocks;
@@ -22,6 +23,7 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
@@ -398,6 +400,33 @@ public class CNItems {
         .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/reactor_blueprint")))
         .properties(p -> p.stacksTo(1))
         .register();
+
+    public static final ItemEntry<Item> REINFORCED_GLASS_BOTTLE = CreateNuclear.REGISTRATE
+            .item("reinforced_glass_bottle", Item::new)
+            .lang("Reinforced Glass Bottle")
+            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, c.get(), 3)
+                    .unlockedBy("has_reinforced_glass", RegistrateRecipeProvider.has(CNBlocks.REINFORCED_GLASS.get()))
+                    .define('G', CNBlocks.REINFORCED_GLASS)
+                    .pattern("G G")
+                    .pattern(" G ")
+                    .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+            .properties(p -> p.stacksTo(16))
+            .register();
+
+    public static final ItemEntry<BiomeIrradationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
+            .item("biome_irradiation_extractor", BiomeIrradationExtractorItem::new)
+            .lang("Biome Irradiation Extractor")
+            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
+                    .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
+                    .define('B', CNItems.REINFORCED_GLASS_BOTTLE)
+                    .define('S', Items.NETHER_STAR)
+                    .pattern("BBB")
+                    .pattern("BSB")
+                    .pattern("BBB")
+                    .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+            .properties(p -> p.stacksTo(16).fireResistant().setNoRepair())
+            .model(biomeRestoreModel())
+            .register();
 
     public static void register() {}
 }
