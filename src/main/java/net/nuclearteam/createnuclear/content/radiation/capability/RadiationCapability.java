@@ -41,8 +41,10 @@ import java.util.function.Supplier;
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class RadiationCapability implements INBTSerializable<CompoundTag> {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, CreateNuclear.MOD_ID);
+    // serializable(), not builder(): builder() attaches no serializer, so the state was never
+    // written to disk and never restored on load.
     public static final Supplier<AttachmentType<RadiationCapability>> RADIATION = ATTACHMENT_TYPES.register("radiation",
-            () -> AttachmentType.builder(() -> new RadiationCapability()).build());
+            () -> AttachmentType.serializable(RadiationCapability::new).build());
 
     public static void register(IEventBus modEventBus) {
         ATTACHMENT_TYPES.register(modEventBus);
@@ -99,50 +101,48 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
     }
 
     public static void applyContagion(LivingEntity entity, double doseValue, int durationTicks) {
-        if (entity.hasData(RADIATION)) {
-            RadiationCapability cap = entity.getData(RADIATION);
-            cap.setContagionDose(doseValue);
-            cap.setContagionTicks(durationTicks);
-        }
+        RadiationCapability cap = entity.getData(RADIATION);
+        cap.setContagionDose(doseValue);
+        cap.setContagionTicks(durationTicks);
     }
 
     public static void tickRadiation(LivingEntity entity) {
         Level level = entity.level();
         if (level.isClientSide) return;
 
-        if (entity.hasData(RADIATION)) {
-            RadiationCapability cap = entity.getData(RADIATION);
-            
-            if (entity instanceof Player player) {
-                long newHash = InventoryHashUtil.compute(player);
-                if (newHash != cap.getInventoryHash()) {
-                    cap.setInventoryHash(newHash);
-                    cap.setRadiation(Math.max(0, computeItemRadiation(player)));
-                }
-            } else {
-                cap.setRadiation(Math.max(0, computeItemRadiation(entity)));
+        // Checked before getData: getData creates and stores the attachment on first access, so
+        // guarding first keeps immune/blacklisted entities from accumulating one every tick.
+        if (!canBeIrradiated(entity)) return;
+
+        RadiationCapability cap = entity.getData(RADIATION);
+
+        if (entity instanceof Player player) {
+            long newHash = InventoryHashUtil.compute(player);
+            if (newHash != cap.getInventoryHash()) {
+                cap.setInventoryHash(newHash);
+                cap.setRadiation(Math.max(0, computeItemRadiation(player)));
             }
-
-            ResourceKey<Biome> biomeKey = level.getBiome(entity.blockPosition()).unwrapKey().orElse(null);
-            ResourceLocation biomeLoc = biomeKey != null ? biomeKey.location() : null;
-            if (!Objects.equals(biomeLoc, cap.getLastBiomeLocation())) {
-                cap.setLastBiomeLocation(biomeLoc);
-            }
-
-            if (!canBeIrradiated(entity)) return;
-
-            if (cap.getContagionTicks() > 0) {
-                cap.setContagionTicks(cap.getContagionTicks() - 1);
-            }
-
-            double contagionDose = cap.getContagionTicks() > 0 ? cap.getContagionDose() : 0;
-
-            double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey) + contagionDose;
-            double resistance = getRadiationResistance(entity);
-            double totalRadiation = totalRaw * (1.0 - resistance);
-
-            applyEffects(entity, totalRadiation);
+        } else {
+            cap.setRadiation(Math.max(0, computeItemRadiation(entity)));
         }
+
+        ResourceKey<Biome> biomeKey = level.getBiome(entity.blockPosition()).unwrapKey().orElse(null);
+        ResourceLocation biomeLoc = biomeKey != null ? biomeKey.location() : null;
+        if (!Objects.equals(biomeLoc, cap.getLastBiomeLocation())) {
+            cap.setLastBiomeLocation(biomeLoc);
+        }
+
+        if (cap.getContagionTicks() > 0) {
+            cap.setContagionTicks(cap.getContagionTicks() - 1);
+        }
+
+        double contagionDose = cap.getContagionTicks() > 0 ? cap.getContagionDose() : 0;
+
+        double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey) + contagionDose;
+        double resistance = getRadiationResistance(entity);
+        double totalRadiation = totalRaw * (1.0 - resistance);
+
+        applyEffects(entity, totalRadiation);
     }
 
     private static double computeItemRadiation(Player player) {

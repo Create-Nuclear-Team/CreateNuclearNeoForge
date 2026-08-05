@@ -38,6 +38,7 @@ public class CNClientEvent {
         );
     }
   
+    @SubscribeEvent
     public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
         CNParticleTypes.registerFactories(event);
         event.registerSpecial(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), new NuclearMushroomCloudParticle.Factory());
