@@ -91,7 +91,6 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         List<BlockPos> positions = new ArrayList<>();
 
         for (BlockPos p : this.getBlocksPosition()) {
-            CreateNuclear.LOGGER.warn("getBlocksPosition: {} {}", level.getBlockEntity(p), level.getBlockEntity(p) instanceof ReactorFluidInputEntity);
             if (level.getBlockEntity(p) instanceof ReactorFluidInputEntity) positions.add(p);
         }
         return List.copyOf(positions);
@@ -126,8 +125,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         if (handlers.isEmpty()) return new VirtualReactorInputFluid();
 
         for (IFluidHandler h : handlers) {
-            int tank = h.getTanks();
-            virtualReactorInputFluid.addFluid(h.getFluidInTank(tank));
+            virtualReactorInputFluid.addFluid(h.getFluidInTank(0));
         }
 
         return virtualReactorInputFluid;
@@ -145,8 +143,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         if (handlers.isEmpty()) return false;
 
         for (IFluidHandler handler : handlers) {
-            int tank = handler.getTanks();
-            FluidStack stack = handler.getFluidInTank(tank);
+            FluidStack stack = handler.getFluidInTank(0);
             if (stack.isEmpty()) continue;
             int toExtract = Math.min(fluidNeeded, stack.getAmount());
             if (toExtract > 1) {

@@ -311,6 +311,30 @@ Les lots 1, 3 et 5 sont essentiellement de la traduction d'imports. Les lots 2, 
 
 Les deux gametests Forge (`DefaultHeatCalculatorGameTest`, `ReactorInputFluidManagerGameTest`) sont à porter avec les lots 1 et 3 respectivement : ils valident précisément la logique la plus risquée.
 
+### Lot 8 — Gametests ✅ FAIT
+
+`./gradlew runGameTestServer` — **30 tests, 28 passent, 2 échouent volontairement.**
+
+Les 4 tests du modèle thermique passent, dont `threeByThreeDiamond` croisé avec le calculateur
+du wiki communautaire. C'est la première validation à l'exécution du portage.
+
+Les 2 échecs sont les marqueurs de régression `*_expectedContract`, qui échouent **aussi sur
+Forge** : `extractFluids` ne décrémente pas `fluidNeeded` entre les handlers (sur-extraction) et
+ignore les demandes d'exactement 1 unité. Comportement identique des deux côtés — c'est ce qu'on
+voulait vérifier. ⚠️ Conséquence : `runGameTestServer` sort en code 1. Ne pas le brancher en CI
+bloquante avant d'avoir corrigé `extractFluids` (dans les deux repos).
+
+**Adaptations du portage :**
+- `loadPattern` écrit un `ReactorBluePrintData` typé (57 `PatternData`) au lieu du tag NBT `pattern`.
+- Capabilities via `level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null)`.
+- `ForgeRegistries.FLUIDS` → `BuiltInRegistries.FLUID`, annotations `net.neoforged.neoforge.gametest`.
+- La structure va dans `data/createnuclear/structure/` (**singulier** en 1.21, `structures` en 1.20.1).
+
+**Bug NeoForge corrigé au passage** (absent de Forge) : `ReactorInputFluidManager` lisait
+`getFluidInTank(handler.getTanks())` — un index hors bornes — dans `getInventory()` **et**
+`extractFluids()`. Corrigé en `getFluidInTank(0)`. Un `LOGGER.warn` de debug oublié dans
+`getBlocksPosition()`, qui spammait à chaque appel, a aussi été retiré.
+
 ---
 
 ## 8. Hors périmètre de ce rapport
