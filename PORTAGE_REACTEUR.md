@@ -100,19 +100,35 @@ Forge déclare `ASSEMBLED` **et** `ACTIVE`. NeoForge n'a que `ASSEMBLED`.
 
 ## 4. Fichiers à créer — par ordre de portage
 
-### Lot 0 — Prérequis (rien ne compile sans)
+### Lot 0 — Prérequis (rien ne compile sans) ✅ FAIT
 | Fichier | Note |
 |---|---|
 | `infrastructure/config/CReactorHeat.java` | création |
 | `infrastructure/config/CRods.java` | **extension** (thorium + ratios + proximité) |
-| `api/multiblock/rods/RodType.java` | **modification** (`ratio()`, prédicats `RodType`) |
+| `api/multiblock/rods/RodType.java` | **modification** (valeurs en `Supplier`, `ratio()`, prédicats `RodType`) |
 | `content/multiblock/IHeat.java` | **modification** (seuils par taille) |
 | `content/multiblock/controller/ReactorControllerBlock.java` | **modification** (`ACTIVE`) |
+| `content/multiblock/controller/ReactorControllerGenerator.java` | **modification** (textures off/standby/on) |
+| `CNItems.java` | **modification** — voir ci-dessous |
 
-### Lot 1 — Modèle thermique (`reactorLogic/`, 7 fichiers, ~217 lignes)
+> **Trouvé en cours de route :** seul `THORIUM_ROD` avait un `RodType` enregistré côté
+> NeoForge. `URANIUM_ROD` et `GRAPHITE_ROD` n'en avaient aucun, donc `resolveRodType()`
+> retombait sur `FALLBACK` (type `NONE`), que `DefaultHeatCalculator` ignore : le modèle
+> thermique aurait calculé **zéro chaleur en permanence**, sans erreur visible. Les trois
+> barres sont désormais enregistrées et adossées à la config.
+>
+> ⚠️ Le blockstate du contrôleur passe de 8 à 16 variants (ajout d'`ACTIVE`) :
+> `runData` doit être relancé, sinon le bloc affiche un modèle manquant en jeu.
+
+### Lot 1 — Modèle thermique (`reactorLogic/`, 7 fichiers, ~217 lignes) ✅ FAIT
 `IHeatCalculator` · `DefaultHeatCalculator` · `IOverheatController` · `DefaultOverheatController` · `HeatBalance` · `EquilibriumState` · `HeatManager`
 
 Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`overFlowLimiter` décrémenté), pénalité de fluide insuffisant ou de dépassement du `maxHeat` du fluide.
+
+> **Correction d'ordre :** `display/ReactorDisplayState` est une dépendance dure de
+> `DefaultHeatCalculator` (paramètre de `computeHeat`). Il a donc été porté avec le lot 1
+> au lieu du lot 4. Ses méthodes NBT prennent un `HolderLookup.Provider` en 1.21, parce que
+> `BigFluidStack.write()/read()` l'exigent côté NeoForge.
 
 ### Lot 2 — Lecture de pattern & consommation (`consumable/`, 6 fichiers, ~317 lignes)
 `PatternReader` · `IConsumable` · `ItemConsumable` · `FluidConsumable` · `ConsumableTimer` · `ConsumptionCycleManager`
