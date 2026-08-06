@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.content.multiblock.frame;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import net.createmod.catnip.platform.CatnipServices;
+import net.createmod.catnip.render.FluidRenderHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -67,8 +68,15 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         // Last arg (invertGasses) must be false: liquid nitrogen has density 0, so
         // it counts as "lighter than air" and would otherwise be flipped 180°,
         // hiding the top surface. We always fill bottom-to-top here.
-        CatnipServices.FLUID_RENDERER.renderFluidBox(
-                fluid.getFluid().defaultFluidState(), // 1.21 takes a FluidState, not a FluidStack
+        // Must pass the FluidStack, not fluid.getFluid().defaultFluidState(): the FluidState
+        // overload resolves the texture and tint from the fluid's block state, which loses the
+        // stack's tint and renders water almost black in the frame windows.
+        // CatnipServices.FLUID_RENDERER is declared as FluidRenderHelper<?>, so the platform
+        // type has to be reintroduced by hand — on NeoForge it is neoforge's FluidStack.
+        @SuppressWarnings("unchecked")
+        FluidRenderHelper<FluidStack> fluidRenderer = (FluidRenderHelper<FluidStack>) CatnipServices.FLUID_RENDERER;
+
+        fluidRenderer.renderFluidBox(fluid,
                 X_MIN, boxYMin, Z_MIN, X_MAX, yMax, Z_MAX,
                 buffer, ms, light, false, false);
     }

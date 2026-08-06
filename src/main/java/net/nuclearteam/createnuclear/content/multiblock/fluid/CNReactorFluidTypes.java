@@ -42,12 +42,12 @@ public class CNReactorFluidTypes {
             .efficiency(1000)
             .build()
         );
-       /* register(ctx, "nitrogen", new ReactorFluidType.Builder()
+        register(ctx, "nitrogen", new ReactorFluidType.Builder()
                 .fluid(CNFluids.LIQUID_NITROGEN.getSource())
                 .maxHeat(8196)
                 .efficiency(100)
                 .build()
-        );*/
+        );
     }
 
     private static void register(BootstrapContext<ReactorFluidType> ctx, String name, ReactorFluidType type) {

@@ -2,15 +2,16 @@ package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import org.jetbrains.annotations.NotNull;
 
 public class ReactorRodInputInventory extends ItemStackHandler {
     private final ReactorRodInputEntity be;
 
     public ReactorRodInputInventory(ReactorRodInputEntity be) {
-        super(2);
+        super(1);
         this.be = be;
     }
 
@@ -22,9 +23,9 @@ public class ReactorRodInputInventory extends ItemStackHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        Level level = be.getLevel();
         return switch (slot) {
-            case 0 -> CNItems.URANIUM_ROD.isIn(stack);
-            case 1 -> CNItems.GRAPHITE_ROD.isIn(stack);
+            case 0 -> level != null && (TypeRodPredicate.isFuel(stack, level) || TypeRodPredicate.isCooled(stack, level));
             default -> !super.isItemValid(slot, stack);
         };
     }
