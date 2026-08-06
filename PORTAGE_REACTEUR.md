@@ -189,11 +189,40 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > `ReactorMeltdownMonitor` du lot 3, elles, existaient déjà. `runData` est nécessaire pour
 > répercuter les nouvelles clés dans `en_us.json`.
 
-### Lot 6 — Réécriture du block entity
-Remplacement de `ReactorControllerBlockEntity` (735 → ~440 lignes) et branchement de tout le reste.
+### Lot 6 — Réécriture du block entity ✅ FAIT (lot 7 inclus)
+`ReactorControllerBlockEntity` passe de **868 lignes monolithiques à 424 lignes** qui délèguent
+aux 33 fichiers des lots 0-5. Divergence vs Forge : **864 lignes → 76**, toutes des adaptations
+1.21 (`HolderLookup.Provider`, DataComponents, imports `neoforged`).
 
-### Lot 7 — API multiblock
-`api/multiblock/IMultiblockController.java` — interface implémentée par le BE Forge, absente côté NeoForge.
+Fichiers portés avec : `ReactorControllerBlock` · `ReactorAssembler` · `CNMultiblock` ·
+`ReactorPattern` · `MultiblockHelpers` · `ReactorOutput` · `ReactorOutputEntity` ·
+`ReactorOutputManager(I)` · `ReactorFrame` · `ReactorFrameRenderer` · `ReactorCasing` ·
+`ReactorCooler` · `ReactorCoreEntity` · `ReactorRodInput` · `IPersistenceService` /
+`DefaultPersistenceService` · `IMultiblockController` (lot 7).
+
+> **Features réellement absentes de NeoForge, découvertes en câblant :**
+>
+> 1. **Seul le réacteur 5×5 existait.** `CNMultiblock` n'enregistrait qu'un multiblock, avec
+>    entrée et sortie à positions fixes. Forge en enregistre trois (5×5 / 7×7 / 9×9) où les I/O
+>    se placent librement sur l'enveloppe. Les 7×7 et 9×9 étaient donc **impossibles à assembler**.
+> 2. **`ReactorFrameEntity` n'était jamais enregistré.** La classe et son renderer existaient,
+>    mais sans `BlockEntityEntry` dans `CNBlockEntityTypes` : le bloc frame n'avait aucune block
+>    entity, donc le rendu du fluide dans les vitres ne pouvait pas fonctionner. Ajouté.
+> 3. **La capacité de fluide était multipliée par le nombre d'entrées.** `applyReactorTierCapacity`
+>    donnait à *chaque* entrée la capacité totale du réacteur ; 4 entrées = 4× la capacité prévue.
+>    Remplacé par `applyCapacity(int)`, l'assembleur répartissant le total comme sur Forge.
+> 4. **`ReactorOutputEntity` utilisait un `KineticScrollValueBehaviour`** (vitesse réglable à la
+>    molette) au lieu du `generatedSpeed` persisté piloté par le manager. Remplacé, ce qui
+>    supprime aussi l'interaction `DIR` sur `ReactorOutput` que Forge avait retirée.
+>
+> **Piège évité :** Forge déclare `int heat = ...` dans `tick()` en variable **locale masquant le
+> champ** — donc morte. Une lecture rapide pousse à en faire une affectation du champ, ce qui
+> changerait la valeur de `previousHeat` passée au calcul. La sémantique Forge est conservée.
+
+**Divergences résiduelles assumées** (à ne pas « corriger » lors d'une synchro) :
+`CNShapes.REACTOR_INPUT` et `CNBlockEntityTypes.REACTOR_INPUT` gardent leur nom NeoForge
+(Forge : `REACTOR_ROD_INPUT`) — les renommer changerait l'identifiant de registre
+`createnuclear:reactor_input` et casserait les mondes existants.
 
 ---
 
