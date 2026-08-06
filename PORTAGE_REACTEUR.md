@@ -381,6 +381,10 @@ Le reste du mod présente aussi des écarts. Inventaire complet en §9.
 
 ## 9. Ce qui n'est PAS porté de Forge vers NeoForge
 
+> 📄 **Cette section est reprise et approfondie dans [`PARITE_FORGE_NEOFORGE.md`](PARITE_FORGE_NEOFORGE.md)**,
+> qui détaille pour chaque feature manquante ses points d'accroche, sa difficulté et l'ordre de
+> travail conseillé. Le présent document reste centré sur le réacteur.
+
 État au 6 août 2026, branche `V2-Reacteur`. Le comptage brut donne **42 fichiers Forge sans
 équivalent NeoForge**, mais 6 sont en réalité présents sous un autre nom — le vrai reste est
 **36 fichiers**, plus des écarts internes sur des fichiers partagés.
