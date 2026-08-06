@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -102,7 +103,11 @@ public class CNBlocks {
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME =
         CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(3F).destroyTime(2F))
+            // noOcclusion is what makes the window actually readable: without it the frame counts
+            // as a full opaque block, light stops propagating through it, and the fluid rendered
+            // inside the window comes out almost black.
+            .properties(p -> p.explosionResistance(3F).destroyTime(2F).noOcclusion())
+            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate((c, p) ->
@@ -148,6 +153,7 @@ public class CNBlocks {
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
+            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorRodInputGenerator()::generate)
@@ -160,6 +166,7 @@ public class CNBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.explosionResistance(6F))
                     .properties(p -> p.destroyTime(2F))
+                    .addLayer(() -> RenderType::cutoutMipped)
                     .transform(pickaxeOnly())
                     .tag(BlockTags.NEEDS_DIAMOND_TOOL)
                     .blockstate(new ReactorFluidInputGenerator()::generate)
@@ -175,7 +182,7 @@ public class CNBlocks {
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
             .transform(pickaxeOnly())
             .blockstate(new ReactorOutputGenerator()::generate)
-            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
+            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 64000.0))
             .item()
             .transform(customItemModel("reactor", "output", "item"))
             .register();
@@ -204,6 +211,7 @@ public class CNBlocks {
         .block("reinforced_glass", ReinforcedGlassBlock::new)
         .initialProperties(() -> Blocks.GLASS)
         .properties(p -> p.explosionResistance(7.0F).destroyTime(2F))
+        .addLayer(() -> RenderType::translucent)
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_GLASS)))
         .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_GLASS)))
         .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
@@ -242,6 +250,7 @@ public class CNBlocks {
             .properties(EnrichingFireBlock.getLight())
             .tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_ENRICHED.tag)
             .loot((lt, b) -> lt.add(b, BlockLootSubProvider.noDrop()))
+            .addLayer(() -> RenderType::cutout)
             .blockstate((c, p) -> {
                 String baseFolder = "block/enriching/fire/";
                 ModelFile Floor0 = p.models().getExistingFile(p.modLoc(baseFolder + "floor0"));
