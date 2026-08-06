@@ -14,6 +14,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
@@ -137,7 +139,12 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
                 {3, 8}, {4, 8}, {5, 8}
         };
 
+        // `pattern` keeps the grid exactly as the player laid it out; `patternAll` is the
+        // normalized view where every empty slot AND every non-rod item becomes a glass
+        // pane, so consumers can assume it only ever holds real rods (see PatternReader).
         PatternData[] patternData = new PatternData[positions.length];
+        PatternData[] patternAllData = new PatternData[positions.length];
+        ItemStack glassPane = new ItemStack(Items.GLASS_PANE);
         int countGraphiteRod = 0;
         int countUraniumRod = 0;
 
@@ -152,25 +159,18 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
                     countUraniumRod++;
                 }
                 patternData[i] = new PatternData(i, stack);
+
+                RodType rodType = RodType.resolveRodType(stack.getItem(), playerInventory.player.level());
+                boolean isRod = rodType.type() == TypeRod.FUEL || rodType.type() == TypeRod.COOLER;
+                patternAllData[i] = new PatternData(i, isRod ? stack : glassPane);
             } else {
-                patternData[i] = new PatternData(i, new ItemStack(Items.GLASS_PANE));
+                patternData[i] = new PatternData(i, glassPane);
+                patternAllData[i] = new PatternData(i, glassPane);
             }
         }
 
-        /*CreateNuclear.LOGGER.warn("PatternData slots:\n{}\n\n Count: {}",
-                Arrays.stream(patternData)
-                        .map(pd -> "Slot " + pd.slot() + " => " + pd.stack())
-                        .collect(Collectors.joining("\n")), countGraphiteRod
-        );*/
-
-        ReactorBluePrintData reactorBluePrintData = new ReactorBluePrintData(countGraphiteRod, countUraniumRod, CNConfigs.common().rods.graphiteRodLifetime.get(), CNConfigs.common().rods.uraniumRodLifetime.get(), patternData, patternData);
+        ReactorBluePrintData reactorBluePrintData = new ReactorBluePrintData(countGraphiteRod, countUraniumRod, CNConfigs.common().rods.graphiteRodLifetime.get(), CNConfigs.common().rods.uraniumRodLifetime.get(), patternData, patternAllData);
         contentHolder.set(CNDataComponents.REACTOR_BLUE_PRINT_DATA, reactorBluePrintData);
-
-        ReactorBluePrintData newData = new ReactorBluePrintData(countGraphiteRod, countUraniumRod, CNConfigs.common().rods.graphiteRodLifetime.get(), CNConfigs.common().rods.uraniumRodLifetime.get(), patternData, patternData);
-
-        if (!newData.equals(reactorBluePrintData)) {
-            contentHolder.set(CNDataComponents.REACTOR_BLUE_PRINT_DATA, newData);
-        }
 
     }
 

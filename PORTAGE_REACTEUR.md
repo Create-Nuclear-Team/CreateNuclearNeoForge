@@ -130,10 +130,23 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > au lieu du lot 4. Ses méthodes NBT prennent un `HolderLookup.Provider` en 1.21, parce que
 > `BigFluidStack.write()/read()` l'exigent côté NeoForge.
 
-### Lot 2 — Lecture de pattern & consommation (`consumable/`, 6 fichiers, ~317 lignes)
+### Lot 2 — Lecture de pattern & consommation (`consumable/`, 6 fichiers, ~317 lignes) ✅ FAIT
 `PatternReader` · `IConsumable` · `ItemConsumable` · `FluidConsumable` · `ConsumableTimer` · `ConsumptionCycleManager`
 
 `PatternReader` est utilisé par le lot 1 et le lot 3 — à porter tôt.
+
+> **Divergence corrigée dans `ReactorBluePrintMenu` :** côté Forge, `pattern` est la grille
+> brute du joueur et `patternAll` la **même grille normalisée** — slots vides *et* items
+> non-barres remplacés par du `GLASS_PANE`. Côté NeoForge les deux champs pointaient sur
+> **le même tableau**, et les items non-barres y étaient conservés.
+>
+> Sans correction, un item quelconque déposé dans la grille aurait été compté par
+> `PatternReader` comme une exigence du pattern. `ReactorHeatUpdateCoordinator.updateHeatOnly`
+> exige que *chaque* entrée du pattern soit disponible dans les inputs : un item non-barre
+> n'étant jamais fourni, la chaleur serait restée bloquée à 0 sans erreur visible.
+>
+> `saveData` construit désormais deux tableaux distincts. `getItemStorage()` continue de lire
+> `pattern()` (brut), comme la version Forge qui lit l'élément NBT `pattern`.
 
 ### Lot 3 — Services (`service/`, 14 fichiers, ~536 lignes)
 `IHeatService` / `DefaultHeatService` · `IPersistenceService` / `DefaultPersistenceService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
