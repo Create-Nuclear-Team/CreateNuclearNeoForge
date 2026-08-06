@@ -148,8 +148,23 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > `saveData` construit désormais deux tableaux distincts. `getItemStorage()` continue de lire
 > `pattern()` (brut), comme la version Forge qui lit l'élément NBT `pattern`.
 
-### Lot 3 — Services (`service/`, 14 fichiers, ~536 lignes)
-`IHeatService` / `DefaultHeatService` · `IPersistenceService` / `DefaultPersistenceService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
+### Lot 3 — Services (`service/`, 12 fichiers sur 14) ✅ FAIT
+`IHeatService` / `DefaultHeatService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
+
+> **Le piège de §5.1 est neutralisé.** `CNDataComponents.HEAT` (`DataComponentType<Float>`)
+> **existait déjà** côté NeoForge — inutile d'en créer un. `ReactorHeatUpdateCoordinator`
+> écrit désormais via `configuredPattern.set(CNDataComponents.HEAT, (float) heat)`, dans une
+> méthode `writeHeat()` dédiée, au lieu de muter `getOrCreateTag()`. Le test de pattern vide
+> passe par `isEmptyPattern()`, qui vérifie l'absence de `ReactorBluePrintData`.
+>
+> Hors javadoc, ce sont les **seules** différences avec l'original Forge : 9 des 10 autres
+> fichiers sont identiques à l'octet.
+
+> **Reporté au lot 6 :** `IPersistenceService` et `DefaultPersistenceService`. Ils appellent
+> des accesseurs que le `ReactorControllerBlockEntity` NeoForge actuel n'a pas encore
+> (`setMultiblockFacing(Direction)` vs `String`, `getMultiblockPos()` en `BoundingBox` vs
+> `int[]`, `serializeInventory`, `get/setDisplayState`). Les porter maintenant obligerait à
+> réécrire le BE, c'est-à-dire à faire le lot 6 — ils partiront donc avec lui.
 
 ### Lot 4 — Affichage & snapshot (6 fichiers, ~450 lignes)
 `snapshot/ReactorInputSnapshot` · `snapshot/ReactorInputSnapshotBuilder` · `display/ReactorDisplayState` · `display/ReactorGoggleTooltipRenderer` · `manager/ReactorFrameDisplayManagerI` · `manager/ReactorFrameDisplayManager`
