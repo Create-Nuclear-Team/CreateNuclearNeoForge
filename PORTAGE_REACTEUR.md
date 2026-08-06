@@ -1,0 +1,230 @@
+# Portage du réacteur — Forge → NeoForge
+
+Comparaison `CreateNuclearForge` (branche `V2`) → `CreateNuclearNeoForge` (branche `V2`).
+Périmètre : domaine réacteur uniquement (`content/multiblock/**` + dépendances directes).
+
+---
+
+## 1. Constat central
+
+**Le réacteur NeoForge n'est pas une version « réorganisée » du réacteur Forge : c'est une génération antérieure du code.**
+
+C'est le point le plus important du rapport, parce qu'il change la nature du travail. Un portage classique consiste à traduire l'API. Ici, il faut d'abord **remplacer la logique**, puis traduire l'API.
+
+| | Forge | NeoForge |
+|---|---|---|
+| `ReactorControllerBlockEntity` | 440 lignes, logique déléguée | **735 lignes monolithiques** |
+| Packages `service/`, `reactorLogic/`, `consumable/`, `snapshot/`, `display/` | 31 fichiers | **0 — inexistants** |
+| Modèle thermique | équilibre 6:1 fuel/cooler, surchauffe progressive, fluide caloporteur | somme `baseUraniumHeat`/`baseGraphiteHeat` codée en dur |
+| Fusion du cœur | compte à rebours 300 ticks + notifications + explosion dimensionnée | **absente** |
+| Alarmes | pilotées par coordinateur + advancement | **jamais déclenchées** |
+| Consommation des barres | cycles par type de barre, persistés en NBT | timers `tmpUraniumTimer`/`tmpGraphiteTimer` codés en dur |
+| Son de fonctionnement | boucle pilotée par blockstate `ACTIVE` | **absent** |
+| Tooltip goggles | rendu depuis un snapshot synchronisé | lit `fuelItem`/`coolerItem` locaux |
+
+Concrètement, le `tick()` NeoForge fait encore : lire l'inventaire d'un unique `ReactorRodInput`, décrémenter deux timers, calculer une chaleur par voisinage uranium/graphite, et faire tourner la sortie. Il n'y a ni surchauffe, ni fusion, ni explosion, ni consommation de fluide.
+
+**Conséquence sur la méthode :** ne pas essayer de « compléter » le BE NeoForge existant. Il faut le remplacer par la version Forge et porter les 31 fichiers de logique en dessous. Les ~300 lignes actuelles de calcul (`calculateHeat`, `calculateProgress`, `updateTimers`, `getStructureBounds`, `convertePattern`, `formattedPattern`, `rotate`) sont du code mort une fois le portage fait.
+
+---
+
+## 2. Ce qui existe déjà côté NeoForge (bonne nouvelle)
+
+Toute l'infrastructure dont dépendent les services Forge est **déjà présente** :
+
+`RodType` · `ReactorFluidType` · `BigFluidStack` · `NotifyUtil` · `CreateNuclearLang` · `BiomeIrradiationService` · `CNBiomes` · `NuclearExplosionEntity` · `CNAdvancement` · `CNAdvancementBehaviour` · `CNConfigs` · `ReactorBluePrintItem.getItemStorage()` · `CNSoundEvents.REACTOR_RUNNING`
+
+Les 5 managers (`ReactorInputManager`, `ReactorOutputManager`, `ReactorInputFluidManager`, `ReactorAlarmManager`, `AbstractReactorIOManager`) sont eux aussi déjà portés et à jour.
+
+Le portage ne part donc pas de zéro : il porte sur la couche logique, pas sur les fondations.
+
+---
+
+## 3. Divergences d'API bloquantes — à traiter EN PREMIER
+
+Ces cinq points doivent être réglés avant de porter le moindre service, sinon rien ne compile.
+
+### 3.1 `RodType` — modèle différent
+
+| Forge | NeoForge |
+|---|---|
+| `Holder<Item> item` (une barre par type) | `HolderSet<Item> items` (plusieurs barres par type) |
+| `baseRodHeat()` → `Supplier<Integer>`, appelé `.get()` | `baseRodHeat()` → `int` direct |
+| `proximityRodHeat()` → `Supplier<Float>` | `proximityRodHeat()` → `float` direct |
+| `rodTimer()` → `Supplier<Integer>` | `rodTimer()` → `int` direct |
+| **`ratio()` présent** | **`ratio()` absent** |
+| `TypeRodPredicate.isFuel(RodType)` / `isCooled(RodType)` | uniquement `IS_FUEL` / `IS_COOLED` sur `ItemStack` |
+
+**À faire :** ajouter `ratio()` à `RodType` NeoForge (+ builder + codec + config), ajouter les surcharges `isFuel(RodType)` / `isCooled(RodType)`. Dans les services portés, supprimer les `.get()` sur `baseRodHeat`/`proximityRodHeat`/`rodTimer`.
+
+Le `HolderSet` au lieu du `Holder` n'est pas un problème : les services n'utilisent que `resolveRodType(Item, Level)`, dont la signature est identique des deux côtés.
+
+### 3.2 `IHeat.HeatLevel` — pas de notion de taille de réacteur
+
+| Forge | NeoForge |
+|---|---|
+| `of(int heat, int reactorSize)` | `of(int heat)` |
+| `isNotDanger(int heat, int reactorSize)` | **absent** |
+| `getFormattedHeatText(int heat, int reactorSize)` | `getFormattedHeatText(int heat)` |
+| `getFormattedItemText(ItemStack, Boolean, Level)` | `getFormattedItemText(ItemStack, Boolean)` |
+
+Côté Forge, les seuils de danger dépendent de la taille du réacteur (5×5 / 7×7 / 9×9). C'est ce qui rend un 9×9 viable à haute chaleur. Côté NeoForge, le seuil est unique.
+
+**À faire :** porter la version taille-consciente de `IHeat.HeatLevel`, qui dépend du point suivant.
+
+### 3.3 `CReactorHeat` — fichier de config absent
+
+```java
+public final ConfigInt size5Danger = i(256,  0, 8192, ...);
+public final ConfigInt size7Danger = i(1024, 0, 8192, ...);
+public final ConfigInt size9Danger = i(4096, 0, 8192, ...);
+```
+
+**À faire :** créer `infrastructure/config/CReactorHeat.java` et le déclarer dans `CNCServer`/`CNConfigs`.
+
+### 3.4 `CRods` — config incomplète
+
+Forge expose 12 valeurs (uranium / graphite / **thorium**, avec `*HeatRatio` et `*ProximityBonus`). NeoForge n'en expose que 3 (`uraniumRodLifetime`, `graphiteRodLifetime`, `maxHeat`) et **ne connaît pas le thorium**.
+
+**À faire :** aligner `CRods` sur la version Forge. Prérequis du `ratio()` de 3.1.
+
+### 3.5 `ReactorControllerBlock` — propriété `ACTIVE` absente
+
+Forge déclare `ASSEMBLED` **et** `ACTIVE`. NeoForge n'a que `ASSEMBLED`.
+
+`ACTIVE` est recalculée chaque tick serveur et synchronisée automatiquement au client ; c'est elle qui pilote la boucle sonore de fonctionnement. Sans elle, `ReactorRunningSoundInstance` n'a rien à observer.
+
+**À faire :** ajouter `ACTIVE` au blockstate + au datagen des blockstates JSON.
+
+---
+
+## 4. Fichiers à créer — par ordre de portage
+
+### Lot 0 — Prérequis (rien ne compile sans)
+| Fichier | Note |
+|---|---|
+| `infrastructure/config/CReactorHeat.java` | création |
+| `infrastructure/config/CRods.java` | **extension** (thorium + ratios + proximité) |
+| `api/multiblock/rods/RodType.java` | **modification** (`ratio()`, prédicats `RodType`) |
+| `content/multiblock/IHeat.java` | **modification** (seuils par taille) |
+| `content/multiblock/controller/ReactorControllerBlock.java` | **modification** (`ACTIVE`) |
+
+### Lot 1 — Modèle thermique (`reactorLogic/`, 7 fichiers, ~217 lignes)
+`IHeatCalculator` · `DefaultHeatCalculator` · `IOverheatController` · `DefaultOverheatController` · `HeatBalance` · `EquilibriumState` · `HeatManager`
+
+Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`overFlowLimiter` décrémenté), pénalité de fluide insuffisant ou de dépassement du `maxHeat` du fluide.
+
+### Lot 2 — Lecture de pattern & consommation (`consumable/`, 6 fichiers, ~317 lignes)
+`PatternReader` · `IConsumable` · `ItemConsumable` · `FluidConsumable` · `ConsumableTimer` · `ConsumptionCycleManager`
+
+`PatternReader` est utilisé par le lot 1 et le lot 3 — à porter tôt.
+
+### Lot 3 — Services (`service/`, 14 fichiers, ~536 lignes)
+`IHeatService` / `DefaultHeatService` · `IPersistenceService` / `DefaultPersistenceService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
+
+### Lot 4 — Affichage & snapshot (6 fichiers, ~450 lignes)
+`snapshot/ReactorInputSnapshot` · `snapshot/ReactorInputSnapshotBuilder` · `display/ReactorDisplayState` · `display/ReactorGoggleTooltipRenderer` · `manager/ReactorFrameDisplayManagerI` · `manager/ReactorFrameDisplayManager`
+
+`ReactorFrameDisplayManager` remplace les champs `frameFluidCache*` / `frameColumn*` actuellement inlinés dans le BE NeoForge — c'est une extraction, la logique existe déjà et est équivalente.
+
+### Lot 5 — Divers contrôleur (2 fichiers, ~100 lignes)
+`ReactorRunningSoundInstance` · `ReactorDebugDiagnostics`
+
+### Lot 6 — Réécriture du block entity
+Remplacement de `ReactorControllerBlockEntity` (735 → ~440 lignes) et branchement de tout le reste.
+
+### Lot 7 — API multiblock
+`api/multiblock/IMultiblockController.java` — interface implémentée par le BE Forge, absente côté NeoForge.
+
+---
+
+## 5. Pièges de traduction 1.20.1 Forge → 1.21 NeoForge
+
+### 5.1 ⚠️ Le piège majeur : `getConfiguredPatternTag()` renvoie une copie
+
+Côté Forge, la chaleur est **écrite dans le tag de l'ItemStack** :
+
+```java
+configuredPattern.getOrCreateTag().putDouble("heat", heat);   // mute en place
+```
+
+Côté NeoForge, l'implémentation actuelle est :
+
+```java
+public CompoundTag getConfiguredPatternTag() {
+    return this.configuredPattern
+        .getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+        .copyTag();          // ⚠️ COPIE
+}
+```
+
+`copyTag()` renvoie une copie défensive. **Tout `put*` dessus est silencieusement perdu.** Traduire `ReactorHeatUpdateCoordinator.updateHeatOnly()` / `calculateAndWriteHeat()` littéralement produirait un réacteur dont la chaleur reste bloquée à 0, sans aucune erreur de compilation ni exception à l'exécution.
+
+Deux options :
+
+- **A — pansement** : après modification, réécrire le composant
+  `stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag))`.
+  Rapide, mais conserve la sémantique « NBT brut » que 1.21 cherche à supprimer.
+- **B — propre (recommandé)** : introduire un `ReactorHeatData` (ou étendre `ReactorBluePrintData`, qui existe déjà comme record côté NeoForge) et remplacer les accès `tag.getDouble("heat")` par un accès typé.
+
+Option B est plus de travail mais s'aligne sur la direction déjà prise par le repo NeoForge, qui utilise `CNDataComponents` / `ReactorBluePrintData` / `PatternData`. Mélanger les deux approches est le vrai risque : `PatternReader` (Forge) lit `tag.getCompound("patternAll")`, alors que NeoForge stocke déjà le pattern dans `ReactorBluePrintData.patternAll()` sous forme de `PatternData[]`.
+
+**→ `PatternReader` ne doit pas être traduit ligne à ligne. Il doit être réécrit pour lire `ReactorBluePrintData`.**
+
+### 5.2 Correspondances mécaniques
+
+| Forge 1.20.1 | NeoForge 1.21 |
+|---|---|
+| `net.minecraftforge.items.IItemHandler` | `net.neoforged.neoforge.items.IItemHandler` |
+| `net.minecraftforge.fluids.FluidStack` | `net.neoforged.neoforge.fluids.FluidStack` |
+| `net.minecraftforge.api.distmarker.OnlyIn` | `net.neoforged.api.distmarker.OnlyIn` |
+| `ForgeRegistries.ITEMS.getKey(item)` | `BuiltInRegistries.ITEM.getKey(item)` |
+| `ForgeRegistries.ITEMS.getValue(rl)` | `BuiltInRegistries.ITEM.get(rl)` |
+| `new ResourceLocation(s)` | `ResourceLocation.parse(s)` |
+| `read/write(CompoundTag, boolean)` | `read/write(CompoundTag, HolderLookup.Provider, boolean)` |
+| `handler.deserializeNBT(tag)` | `handler.deserializeNBT(provider, tag)` |
+| `ItemStack.of(tag)` | `ItemStack.parse(provider, tag)` → `Optional` |
+| `stack.serializeNBT()` | `stack.saveOptional(provider)` |
+| `CODEC.encodeStart(..).getOrThrow(false, X::new)` | `CODEC.encodeStart(..).getOrThrow()` |
+
+`ReactorDisplayState` et `DefaultPersistenceService` concentrent la majorité de ces changements, car ils sérialisent tout.
+
+### 5.3 `FluidStack` n'est plus nullable de la même façon
+
+En 1.21, `FluidStack` porte des `DataComponents` et `FluidStack.EMPTY` se compare avec `isEmpty()`, jamais avec `==`. Le code Forge de `ReactorFrameDisplayManager` fait `fluid.isEmpty()` — correct — mais `stack.copy()` conserve désormais les composants, ce qui est le comportement voulu.
+
+---
+
+## 6. Volumétrie
+
+| Lot | Fichiers | Lignes (Forge) | Difficulté |
+|---|---|---|---|
+| 0 — Prérequis | 5 (2 créés, 3 modifiés) | ~150 | moyenne |
+| 1 — reactorLogic | 7 | 217 | faible (logique pure, peu d'API MC) |
+| 2 — consumable | 6 | 317 | **élevée** (`PatternReader` à réécrire) |
+| 3 — service | 14 | 536 | moyenne (persistence = élevée) |
+| 4 — display/snapshot | 6 | 450 | **élevée** (sérialisation) |
+| 5 — divers | 2 | 100 | faible |
+| 6 — BlockEntity | 1 | 440 | **élevée** |
+| 7 — api multiblock | 1 | ~30 | faible |
+| **Total** | **42** | **~2 240** | |
+
+Les lots 1, 3 et 5 sont essentiellement de la traduction d'imports. Les lots 2, 4 et 6 demandent de vraies décisions d'architecture (DataComponents vs NBT).
+
+---
+
+## 7. Recommandation d'ordre d'exécution
+
+1. **Lot 0** — sans lui rien ne compile.
+2. **Décision DataComponents vs NBT** (§5.1) — elle conditionne les lots 2, 4 et 6. À trancher avant d'écrire une ligne du lot 2.
+3. **Lots 1 → 5** dans l'ordre, en compilant après chaque lot.
+4. **Lot 6** en dernier : le BE ne compile qu'une fois toutes ses dépendances présentes.
+5. **Lot 7** au choix, indépendant.
+
+Les deux gametests Forge (`DefaultHeatCalculatorGameTest`, `ReactorInputFluidManagerGameTest`) sont à porter avec les lots 1 et 3 respectivement : ils valident précisément la logique la plus risquée.
+
+---
+
+## 8. Hors périmètre de ce rapport
+
+Le reste du mod présente aussi des écarts (~40 fichiers) : sources DisplayLink, animaux irradiés, datagen de recettes, worldgen, mixins client, compat JEI/Alex's Caves. À traiter dans un second temps.

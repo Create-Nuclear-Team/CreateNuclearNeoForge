@@ -36,6 +36,12 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorControllerBlockEntity> {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
+    /**
+     * Whether the reactor is currently producing energy. Recomputed server-side on
+     * every tick by the controller block entity and synced to the client by vanilla,
+     * which is what drives the running-sound loop and the lit controller texture.
+     */
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public ReactorControllerBlock(Properties properties) {
         super(properties);
@@ -43,7 +49,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(ASSEMBLED);
+        builder.add(FACING).add(ASSEMBLED).add(ACTIVE);
         super.createBlockStateDefinition(builder);
     }
 
@@ -51,7 +57,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(ASSEMBLED, false);
+                .setValue(ASSEMBLED, false)
+                .setValue(ACTIVE, false);
     }
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,

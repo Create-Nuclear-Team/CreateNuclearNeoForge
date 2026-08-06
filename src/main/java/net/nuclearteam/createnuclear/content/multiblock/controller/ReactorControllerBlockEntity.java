@@ -340,20 +340,20 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             CreateLang.translate("gui.gauge.info_header").style(ChatFormatting.GRAY).forGoggles(tooltip);
             IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
-            IHeat.HeatLevel.getFormattedHeatText(heat).forGoggles(tooltip);
+            IHeat.HeatLevel.getFormattedHeatText(heat, getMultiblockSize()).forGoggles(tooltip);
 
             if (fuelItem.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
-                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true, level).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(fuelItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(fuelItem, false, level).forGoggles(tooltip);
             }
 
             if (fuelItem.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
-                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.GRAPHITE_ROD.asItem(), 1), true).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.GRAPHITE_ROD.asItem(), 1), true, level).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(coolerItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(coolerItem, false, level).forGoggles(tooltip);
             }
         }
 
@@ -463,7 +463,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                     heat = (int) calculateHeat(inventory.getItem(0));
                     if (updateTimers()) {
 
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
+                        IHeat.HeatLevel currentLevel = IHeat.HeatLevel.of(heat, getMultiblockSize());
+                        if (currentLevel == IHeat.HeatLevel.SAFETY || currentLevel == IHeat.HeatLevel.CAUTION || currentLevel == IHeat.HeatLevel.WARNING) {
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4, true);
                             return;
                         } else {

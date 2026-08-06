@@ -30,7 +30,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
         BlockPos controllerPos = getBlockPosForReactor();
         if (level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController) {
             int heat = reactorController.heat;
-            if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
+            if (IHeat.HeatLevel.of(heat, reactorController.getMultiblockSize()) == IHeat.HeatLevel.DANGER) {
                 if (countdownTicks >= CNConfigs.common().explode.time.get()) { // 300 ticks = 15 secondes
                     explodeReactorCore(level, getBlockPos());
                 } else {
