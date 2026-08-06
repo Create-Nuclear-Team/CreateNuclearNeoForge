@@ -2,7 +2,9 @@ package net.nuclearteam.createnuclear.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -77,6 +79,41 @@ public class DefaultHeatCalculatorGameTest {
     }
 
     private static final DefaultHeatCalculator CALCULATOR = new DefaultHeatCalculator();
+
+    // ================================================================
+    // 0. the heat component must survive being saved at zero
+    // ================================================================
+
+    /**
+     * Regression test for a world-save crash: {@code CNDataComponents.HEAT} was registered with
+     * {@code ExtraCodecs.POSITIVE_FLOAT}, which rejects {@code 0.0}. The controller writes the
+     * heat on every tick, so as soon as a blueprint sat in a stopped reactor the chunk save blew
+     * up with "Value must be positive: 0.0" and the block entity silently stopped persisting.
+     * <p>
+     * A persistent codec that can refuse a value fails at save time, not at write time, which is
+     * why this is asserted here rather than left to the non-negative floor in
+     * {@link DefaultHeatCalculator#computeHeat}.
+     */
+    @GameTest(template = STRUCTURE)
+    public static void heatComponent_atZero_survivesSerialization(GameTestHelper helper) {
+        ItemStack blueprint = new ItemStack(CNItems.REACTOR_BLUEPRINT.get());
+        blueprint.set(CNDataComponents.HEAT, 0f);
+
+        var registries = helper.getLevel().registryAccess();
+        Tag saved;
+        try {
+            saved = blueprint.save(registries);
+        } catch (RuntimeException e) {
+            throw new GameTestAssertException(
+                    "a blueprint carrying heat=0 must be serializable, got: " + e.getMessage());
+        }
+
+        ItemStack restored = ItemStack.parse(registries, saved).orElse(ItemStack.EMPTY);
+        helper.assertTrue(restored.getOrDefault(CNDataComponents.HEAT, -1f) == 0f,
+                "heat=0 should round-trip through save/parse, got "
+                        + restored.getOrDefault(CNDataComponents.HEAT, -1f));
+        helper.succeed();
+    }
 
     // ================================================================
     // 1. single fuel rod, no neighbors

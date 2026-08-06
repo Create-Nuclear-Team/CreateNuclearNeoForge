@@ -23,9 +23,21 @@ import java.util.function.UnaryOperator;
 public class CNDataComponents {
     private static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CreateNuclear.MOD_ID);
 
+    /**
+     * Reactor heat stored on the blueprint stack, written by the controller on every tick.
+     * <p>
+     * Plain {@code Codec.FLOAT}, deliberately not {@code ExtraCodecs.POSITIVE_FLOAT}: zero is
+     * the normal value for an idle or stopped reactor, and a persistent codec that can reject
+     * a value crashes the world save rather than the write. That is exactly what happened with
+     * {@code POSITIVE_FLOAT} ("Value must be positive: 0.0" while serializing the blueprint).
+     * <p>
+     * The non-negative invariant is enforced upstream instead, where it can't take a save down:
+     * {@code DefaultHeatCalculator#computeHeat} floors its result at 0. This also matches the
+     * Forge branch, which stores the value in a plain NBT double.
+     */
     public static final DataComponentType<Float> HEAT = register(
             "heat",
-            builder -> builder.persistent(ExtraCodecs.POSITIVE_FLOAT).networkSynchronized(ByteBufCodecs.FLOAT)
+            builder -> builder.persistent(Codec.FLOAT).networkSynchronized(ByteBufCodecs.FLOAT)
     );
 
     public static final DataComponentType<ReactorBluePrintData> REACTOR_BLUE_PRINT_DATA = register(
