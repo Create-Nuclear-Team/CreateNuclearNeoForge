@@ -166,10 +166,17 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > `int[]`, `serializeInventory`, `get/setDisplayState`). Les porter maintenant obligerait à
 > réécrire le BE, c'est-à-dire à faire le lot 6 — ils partiront donc avec lui.
 
-### Lot 4 — Affichage & snapshot (6 fichiers, ~450 lignes)
-`snapshot/ReactorInputSnapshot` · `snapshot/ReactorInputSnapshotBuilder` · `display/ReactorDisplayState` · `display/ReactorGoggleTooltipRenderer` · `manager/ReactorFrameDisplayManagerI` · `manager/ReactorFrameDisplayManager`
+### Lot 4 — Affichage & snapshot (6 fichiers, ~450 lignes) ✅ FAIT
+`snapshot/ReactorInputSnapshot` · `snapshot/ReactorInputSnapshotBuilder` · `display/ReactorDisplayState` (porté au lot 1) · `display/ReactorGoggleTooltipRenderer` · `manager/ReactorFrameDisplayManagerI` · `manager/ReactorFrameDisplayManager`
 
-`ReactorFrameDisplayManager` remplace les champs `frameFluidCache*` / `frameColumn*` actuellement inlinés dans le BE NeoForge — c'est une extraction, la logique existe déjà et est équivalente.
+`ReactorFrameDisplayManager` remplace les champs `frameFluidCache*` / `frameColumn*` actuellement inlinés dans le BE NeoForge — c'est une extraction, la logique existe déjà et est équivalente. Le BE ne sera débarrassé de ses copies qu'au lot 6.
+
+> Aucune surprise sur ce lot : `ReactorInputSnapshot` est identique à l'octet, les trois
+> autres ne diffèrent que par les imports `minecraftforge` → `neoforged`, plus
+> `FluidStack.getDisplayName()` → `getHoverName()` dans le renderer.
+>
+> Le javadoc d'exemple de `ReactorGoggleTooltipRenderer` a été corrigé au passage : côté
+> Forge il montrait un appel à `render()` avec 4 arguments alors que la méthode en prend 5.
 
 ### Lot 5 — Divers contrôleur (2 fichiers, ~100 lignes)
 `ReactorRunningSoundInstance` · `ReactorDebugDiagnostics`
