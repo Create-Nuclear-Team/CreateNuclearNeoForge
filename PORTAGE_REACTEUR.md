@@ -12,8 +12,8 @@ Périmètre : domaine réacteur uniquement (`content/multiblock/**` + dépendanc
 > `ReactorControllerBlockEntity` : 868 lignes monolithiques → 424 lignes déléguantes,
 > divergence vs Forge ramenée de **864 lignes à 76** (toutes des adaptations 1.21).
 >
-> Gametests : `./gradlew runGameTestServer` → **31 tests, 29 passent**, 2 échecs volontaires
-> (marqueurs de régression `*_expectedContract`, qui échouent aussi sur Forge).
+> Gametests : `./gradlew runGameTestServer` → **29 tests, tous verts** (`EXIT=0`).
+> Utilisable en CI bloquante.
 >
 > Ce qui reste hors périmètre est inventorié en **§9**.
 
@@ -350,16 +350,15 @@ Les deux gametests Forge (`DefaultHeatCalculatorGameTest`, `ReactorInputFluidMan
 
 ### Lot 8 — Gametests ✅ FAIT
 
-`./gradlew runGameTestServer` — **30 tests, 28 passent, 2 échouent volontairement.**
+`./gradlew runGameTestServer` — **29 tests, tous verts** (`EXIT=0`).
 
 Les 4 tests du modèle thermique passent, dont `threeByThreeDiamond` croisé avec le calculateur
 du wiki communautaire. C'est la première validation à l'exécution du portage.
 
-Les 2 échecs sont les marqueurs de régression `*_expectedContract`, qui échouent **aussi sur
-Forge** : `extractFluids` ne décrémente pas `fluidNeeded` entre les handlers (sur-extraction) et
-ignore les demandes d'exactement 1 unité. Comportement identique des deux côtés — c'est ce qu'on
-voulait vérifier. ⚠️ Conséquence : `runGameTestServer` sort en code 1. Ne pas le brancher en CI
-bloquante avant d'avoir corrigé `extractFluids` (dans les deux repos).
+> À l'écriture du lot, la suite comptait 31 tests dont 2 échouant volontairement : les marqueurs
+> `*_expectedContract` du bug `extractFluids`, qui échouait identiquement sur Forge. Ce bug est
+> corrigé depuis dans les deux repos (§9.4), les marqueurs sont donc passés au vert et les deux
+> tests qui figeaient le comportement bogué ont été supprimés.
 
 **Adaptations du portage :**
 - `loadPattern` écrit un `ReactorBluePrintData` typé (57 `PatternData`) au lieu du tag NBT `pattern`.
@@ -492,22 +491,30 @@ audité ligne à ligne, contrairement au domaine réacteur.
 Le lot 9 a montré que ces écarts cachent de vrais bugs : la capacité de stress et les
 `addLayer` manquants étaient tous les deux dans `CNBlocks`.
 
-### 9.4 Bugs connus, présents dans les DEUX versions
+### 9.4 Bug `extractFluids` ✅ CORRIGÉ dans les deux versions
 
-À corriger dans les deux repos, pas seulement ici :
+`ReactorInputFluidManager.extractFluids` ne décrémentait jamais `fluidNeeded` entre les
+handlers : le montant demandé était traité comme un quota **par entrée** au lieu d'un total.
+Un réacteur demandant 10 unités avec deux entrées de 10 les vidait toutes les deux, soit 20
+retirées. Plus le joueur posait d'entrées, plus le caloporteur disparaissait vite.
 
-`ReactorInputFluidManager.extractFluids` ne décrémente jamais `fluidNeeded` entre les
-handlers (**sur-extraction** : demander 10 unités en retire 10 par entrée) et ignore les
-demandes d'exactement 1 unité (`if (toExtract > 1)`). Les deux gametests
-`*_expectedContract` échouent volontairement là-dessus et deviendront verts une fois corrigé.
-C'est aussi pour ça que `runGameTestServer` sort en code 1 : **ne pas le brancher en CI
-bloquante** avant.
+Un garde `if (toExtract > 1)` avalait aussi les demandes d'exactement 1 unité — précisément
+ce que demande `FluidConsumptionRateCalculator` en bas de la courbe de consommation.
+
+Corrigé à l'identique dans les deux repos (implémentations byte-identical). Les deux tests
+`*_expectedContract` passent, les deux tests qui figeaient le comportement bogué sont
+supprimés, et le javadoc — qui promettait « true si le montant complet a été extrait » alors
+que le code renvoyait true sur toute extraction partielle — documente désormais le vrai
+contrat.
+
+**`runGameTestServer` sort maintenant en code 0 des deux côtés** (Forge 28 tests,
+NeoForge 29) : il peut servir de garde-fou CI.
 
 ### 9.5 Ordre suggéré pour la suite
 
-1. **Merger `origin/V2`** (4 commits d'avance) — un seul conflit attendu, un import dans `CNItems`.
+1. ~~**Merger `origin/V2`**~~ ✅ fait — un seul conflit, l'import prévu dans `CNItems`.
 2. **Jauges DisplayLink** — le plus visible, sans prérequis, le réacteur expose déjà tout.
-3. **Corriger `extractFluids`** dans les deux repos, les tests passent au vert.
+3. ~~**Corriger `extractFluids`**~~ ✅ fait dans les deux repos.
 4. **Worldgen config** — silencieux mais fausse la génération de minerai.
 5. **Vache irradiée + `IrradiatedAnimal`/`AnimalUtil`** — permet aussi de dédupliquer chat/loup/poulet.
 6. Snow Powder, datagen manquant, compat Alex's Caves, mixins client.
