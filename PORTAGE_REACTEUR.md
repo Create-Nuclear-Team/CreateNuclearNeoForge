@@ -1,7 +1,21 @@
 # Portage du réacteur — Forge → NeoForge
 
-Comparaison `CreateNuclearForge` (branche `V2`) → `CreateNuclearNeoForge` (branche `V2`).
+Comparaison `CreateNuclearForge` (branche `V2`) → `CreateNuclearNeoForge` (branche `V2-Reacteur`).
 Périmètre : domaine réacteur uniquement (`content/multiblock/**` + dépendances directes).
+
+> ## ✅ Portage terminé et validé en jeu
+>
+> Les 8 lots sont faits. Le réacteur s'assemble, produit, chauffe, alarme, fond et explose.
+> Validé en jeu par mathi le 6 août 2026 : assemblage, blueprint, fluide, production SU.
+>
+> **~50 fichiers portés**, dont la majorité identiques à l'octet à l'original Forge.
+> `ReactorControllerBlockEntity` : 868 lignes monolithiques → 424 lignes déléguantes,
+> divergence vs Forge ramenée de **864 lignes à 76** (toutes des adaptations 1.21).
+>
+> Gametests : `./gradlew runGameTestServer` → **31 tests, 29 passent**, 2 échecs volontaires
+> (marqueurs de régression `*_expectedContract`, qui échouent aussi sur Forge).
+>
+> Ce qui reste hors périmètre est inventorié en **§9**.
 
 ---
 
@@ -224,6 +238,29 @@ Fichiers portés avec : `ReactorControllerBlock` · `ReactorAssembler` · `CNMul
 (Forge : `REACTOR_ROD_INPUT`) — les renommer changerait l'identifiant de registre
 `createnuclear:reactor_input` et casserait les mondes existants.
 
+### Lot 9 — Corrections issues du test en jeu ✅ FAIT
+
+Six défauts trouvés en jouant, tous corrigés. Cinq étaient des divergences NeoForge
+préexistantes, un était une erreur introduite par le portage.
+
+| Symptôme en jeu | Cause | Origine |
+|---|---|---|
+| Crash à la sauvegarde du monde | `CNDataComponents.HEAT` en `ExtraCodecs.POSITIVE_FLOAT`, qui refuse `0.0` — or un réacteur à l'arrêt écrit 0 à chaque tick | **introduit au lot 3** |
+| Fluide quasi noir dans les vitres | `reactor_frame` sans `.noOcclusion()` : bloc traité comme opaque plein, la lumière ne passe plus | préexistant |
+| idem | renderer passant un `FluidState` au lieu du `FluidStack`, ce qui perd la teinte | introduit au lot 6 |
+| 2 slots dans le rod input | `super(2)` avec uranium/graphite figés, au lieu d'un slot acceptant toute barre via `RodType` | préexistant |
+| Explosion malgré un pattern stable | azote liquide **commenté** dans `CNReactorFluidTypes` → pas de `ReactorFluidType` → `efficiency = -1` → `fluidMalus` permanent → surchauffe infinie | préexistant |
+| 81 920 SU au lieu de 512 000 | capacité de stress du `REACTOR_OUTPUT` à `10240.0` au lieu de `64000.0` (rapport 6,25 ✓) | préexistant |
+
+> **Leçon sur les codecs :** un codec **persistant** qui peut refuser une valeur échoue au moment
+> de la **sauvegarde**, très loin de l'écriture fautive, et emporte le block entity avec lui.
+> Les invariants de domaine se valident en amont, pas dans le codec.
+> Le test `heatComponent_atZero_survivesSerialization` verrouille ce cas.
+
+**Trouvé en vérifiant :** Forge a **5 appels à `addLayer`**, NeoForge n'en avait qu'**un**.
+Quatre blocs avaient perdu leur couche de rendu — dont `reinforced_glass` en `translucent`,
+qui rendait donc **opaque**. Tous rétablis.
+
 ---
 
 ## 5. Pièges de traduction 1.20.1 Forge → 1.21 NeoForge
@@ -339,4 +376,140 @@ bloquante avant d'avoir corrigé `extractFluids` (dans les deux repos).
 
 ## 8. Hors périmètre de ce rapport
 
-Le reste du mod présente aussi des écarts (~40 fichiers) : sources DisplayLink, animaux irradiés, datagen de recettes, worldgen, mixins client, compat JEI/Alex's Caves. À traiter dans un second temps.
+Le reste du mod présente aussi des écarts. Inventaire complet en §9.
+
+---
+
+## 9. Ce qui n'est PAS porté de Forge vers NeoForge
+
+État au 6 août 2026, branche `V2-Reacteur`. Le comptage brut donne **42 fichiers Forge sans
+équivalent NeoForge**, mais 6 sont en réalité présents sous un autre nom — le vrai reste est
+**36 fichiers**, plus des écarts internes sur des fichiers partagés.
+
+### 9.1 Faux positifs — présents mais renommés ou déplacés
+
+Ne pas les reporter comme manquants lors d'une synchro :
+
+| Forge | NeoForge |
+|---|---|
+| `content/multiblock/rod/CNRodTypes` | `content/rod/CNRodTypes` |
+| `foundation/damageTypes/CNDamageSources` | `foundation/damages**T**ypes/CNDamageSources` |
+| `content/equipment/armor/ArmorMaterials` | `CNArmorMaterials` |
+| `infrastructure/config/CExplode` | `CExplose` *(faute de frappe côté Neo)* |
+| `input/fluid/PlayerInteract**R**eactorFluidInput` | `PlayerInteract**e**ReactorFluidInput` *(faute de frappe)* |
+| `irradiated/cat/CatLieOnBedGoal`, `CatSitOnBlockGoal` | `IrradiatedCatLieOnBedGoal`, `IrradiatedCatSitOnBlockGoal` |
+
+### 9.2 Features entièrement absentes
+
+**① Jauges DisplayLink du réacteur — 9 fichiers** ← *le manque le plus visible en jeu*
+
+`CNDisplaySources` · `AbstractReactorStatDisplaySource` · `HeatDisplaySource` ·
+`FuelDisplaySource` · `CoolerDisplaySource` · `LiquidLevelDisplaySource` ·
+`ReactorSizeDisplaySource` · `ReactorDisplayConstants` · `ReactorGaugeRenderer`
+
+NeoForge n'a que `ReactorSummary` + `ReactorSummaryDisplaySource`. Côté Forge, `CNBlocks`
+attache en plus au contrôleur `.transform(displaySource(CNDisplaySources.HEAT))`,
+`LIQUID_LEVEL`, etc. — **impossible de brancher un Display Link sur une statistique précise
+du réacteur** côté NeoForge. Le code réacteur nécessaire (`ReactorDisplayState`,
+`getMultiblockSize`, `getInputFluidManager`) est désormais en place, donc c'est un portage
+direct sans prérequis.
+*NeoForge a en plus `ReactorGaugeOverrides`, qui n'existe pas côté Forge.*
+
+**② Poudre de neige (Snow Powder) — 4 fichiers**
+
+`SnowPowderRecipe` · `SnowPowderRecipeGen` · `CNSnowPowderRecipeGen` · `FanSnowPowderCategory` (JEI)
+
+Recette de ventilateur complète, avec sa catégorie JEI. Rien de tout ça côté NeoForge.
+
+**③ Vache irradiée + abstraction des animaux — 5 fichiers**
+
+`IrradiatedCow` · `IrradiatedCowModel` · `IrradiatedCowRenderer` · `IrradiatedAnimal` · `AnimalUtil`
+
+NeoForge a le chat, le loup et le poulet, mais **pas la vache**. Il lui manque aussi la classe
+de base `IrradiatedAnimal` et l'utilitaire `AnimalUtil` : ses animaux dupliquent donc la
+logique que Forge a factorisée. C'est le dossier le plus divergent hors réacteur
+(`IrradiatedCat` 384 lignes d'écart, `IrradiatedWolf` 333).
+
+**④ Worldgen piloté par config — 2 fichiers**
+
+`CNPlacementModifiers` · `ConfigPlacementFilter`
+
+Filtre de placement lisant la config : sans lui, les options de génération de minerai
+(`CWorldGen`) ne sont probablement pas respectées.
+
+**⑤ Datagen de recettes — 2 fichiers**
+
+`CNDeployingRecipeGen` · `CNProcessingRecipeGen` — des recettes existent donc côté Forge
+et pas côté NeoForge.
+
+**⑥ Radiation — 2 fichiers**
+
+`IRadiationCapability` · `RadiationProvider`
+
+Attendu : NeoForge 1.21 remplace les capabilities Forge par les *data attachments*.
+`RadiationCapability` existe et diverge de 186 lignes. **À vérifier fonctionnellement**
+plutôt qu'à porter à l'identique.
+
+**⑦ Compat externe — 2 fichiers**
+
+`Mods` · `AlexscaveCompat` — intégration Alex's Caves absente.
+
+**⑧ Mixins client — 2 fichiers**
+
+`CameraAccessor` · `GameRendererMixin` — effet visuel (probablement lié au shader de radiation).
+NeoForge a à la place `AntiRadiationArmorTextureMixin`, qui n'existe pas côté Forge.
+
+**⑨ Divers — 6 fichiers**
+
+`CNOpenPipeEffectHandlers` (effets des tuyaux ouverts) · `UraniumOreItem` ·
+`CriterionTriggerBase` (base des advancements custom) · `RodsTooltipHandler` +
+`RodsStats` (tooltips détaillés des barres) · `SimplexNoise`
+
+**⑩ Extracteur d'irradiation de biome — 1 fichier**
+
+`BiomeIrradationExtractorItem`. ⚠️ **Déjà porté en amont** : les 4 commits d'`origin/V2` que
+cette branche n'a pas encore intégrés l'ajoutent sous le nom `BiomeIrradiationExtractorItem`.
+Il apparaîtra automatiquement au merge.
+
+### 9.3 Portés mais non audités
+
+Ces fichiers existent des deux côtés mais divergent fortement. Un gros diff n'est **pas**
+une preuve de feature manquante — l'API 1.21 en explique une grande part. Aucun n'a été
+audité ligne à ligne, contrairement au domaine réacteur.
+
+| Fichier | Lignes divergentes |
+|---|---|
+| `CNBlocks` | 701 |
+| `CNItems` | 457 |
+| `foundation/data/recipe/CNStandardRecipeGen` | 395 |
+| `foundation/advancement/CNAdvancement` | 394 |
+| `content/contraptions/irradiated/cat/IrradiatedCat` | 384 |
+| `compat/jei/CreateNuclearJEI` | 344 |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 |
+| `CNCreativeModeTabs` | 249 |
+| `content/radiation/capability/RadiationCapability` | 186 |
+
+Le lot 9 a montré que ces écarts cachent de vrais bugs : la capacité de stress et les
+`addLayer` manquants étaient tous les deux dans `CNBlocks`.
+
+### 9.4 Bugs connus, présents dans les DEUX versions
+
+À corriger dans les deux repos, pas seulement ici :
+
+`ReactorInputFluidManager.extractFluids` ne décrémente jamais `fluidNeeded` entre les
+handlers (**sur-extraction** : demander 10 unités en retire 10 par entrée) et ignore les
+demandes d'exactement 1 unité (`if (toExtract > 1)`). Les deux gametests
+`*_expectedContract` échouent volontairement là-dessus et deviendront verts une fois corrigé.
+C'est aussi pour ça que `runGameTestServer` sort en code 1 : **ne pas le brancher en CI
+bloquante** avant.
+
+### 9.5 Ordre suggéré pour la suite
+
+1. **Merger `origin/V2`** (4 commits d'avance) — un seul conflit attendu, un import dans `CNItems`.
+2. **Jauges DisplayLink** — le plus visible, sans prérequis, le réacteur expose déjà tout.
+3. **Corriger `extractFluids`** dans les deux repos, les tests passent au vert.
+4. **Worldgen config** — silencieux mais fausse la génération de minerai.
+5. **Vache irradiée + `IrradiatedAnimal`/`AnimalUtil`** — permet aussi de dédupliquer chat/loup/poulet.
+6. Snow Powder, datagen manquant, compat Alex's Caves, mixins client.
+7. **Auditer `CNBlocks` et `CNItems`** en dernier, mais ne pas l'oublier : c'est là qu'étaient
+   cachés deux des six bugs du lot 9.
