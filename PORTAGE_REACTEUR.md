@@ -178,8 +178,16 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > Le javadoc d'exemple de `ReactorGoggleTooltipRenderer` a été corrigé au passage : côté
 > Forge il montrait un appel à `render()` avec 4 arguments alors que la méthode en prend 5.
 
-### Lot 5 — Divers contrôleur (2 fichiers, ~100 lignes)
+### Lot 5 — Divers contrôleur (2 fichiers, ~100 lignes) ✅ FAIT
 `ReactorRunningSoundInstance` · `ReactorDebugDiagnostics`
+
+> Les deux fichiers sont **identiques à l'octet** — aucune adaptation d'API. `AbstractTickableSoundInstance`
+> n'a pas bougé entre 1.20.1 et 1.21, et `ReactorAlarmSoundInstance` (déjà porté) sert de témoin.
+>
+> En revanche les 8 clés `createnuclear.reactor.debug.*` manquaient dans
+> `lang/default/reactor.json` — ajoutées. Les 9 clés `notification.reactor.*` dont dépend le
+> `ReactorMeltdownMonitor` du lot 3, elles, existaient déjà. `runData` est nécessaire pour
+> répercuter les nouvelles clés dans `en_us.json`.
 
 ### Lot 6 — Réécriture du block entity
 Remplacement de `ReactorControllerBlockEntity` (735 → ~440 lignes) et branchement de tout le reste.
