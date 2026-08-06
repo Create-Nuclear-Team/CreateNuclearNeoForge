@@ -70,9 +70,16 @@ neoForge {
             logLevel = org.slf4j.event.Level.DEBUG
         }
 
+        
         client {
             client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            gameDirectory = project.file('run')
+        }
+
+        client2 {
+            client()
+            gameDirectory = project.file('run/client2')
+            programArguments.addAll('--username', 'Dev2')
         }
 
         server {
@@ -90,7 +97,7 @@ neoForge {
         data {
             data()
             programArguments.addAll(
-                    '--mod', mod_id,
+                    '--mod', mod_id as String,
                     '--all',
                     '--output', file('src/generated/resources/').absolutePath,
                     '--existing', file('src/main/resources/').absolutePath
@@ -136,7 +143,7 @@ dependencies {
     //compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
     implementation("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
     implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-    implementation("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}")
+    implementation("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
     runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")

@@ -4,11 +4,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
@@ -37,7 +36,7 @@ public class RadiationEffect extends MobEffect {
     /**
      * Applies the radiation effect to the entity.
      * - Does nothing if the entity is immune via tag.
-     * - Skips damage if the entity wears any anti-radiation armor.
+     * - Skips damage if the entity is fully protected (anti-radiation armor, iodine effect, ...).
      * - Otherwise, applies magic damage based on the amplifier.
      *
      * @param livingEntity The affected living entity.
@@ -51,19 +50,11 @@ public class RadiationEffect extends MobEffect {
             return true;
         }
 
-        // Check if the entity is wearing any anti-radiation armor
-        boolean isWearingAntiRadiationArmor = false;
-        for (ItemStack armor : livingEntity.getArmorSlots()) {
-            if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-                isWearingAntiRadiationArmor = true;
-                break;
-            }
-        }
-
-        // If protected by armor, do not apply damage
-        if (isWearingAntiRadiationArmor) {
-            return false;
-
+        // Full irradiated resistance (anti-radiation armor, iodine, ...) cancels the effect entirely,
+        // whatever its source (radiation dose, potion, explosion).
+        if (RadiationCapability.getRadiationResistance(livingEntity) >= 1.0) {
+            livingEntity.removeEffect(CNEffects.RADIATION);
+            return true;
         }
 
         // Apply radiation damage (magic type), scaled by amplifier

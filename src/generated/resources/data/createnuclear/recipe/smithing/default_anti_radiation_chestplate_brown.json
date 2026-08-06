@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "createnuclear:brown_cloth"
+  },
+  "base": {
+    "item": "createnuclear:default_anti_radiation_chestplate"
+  },
+  "result": {
+    "count": 1,
+    "id": "createnuclear:default_anti_radiation_chestplate"
+  },
+  "template": []
+}

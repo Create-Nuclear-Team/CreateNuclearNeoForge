@@ -15,8 +15,16 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken.Irr
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolf;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorModel;
 
 public class CNEntityType {
+
+    public static final EntityEntry<net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity> NUCLEAR_EXPLOSION = CreateNuclear.REGISTRATE
+        .entity("nuclear_explosion", net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity::new, MobCategory.MISC)
+        .properties(p -> p.sized(1.0f, 1.0f))
+        .lang("Nuclear Explosion")
+        .renderer(() -> net.minecraft.client.renderer.entity.NoopRenderer::new)
+        .register();
 
    public static final EntityEntry<IrradiatedCat> IRRADIATED_CAT = CreateNuclear.REGISTRATE
         .entity("irradiated_cat", IrradiatedCat::new, MobCategory.CREATURE)
@@ -52,6 +60,7 @@ public class CNEntityType {
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_CAT, IrradiatedCatModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_CHICKEN, IrradiatedChickenModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_WOLF, IrradiatedWolfModel::createBodyLayer);
+       event.registerLayerDefinition(CNModelLayers.ANTI_RADIATION_ARMOR, AntiRadiationArmorModel::createBodyLayer);
    }
 
     public static void register() {}
