@@ -152,14 +152,14 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
         int mode = context.sourceConfig().getInt("display_mode");
 
-        int heat = (int) controller.getConfiguredPattern()
-                .getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY)
-                .copyTag()
-                .getDouble("heat");
+        // Divergence assumee vs Forge, qui lit getConfiguredPattern().getOrCreateTag().getDouble("heat") :
+        // en 1.21 la chaleur vit dans le data component CNDataComponents.HEAT, et relire le tag NBT de la
+        // stack renvoie une copie defensive ou la valeur est toujours absente (elle valait donc 0 ici).
+        int heat = controller.getConfiguredPatternHeat();
         int fuel = 0;
         int cooler = 0;
 
-        /*if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
+        if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
             for (Map.Entry<Item, Integer> entry : controller.getDisplayState().items().entrySet()) {
                 if (TypeRodPredicate.isFuel(entry.getKey().getDefaultInstance(), context.level())) {
                     fuel += entry.getValue();
@@ -167,7 +167,7 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
                     cooler += entry.getValue();
                 }
             }
-        }*/
+        }
 
         int size = controller.getMultiblockSize();
         List<BigFluidStack> fluidList = controller.getBigFluidStack();
@@ -186,10 +186,10 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
                         CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
                         CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY))
                 .size(lSize, formatSize(size))
-                //.fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
-                //.cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
-                //.fluid(lFluid, formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth))
-                //.heat(lHeat, formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
+                .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
+                .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
+                .fluid(lFluid, formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth))
+                .heat(lHeat, formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
                 .build());
     }
 
@@ -203,13 +203,13 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
     }
 
     private MutableComponent formatFluid(int current, int max, int mode, ChatFormatting color, int width) {
-        //if (mode == 0 || mode == 3) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
+        if (mode == 0 || mode == 3) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
         return Component.literal(String.valueOf(current)).append(" ").append(CreateNuclearLang.translateDirect("generic.unit.fluid.value")).withStyle(color);
     }
 
     private MutableComponent formatValue(int current, int max, int mode, boolean gaugeOnNormal, ChatFormatting color, int width) {
-        //if (mode == 3 || (mode == 0 && gaugeOnNormal)) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
+        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
         return Component.literal(String.valueOf(current)).withStyle(color);
     }

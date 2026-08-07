@@ -57,6 +57,7 @@ import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 
+import static com.simibubi.create.api.behaviour.display.DisplaySource.displaySource;
 import static com.simibubi.create.foundation.data.CreateRegistrate.casingConnectivity;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -81,6 +82,12 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .simpleItem()
             .transform(pickaxeOnly())
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.FUEL))
+            .transform(displaySource(CNDisplaySources.COOLER))
+            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .register();
 
     public static final BlockEntry<ReactorCore> REACTOR_CORE =
@@ -195,6 +202,12 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorControllerGenerator()::generate)
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.FUEL))
+            .transform(displaySource(CNDisplaySources.COOLER))
+            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
