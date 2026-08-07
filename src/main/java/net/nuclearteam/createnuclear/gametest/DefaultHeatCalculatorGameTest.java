@@ -1,10 +1,12 @@
 package net.nuclearteam.createnuclear.gametest;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -66,6 +68,11 @@ public class DefaultHeatCalculatorGameTest {
      * {@code ReactorBluePrintItem.getItemStorage} bails out on a shorter array.
      */
     private static void loadPattern(ReactorControllerInventory inventory, Map<Integer, Item> rodsBySlot) {
+        inventory.setStackInSlot(0, buildBlueprint(rodsBySlot));
+    }
+
+    /** Builds the blueprint {@link #loadPattern} loads, without touching an inventory. */
+    private static ItemStack buildBlueprint(Map<Integer, Item> rodsBySlot) {
         PatternData[] pattern = new PatternData[PATTERN_SLOTS];
         for (int slot = 0; slot < PATTERN_SLOTS; slot++) {
             Item rod = rodsBySlot.get(slot);
@@ -75,7 +82,7 @@ public class DefaultHeatCalculatorGameTest {
         ItemStack blueprint = new ItemStack(CNItems.REACTOR_BLUEPRINT.get());
         blueprint.set(CNDataComponents.REACTOR_BLUE_PRINT_DATA,
                 new ReactorBluePrintData(0, 0, 0, 0, pattern, pattern));
-        inventory.setStackInSlot(0, blueprint);
+        return blueprint;
     }
 
     private static final DefaultHeatCalculator CALCULATOR = new DefaultHeatCalculator();
@@ -112,6 +119,84 @@ public class DefaultHeatCalculatorGameTest {
         helper.assertTrue(restored.getOrDefault(CNDataComponents.HEAT, -1f) == 0f,
                 "heat=0 should round-trip through save/parse, got "
                         + restored.getOrDefault(CNDataComponents.HEAT, -1f));
+        helper.succeed();
+    }
+
+    // ================================================================
+    // 0b. a blueprint with empty pattern slots must survive saving
+    // ================================================================
+
+    /**
+     * Regression test for a second world-save crash, same family as
+     * {@link #heatComponent_atZero_survivesSerialization} but on the pattern rather than the heat.
+     * <p>
+     * {@code PatternData.CODEC} used {@link ItemStack#CODEC}, which rejects the empty stack
+     * ("Item must not be minecraft:air" / "Value must be within range [1;99]: 0"). A reactor
+     * pattern is 57 slots and is almost never full, so any blueprint sitting in a controller made
+     * {@code ReactorControllerBlockEntity.write} throw at chunk-save time. The block entity then
+     * silently stopped persisting — the controller lost its blueprint on every world reload.
+     * <p>
+     * The fix is {@link ItemStack#OPTIONAL_CODEC}, which encodes the empty stack as {@code {}}
+     * and leaves the encoding of non-empty stacks untouched, so blueprints already on disk still
+     * load.
+     */
+    @GameTest(template = STRUCTURE)
+    public static void blueprintWithEmptyPatternSlots_survivesSerialization(GameTestHelper helper) {
+        ItemStack blueprint = buildBlueprint(Map.of(18, CNItems.THORIUM_ROD.get()));
+
+        var registries = helper.getLevel().registryAccess();
+        Tag saved;
+        try {
+            saved = blueprint.save(registries);
+        } catch (RuntimeException e) {
+            throw new GameTestAssertException(
+                    "a blueprint whose pattern has empty slots must be serializable, got: " + e.getMessage());
+        }
+
+        ItemStack restored = ItemStack.parse(registries, saved).orElse(ItemStack.EMPTY);
+        ReactorBluePrintData data = restored.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA);
+        helper.assertTrue(data != null, "the pattern component should round-trip through save/parse");
+
+        helper.assertTrue(data.pattern().length == PATTERN_SLOTS,
+                "all " + PATTERN_SLOTS + " pattern slots should round-trip, got " + data.pattern().length);
+        helper.assertTrue(data.pattern()[18].stack().is(CNItems.THORIUM_ROD.get()),
+                "the populated slot should keep its rod, got " + data.pattern()[18].stack());
+        helper.assertTrue(data.pattern()[0].stack().isEmpty(),
+                "an empty slot should round-trip as empty, got " + data.pattern()[0].stack());
+        helper.succeed();
+    }
+
+    // ================================================================
+    // 0c. the same blueprint must survive being synced to a client
+    // ================================================================
+
+    /**
+     * Same defect as {@link #blueprintWithEmptyPatternSlots_survivesSerialization}, on the network
+     * path: {@code PatternData.STREAM_CODEC} used {@link ItemStack#STREAM_CODEC}, which throws
+     * {@code EncoderException("Empty ItemStack not allowed")} on the empty stack. Since
+     * {@code REACTOR_BLUE_PRINT_DATA} is registered as {@code networkSynchronized}, merely holding
+     * a blueprint would fail to encode when the stack was sent to a client.
+     */
+    @GameTest(template = STRUCTURE)
+    public static void blueprintWithEmptyPatternSlots_survivesNetworkSync(GameTestHelper helper) {
+        ItemStack blueprint = buildBlueprint(Map.of(18, CNItems.THORIUM_ROD.get()));
+
+        RegistryFriendlyByteBuf buf =
+                new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
+        try {
+            ItemStack.STREAM_CODEC.encode(buf, blueprint);
+        } catch (RuntimeException e) {
+            throw new GameTestAssertException(
+                    "a blueprint whose pattern has empty slots must be network-encodable, got: " + e.getMessage());
+        }
+
+        ItemStack restored = ItemStack.STREAM_CODEC.decode(buf);
+        ReactorBluePrintData data = restored.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA);
+        helper.assertTrue(data != null, "the pattern component should round-trip over the network");
+        helper.assertTrue(data.pattern()[18].stack().is(CNItems.THORIUM_ROD.get()),
+                "the populated slot should keep its rod, got " + data.pattern()[18].stack());
+        helper.assertTrue(data.pattern()[0].stack().isEmpty(),
+                "an empty slot should round-trip as empty, got " + data.pattern()[0].stack());
         helper.succeed();
     }
 
