@@ -3,13 +3,20 @@
 Ce document liste tout ce qui sépare encore `CreateNuclearNeoForge` de `CreateNuclearForge`
 en termes de **features**, et comment porter chaque bloc.
 
-État au **6 août 2026**, branche `V2-Reacteur` (après merge d'`origin/V2`).
+État au **7 août 2026**, branche `V2-Reacteur`.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 281 |
+| Fichiers `.java` | 296 | 290 |
 | Ressources | 1 132 | 1 115 |
+
+### Journal
+
+| Date | Chantier | Commit |
+|---|---|---|
+| 7 août | §3.1 Jauges DisplayLink — **fait** | `3f99c87` |
+| 7 août | Bug de persistance du contrôleur (hors roadmap, trouvé en chemin) | `a8d1f1b` |
 
 ---
 
@@ -69,7 +76,31 @@ Classés par feature, du plus au moins impactant.
 
 ---
 
-### 3.1 Jauges DisplayLink du réacteur — 9 fichiers ⭐ priorité 1
+### 3.1 ~~Jauges DisplayLink du réacteur — 9 fichiers~~ ✅ FAIT le 7 août (`3f99c87`)
+
+> **Ce que le diagnostic ci-dessous sous-estimait.** La feature n'était pas *incomplète* côté
+> NeoForge, elle était **entièrement morte** : `ReactorSummaryDisplaySource` existait mais
+> n'était référencée nulle part — ni `CNDisplaySources`, ni le moindre
+> `.transform(displaySource(...))` dans `CNBlocks`. Aucune source n'était donc proposée sur un
+> Display Link, pas même le résumé.
+>
+> Deux bugs trouvés au passage dans `ReactorSummaryDisplaySource` :
+> - carburant, refroidisseur, fluide et chaleur étaient **commentés** (faute de
+>   `ReactorGaugeRenderer`), ainsi que les branches « gauge » de `formatValue`/`formatFluid` ;
+> - la chaleur était lue via `getConfiguredPattern().get(CUSTOM_DATA).copyTag()` — le piège n°1
+>   du §6 — et valait donc **toujours 0**. Remplacé par `getConfiguredPatternHeat()`.
+>
+> La question du doublon `ReactorGaugeOverrides` est tranchée : **pas de doublon**. C'est un
+> générateur de modèle d'item (datagen) pour la jauge du bloc `reactor_frame`, sans rapport avec
+> `ReactorGaugeRenderer` qui dessine des barres `█▒` en texte.
+>
+> Toutes les clés de lang `display_source.*` étaient déjà présentes dans `interface.json`,
+> identiques à Forge. Aucune ressource à ajouter.
+
+<details>
+<summary>Diagnostic d'origine</summary>
+
+#### Jauges DisplayLink du réacteur — 9 fichiers ⭐ priorité 1
 
 `CNDisplaySources` · `AbstractReactorStatDisplaySource` · `HeatDisplaySource` ·
 `FuelDisplaySource` · `CoolerDisplaySource` · `LiquidLevelDisplaySource` ·
@@ -100,6 +131,8 @@ ont besoin : `ReactorDisplayState`, `getMultiblockSize()`, `getInputFluidManager
 **À savoir :** NeoForge possède en plus un `content/multiblock/frame/ReactorGaugeOverrides`
 qui n'existe pas côté Forge — vérifier s'il fait doublon avec `ReactorGaugeRenderer` avant de
 porter, pour ne pas se retrouver avec deux systèmes de jauges.
+
+</details>
 
 ---
 
@@ -264,7 +297,7 @@ ligne à ligne, contrairement au domaine réacteur.
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Jauges DisplayLink** | 9 | faible | Le manque le plus visible, zéro prérequis |
+| ~~1~~ | ~~**Jauges DisplayLink**~~ ✅ | 9 | faible | Fait le 7 août — `3f99c87` |
 | 2 | **Divers (§3.8)** | 4 | faible | Quatre gains rapides et indépendants |
 | 3 | **Datagen recettes** | 2 | faible | Peut bloquer la progression du joueur |
 | 4 | **Worldgen config** | 2 | faible/moy. | Silencieux mais fausse la génération |
@@ -323,6 +356,21 @@ Ce sont les plus coûteux : le code compile, ne lève rien, et se comporte mal.
    `ExtraCodecs.POSITIVE_FLOAT`, refusant `0.0`, la valeur normale d'un réacteur à l'arrêt.
    **Valider les invariants en amont, pas dans le codec.**
 
+   > **Ce piège a resservi le 7 août** (`a8d1f1b`), sur `PatternData` cette fois :
+   > `ItemStack.CODEC` **refuse la stack vide**, et un motif de réacteur fait 57 slots qui ne
+   > sont presque jamais tous remplis. Résultat : dès qu'un blueprint se trouvait dans un
+   > contrôleur, `ReactorControllerBlockEntity.write` levait à la sauvegarde du chunk et
+   > Minecraft désactivait silencieusement la persistance du block entity
+   > (« It will not persist ») — le contrôleur perdait son blueprint à chaque rechargement.
+   > Même défaut sur le chemin réseau avec `ItemStack.STREAM_CODEC`.
+   > **Réflexe 1.21 : pour un `ItemStack` qui peut être vide, c'est
+   > `ItemStack.OPTIONAL_CODEC` / `OPTIONAL_STREAM_CODEC`, jamais les variantes strictes.**
+   >
+   > Ce bug ne s'était pas vu aux gametests parce qu'ils **ne rechargent pas le monde** :
+   > l'erreur ne sortait que dans le log de `runGameTestServer`, à l'arrêt du serveur, pendant
+   > que « All 29 required tests passed » s'affichait juste au-dessus. **Lire le log, pas
+   > seulement le verdict.**
+
 ---
 
 ## 7. Vérifier l'état à tout moment
@@ -338,6 +386,6 @@ diff CreateNuclearForge/src/main/java/.../X.java \
      CreateNuclearNeoForge/src/main/java/.../X.java
 
 # Non-régression du réacteur — doit sortir en 0 des deux côtés
-cd CreateNuclearNeoForge && ./gradlew runGameTestServer   # 29 tests
+cd CreateNuclearNeoForge && ./gradlew runGameTestServer   # 31 tests
 cd CreateNuclearForge   && ./gradlew runGameTestServer    # 28 tests
 ```
