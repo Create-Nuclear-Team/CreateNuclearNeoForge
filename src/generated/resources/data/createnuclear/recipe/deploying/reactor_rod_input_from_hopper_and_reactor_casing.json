@@ -1,16 +1,16 @@
 {
-  "type": "create:item_application",
+  "type": "create:deploying",
   "ingredients": [
     {
       "item": "createnuclear:reactor_casing"
     },
     {
-      "item": "create:shaft"
+      "item": "minecraft:hopper"
     }
   ],
   "results": [
     {
-      "id": "createnuclear:reactor_output"
+      "id": "createnuclear:reactor_rod_input"
     }
   ]
 }

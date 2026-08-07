@@ -44,14 +44,16 @@ public abstract class CNRecipeProvider extends RecipeProvider {
         GENERATORS.add(new CNMixingRecipeGen(output, registries));
         GENERATORS.add(new CNPressingRecipeGen(output, registries));
         GENERATORS.add(new CNEnrichedRecipeGen(output, registries));
+        GENERATORS.add(new CNSnowPowderRecipeGen(output, registries));
         GENERATORS.add(new CNWashingRecipeGen(output, registries));
+        GENERATORS.add(new CNDeployingRecipeGen(output, registries));
 
 
         gen.addProvider(true, new DataProvider() {
 
             @Override
             public String getName() {
-                return "Create's Processing Recipes";
+                return "CreateNuclear's Processing Recipes";
             }
 
             @Override

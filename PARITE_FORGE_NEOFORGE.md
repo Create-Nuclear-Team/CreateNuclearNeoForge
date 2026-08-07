@@ -6,23 +6,25 @@ en termes de **features**, et comment porter chaque bloc.
 **Ce fichier ne contient que du travail restant.** Ce qui est fait en sort — l'historique
 est dans les commits.
 
-État au **7 août 2026**, branche `V2-Reacteur`.
+État au **7 août 2026**, branche `V2-Reacteur`, après le portage de la poudre de neige, du
+worldgen piloté par la config et du datagen de recettes.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 294 |
-| Ressources | 1 132 | 1 115 |
+| Fichiers `.java` | 296 | 301 |
+| Ressources | 1 132 | 1 118 |
 
 ---
 
 ## 0. Comment lire ce document
 
-Un `diff` brut des arborescences donne **21 fichiers Forge sans équivalent NeoForge**.
+Un `diff` brut des arborescences donne **15 fichiers Forge sans équivalent NeoForge**.
 Ce chiffre est trompeur :
 
-- **4 sont remplacés par un équivalent 1.21 meilleur** → §1, à ne surtout pas « re-porter » ;
-- **17 manquent réellement** → §2, c'est le vrai travail.
+- **4 sont remplacés par un équivalent 1.21 meilleur** → §1.1, à ne surtout pas « re-porter » ;
+- **2 existent sous un autre nom ou dans un autre package** → §1.2, idem ;
+- **9 manquent réellement** → §2, c'est le vrai travail.
 
 S'y ajoutent des écarts *à l'intérieur* de fichiers présents des deux côtés (§3), invisibles
 d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des bugs du réacteur.
@@ -35,9 +37,11 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 
 ---
 
-## 1. Volontairement non portés — l'équivalent 1.21 est meilleur
+## 1. À ne pas porter — l'équivalent existe déjà
 
-**Ne pas porter ces fichiers.** Les recréer serait une régression.
+**Ne pas recréer ces fichiers.** Le `diff` d'arborescence du §7 les listera toujours.
+
+### 1.1 Volontairement non portés — l'équivalent 1.21 est meilleur
 
 | Fichier Forge | Remplacé côté NeoForge par |
 |---|---|
@@ -46,34 +50,27 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 | `foundation/advancement/CriterionTriggerBase` | **`SimpleCriterionTrigger` vanilla** — `SimpleCreateNuclearTrigger` en hérite directement |
 | `foundation/utility/SimplexNoise` | **`net.minecraft.world.level.levelgen.synth.SimplexNoise`** — `Maths` utilise déjà celui de vanilla |
 
+### 1.2 Présents sous un autre nom ou dans un autre package
+
+| Fichier Forge | Équivalent NeoForge | Pourquoi |
+|---|---|---|
+| `foundation/data/recipe/CNProcessingRecipeGen` | `foundation/data/recipe/CNRecipeProvider` | En 1.21 la classe n'hérite plus de `ProcessingRecipeGen` mais de `RecipeProvider`, et agrège les générateurs. Même rôle, nom aligné sur son parent |
+| `api/data/recipe/SnowPowderRecipeGen` | `foundation/data/recipe/SnowPowderRecipeGen` | Suit `EnrichedRecipeGen`, qui vit dans `foundation` côté NeoForge parce qu'il hérite de `StandardProcessingRecipeGen` (introduit en 1.21) |
+
+> ⚠️ `api/data/recipe/EnrichedRecipeGen` existe encore côté NeoForge mais **n'est référencé
+> nulle part** — c'est un vestige de la première tentative de portage, avant
+> `StandardProcessingRecipeGen`. Le vivant est celui de `foundation`. Ne pas le prendre pour
+> modèle, et le supprimer à l'occasion.
+
 ---
 
-## 2. Les 17 fichiers réellement manquants
+## 2. Les 9 fichiers réellement manquants
 
 Classés par feature, du plus au moins impactant.
 
 ---
 
-### 2.1 Poudre de neige (Snow Powder) — 4 fichiers
-
-`content/kinetics/fan/processing/SnowPowderRecipe` · `api/data/recipe/SnowPowderRecipeGen` ·
-`foundation/data/recipe/CNSnowPowderRecipeGen` · `compat/jei/category/FanSnowPowderCategory`
-
-**Ce qui manque en jeu :** un type de recette de ventilateur entier, avec sa catégorie JEI.
-Aucune trace côté NeoForge — `CNRecipeTypes` n'a pas d'entrée `SNOW_POWDER`.
-
-**Points d'accroche :**
-- `CNRecipeTypes` — ajouter `SNOW_POWDER(SnowPowderRecipe::new)`
-- `CreateNuclearJEI` — enregistrer la catégorie (`builder(SnowPowderRecipe.class)`)
-- le datagen `CNSnowPowderRecipeGen` doit être branché au provider de recettes
-- vérifier les ressources associées (textures/lang de la catégorie JEI)
-
-**Difficulté : moyenne.** L'API des recettes Create a changé en 1.21 ; s'inspirer d'un type de
-recette déjà porté (`CNEnrichedRecipeGen`, `EnrichedRecipeGen`) plutôt que de traduire à l'aveugle.
-
----
-
-### 2.2 Vache irradiée + abstraction des animaux — 5 fichiers
+### 2.1 Vache irradiée + abstraction des animaux — 5 fichiers
 
 `IrradiatedCow` · `IrradiatedCowModel` · `IrradiatedCowRenderer` ·
 `IrradiatedAnimal` · `AnimalUtil`
@@ -97,41 +94,7 @@ qui fonctionnent aujourd'hui — à faire avec un test en jeu de chaque animal.
 
 ---
 
-### 2.3 Worldgen piloté par la config — 2 fichiers
-
-`infrastructure/worldgen/CNPlacementModifiers` · `infrastructure/worldgen/ConfigPlacementFilter`
-
-**Ce qui manque en jeu :** un filtre de placement qui lit la config avant de générer un minerai.
-Sans lui, **les options de `CWorldGen` ne sont probablement pas respectées** : désactiver un
-minerai dans la config n'a aucun effet.
-
-**Points d'accroche :**
-- `CreateNuclear.java` → `CNPlacementModifiers.register(modEventBus)`
-- `CNPlacedFeatures` (lignes 51 et 60 côté Forge) → `ConfigPlacementFilter.INSTANCE` dans la
-  liste des modificateurs de placement
-
-**Difficulté : faible à moyenne.** Le `PlacementModifierType` se déclare de la même façon en
-1.21, mais l'enregistrement passe par un `DeferredRegister` NeoForge.
-
-⚠️ **À vérifier avant de porter** : NeoForge n'a peut-être aucun filtre, ou en a un autre. Un
-`runData` sera nécessaire, et les features placées changeront — donc **monde de test neuf**.
-
----
-
-### 2.4 Datagen de recettes — 2 fichiers
-
-`foundation/data/recipe/CNDeployingRecipeGen` · `foundation/data/recipe/CNProcessingRecipeGen`
-
-**Ce qui manque en jeu :** des recettes qui existent côté Forge et pas côté NeoForge —
-déployeur, et une base commune de recettes de traitement.
-
-**Difficulté : faible**, mais **impact direct sur la progression du joueur** : des objets
-peuvent être tout simplement non craftables. À vérifier en jeu, JEI en main, en comparant les
-deux versions côte à côte.
-
----
-
-### 2.5 Compat Alex's Caves — 2 fichiers
+### 2.2 Compat Alex's Caves — 2 fichiers
 
 `compat/Mods` · `compat/alexscave/AlexscaveCompat`
 
@@ -154,7 +117,7 @@ Côté NeoForge, `NuclearExplosionEntity` n'en a aucune trace.
 
 ---
 
-### 2.6 Mixins client — 2 fichiers
+### 2.3 Mixins client — 2 fichiers
 
 `foundation/mixin/client/CameraAccessor` · `foundation/mixin/client/GameRendererMixin`
 
@@ -196,6 +159,41 @@ ligne à ligne, contrairement au domaine réacteur.
 > **Méthode qui a marché :** ne pas lire le diff en entier, mais partir d'un symptôme observé en
 > jeu et remonter. C'est plus rapide et ça ne trouve que des bugs réels.
 
+### 3.1 Recettes — diff des JSON générés
+
+Le diff des `.java` cache mal les recettes manquantes ; celui des JSON générés les montre
+directement. Commande dans le §7.
+
+**Corrigé** (symptôme signalé : le concentré d'azote refroidi ne servait à rien) — toute la
+chaîne de l'azote était morte, **cassée aux deux bouts** :
+
+| Étape | Recette | État avant |
+|---|---|---|
+| nitrate → concentré d'azote | `smelting` + `blasting` | absente de `CNStandardRecipeGen` |
+| concentré → concentré refroidi | `snow_powder` | absente — c'est le §2.1, porté depuis |
+| concentré refroidi + glace → azote liquide | `mixing` | absente de `CNMixingRecipeGen` |
+
+Seul le fluide `LIQUID_NITROGEN` était enregistré — donc obtenable uniquement en créatif.
+
+**Reste à traiter :**
+
+| Recette Forge | Absente côté NeoForge |
+|---|---|
+| `mixing/thorium_fluid` | oui — `CNFluids.THORIUM` est enregistré mais inobtenable, même schéma que l'azote |
+| `crafting/thorium_block_from_compacting` · `crafting/thorium_ingot_from_compacting` | oui — `THORIUM_COMPACTING` manque dans `CNStandardRecipeGen` |
+| `mechanical_crafting/reactor_alarm` | oui |
+
+> ⚠️ **Sept recettes partent dans le namespace `create`.** `CNCrushingRecipeGen` (6) et
+> `CNWashingRecipeGen` (1) utilisent `create(() -> ingrédient, …)`. En 1.21 cette surcharge
+> **prend `Create.ID` comme namespace par défaut**, plus celui du générateur — les JSON
+> atterrissent dans `src/generated/resources/data/create/recipe/`. Ce n'est pas un manque : les
+> recettes se chargent, mais sous l'id de Create, et **écrasent celles de Create** là où les ids
+> coïncident (`crushing/raw_copper`, `crushing/raw_zinc`, `crushing/raw_uranium_block`,
+> `splashing/crushed_raw_lead` existent dans le jar de Create). Forge n'a pas le problème :
+> l'ancienne surcharge prenait le namespace du générateur.
+> **Correctif : `create(CreateNuclear.MOD_ID, () -> ingrédient, …)`.** À faire avec un test JEI,
+> les ids de recette changent.
+
 ---
 
 ## 4. Vérifications en jeu en attente
@@ -209,6 +207,15 @@ les gametests.**
 | Tooltip d'une barre d'uranium/graphite | cinq lignes de stats, type en vert (FUEL) ou cyan | livré sans test en jeu |
 | `raw_uranium_block` en inventaire | la radiation monte de 27 par item | livré sans test en jeu |
 | Tuyau ouvert Create crachant de l'uranium | irradie les entités de la zone | livré sans test en jeu ; la feature était morte avant, donc jamais observée |
+| Ventilateur derrière de la neige poudreuse | le concentré d'azote devient du concentré d'azote refroidi ; particules flocon/éternuement ; entités ralenties | §2.1 porté sans test en jeu. Vérifier aussi la catégorie JEI « Cryogenic fan » |
+| `enable_world_gen = false` dans la config commune | **monde neuf** sans uranium, plomb, thorium, nitrate ni strates | filtre de placement porté sans test en jeu. Ne se voit que sur un monde généré après coup |
+| `enable_world_gen = true` (défaut) | les cinq features génèrent comme avant | le filtre est désormais `createnuclear:config_filter`, plus celui de Create — non-régression à confirmer |
+| Chaîne de l'azote de bout en bout | nitrate → *(four)* → concentré → *(ventilateur + neige poudreuse)* → concentré refroidi → *(mixeur + glace)* → 100 mB d'azote liquide | §3.1 corrigé sans test en jeu |
+
+> **Divergence assumée sur la clé de config.** `CWorldGen` exposait `disableWorldGen` (défaut
+> `false`) — un copier-coller littéral de la classe homonyme de Create, **jamais lu par personne**.
+> Il est remplacé par `enable_world_gen` (défaut `true`), la clé de Forge. Un `createnuclear-common.toml`
+> existant perdra donc son ancienne entrée : sans effet, puisqu'elle n'en avait aucun.
 
 ---
 
@@ -216,13 +223,13 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Datagen recettes (§2.4)** | 2 | faible | Peut bloquer la progression du joueur |
-| 2 | **Worldgen config (§2.3)** | 2 | faible/moy. | Silencieux mais fausse la génération |
-| 3 | **Compat Alex's Caves (§2.5)** | 2 | faible | Isolé, sans risque |
-| 4 | **Snow Powder (§2.1)** | 4 | moyenne | Feature complète, API recettes à traduire |
-| 5 | **Abstraction animaux + vache (§2.2)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 6 | **Mixins client (§2.6)** | 2 | moyenne | Sensible, à faire avec test visuel |
-| 7 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Compat Alex's Caves (§2.2)** | 2 | faible | Isolé, sans risque |
+| 2 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
+| 3 | **Mixins client (§2.3)** | 2 | moyenne | Sensible, à faire avec test visuel |
+| 4 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+
+Les tests en jeu du §4 passent avant tout ça : trois chantiers viennent d'être livrés sans être
+observés une seule fois en jeu.
 
 ---
 
@@ -263,6 +270,9 @@ les gametests.**
 | `data/<ns>/structures/` | `data/<ns>/structure/` *(singulier)* |
 | capabilities `getCapability(...)` | `level.getCapability(Capabilities.X.BLOCK, pos, ctx)` |
 | `ForgeCatnipServices.FLUID_RENDERER` | `CatnipServices.FLUID_RENDERER` — typé `<?>`, **cast requis** |
+| `ProcessingRecipe<XWrapper>` + `RecipeWrapper`/`ItemStackHandler` | `StandardProcessingRecipe<SingleRecipeInput>` — plus de classe wrapper à écrire, `new SingleRecipeInput(stack)` suffit |
+| `Codec.unit(...)` pour un `PlacementModifierType` | `MapCodec.unit(...)` — `PlacementModifierType#codec()` renvoie un `MapCodec` |
+| `CatnipServices.REGISTRIES.getKeyOrThrow(...)` | `RegisteredObjectsHelper.getKeyOrThrow(...)` |
 
 ### Deux pièges qui ne cassent pas la compilation
 
@@ -302,10 +312,18 @@ complètement** — un `import` simple ne suffira pas.
 ## 7. Vérifier l'état à tout moment
 
 ```bash
-# Fichiers Forge sans équivalent NeoForge — doit en lister 21
+# Fichiers Forge sans équivalent NeoForge — doit en lister 15 (4 du §1.1, 2 du §1.2, 9 du §2)
 cd ~/Documents/Ynov/Ydays
 diff <(cd CreateNuclearForge/src && find . -name '*.java' | sort) \
      <(cd CreateNuclearNeoForge/src && find . -name '*.java' | sort)
+
+# Recettes présentes côté Forge et absentes côté NeoForge (§3.1)
+# Les préfixes diffèrent : `recipes/` en 1.20.1, `recipe/` en 1.21
+diff <(cd CreateNuclearForge/src/generated/resources/data/createnuclear/recipes && find . -name '*.json' | sort) \
+     <(cd CreateNuclearNeoForge/src/generated/resources/data/createnuclear/recipe && find . -name '*.json' | sort)
+
+# Recettes qui fuient dans le namespace de Create — doit être vide hors tags
+find CreateNuclearNeoForge/src/generated/resources/data/create -name '*.json'
 
 # Écart interne d'un fichier partagé
 diff CreateNuclearForge/src/main/java/.../X.java \

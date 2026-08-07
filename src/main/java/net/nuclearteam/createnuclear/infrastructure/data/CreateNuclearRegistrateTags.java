@@ -9,6 +9,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNEntityType;
@@ -36,6 +37,10 @@ public class CreateNuclearRegistrateTags {
 
         prov.tag(BlockTags.DRAGON_TRANSPARENT)
                 .add(CNBlocks.ENRICHING_FIRE.get())
+        ;
+
+        prov.tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_SNOW_POWDER.tag)
+                .add(Blocks.POWDER_SNOW)
         ;
 
         for (CNBlockTags tag : CNBlockTags.values()) {

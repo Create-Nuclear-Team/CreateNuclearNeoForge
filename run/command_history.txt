@@ -29,3 +29,6 @@
 /fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
 /gamemode survival
 /fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
+/time set day
+/gamemode spectator
+/gamemode creative

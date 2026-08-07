@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-07T14:24:39.2517151	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-07T17:41:15.0506966	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -607,6 +607,7 @@ fdace7ee58d9860d4549876326a44645f9df2a10 data/createnuclear/recipe/smithing/defa
 15960ecb10eeaba53bc6fe3dcc382853c5795256 data/createnuclear/recipe/smithing/default_anti_radiation_leggings_yellow.json
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/block/enriching_fire_base_blocks.json
 509b5baa813ae0dc3345fd97754e4088132359ec data/createnuclear/tags/block/fan_processing_catalysts/enriched.json
+bc8701774f57ab000a8f0f1d390702175a6cdbb8 data/createnuclear/tags/block/fan_processing_catalysts/snow_powder.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/block/lead_ores.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/createnuclear/tags/block/thorium_ores.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/block/uranium_ores.json
