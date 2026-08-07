@@ -25,7 +25,7 @@ public class CNRodTypes {
      *     .baseRodHeat(int)
      *     .proximityRodHeat(int)
      *     .rodTimer(int)
-     *     .addItems(Item)
+     *     .item(Item)
      *     .fuelRodType()
      *     .build());
      * }</pre>

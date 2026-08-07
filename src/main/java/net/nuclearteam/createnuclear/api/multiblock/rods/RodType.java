@@ -8,12 +8,17 @@ import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryFixedCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -29,47 +34,40 @@ import java.util.function.Supplier;
 /**
  * Represents a rod type used by the mod's multiblock.
  * <p>
- * A {@code RodType} holds a set of items that can represent this rod type,
+ * A {@code RodType} holds the single item that represents this rod type,
  * heat-related values, a timing value, and a {@link TypeRod} indicating the
- * category (fuel, cooler, or none).
- * <p>
- * Every numeric value is stored as a {@link Supplier} so it can be backed by a
- * live source such as a config option: the value is re-read on each accessor
- * call instead of being frozen at registration time (see {@code CNItems}).
+ * category (fuel, cooler, or mixed).
  */
 @MethodsReturnNonnullByDefault
-public record RodType(HolderSet<Item> items,
+public record RodType(Holder<Item> item,
                       Supplier<Integer> baseRodHeat,
                       Supplier<Float> proximityRodHeat,
                       Supplier<Integer> rodTimer,
                       Supplier<Integer> ratio,
                       TypeRod type) {
 
-    public RodType(HolderSet<Item> items,
+    public RodType(Holder<Item> item,
                    int baseRodHeat, float proximityRodHeat,
                    int rodTimer, TypeRod type) {
-        this(items, baseRodHeat, proximityRodHeat, rodTimer, type, 1);
+        this(item, baseRodHeat, proximityRodHeat, rodTimer, type, 1);
     }
 
-    public RodType(HolderSet<Item> items,
+    public RodType(Holder<Item> item,
                    int baseRodHeat, float proximityRodHeat,
                    int rodTimer, TypeRod type, int ratio) {
-        this(items, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> ratio, type);
+        this(item, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> ratio, type);
     }
 
     /**
      * Serialization codec for saving/loading {@link RodType} instances.
-     * <p>
-     * {@code ratio} is optional and defaults to {@code 1} so datapacks written
-     * before it existed keep loading unchanged.
      */
     public static final Codec<RodType> CODEC = RecordCodecBuilder.create(i -> i.group(
-        RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(RodType::items),
-        Codec.INT.fieldOf("baseRodHeat").forGetter(rt -> rt.baseRodHeat().get()),
-        Codec.FLOAT.fieldOf("proximityRodHeat").forGetter(rt -> rt.proximityRodHeat().get()),
-        Codec.INT.fieldOf("rodTimer").forGetter(rt -> rt.rodTimer().get()),
-        StringRepresentable.fromEnum(TypeRod::values).fieldOf("type").forGetter(RodType::type),
-        Codec.INT.optionalFieldOf("ratio", 1).forGetter(rt -> rt.ratio().get())
+            RegistryFixedCodec.create(Registries.ITEM).fieldOf("item").forGetter(RodType::item),
+            Codec.INT.fieldOf("baseRodHeat").forGetter(rt -> rt.baseRodHeat().get()),
+            Codec.FLOAT.fieldOf("proximityRodHeat").forGetter(rt -> rt.proximityRodHeat().get()),
+            Codec.INT.fieldOf("rodTimer").forGetter(rt -> rt.rodTimer().get()),
+            StringRepresentable.fromEnum(TypeRod::values).fieldOf("type").forGetter(RodType::type),
+            Codec.INT.optionalFieldOf("ratio", 1).forGetter(rt -> rt.ratio().get())
     ).apply(i, RodType::new));
 
     /**
@@ -84,7 +82,7 @@ public record RodType(HolderSet<Item> items,
     public static Optional<Reference<RodType>> getTypeForItem(RegistryAccess registryAccess, Item item) {
         return registryAccess.lookupOrThrow(CreateNuclearRegistries.ROD_TYPE)
             .listElements()
-            .filter(ref -> ref.value().items.contains(item.builtInRegistryHolder()))
+            .filter(ref -> ref.value().item.equals(item.builtInRegistryHolder()))
             .findFirst();
     }
 
@@ -99,7 +97,7 @@ public record RodType(HolderSet<Item> items,
      */
     public static RodType resolveRodType(Item item, Level world) {
         return RodType.getTypeForItem(world.registryAccess(), item)
-            .map(Reference::value)
+            .map(Holder.Reference::value)
             .orElseGet(() -> {
                 RodType fromItem = ItemRodTypesValue.getRodType(item);
                 return fromItem.isNotEmptyItem()
@@ -112,44 +110,47 @@ public record RodType(HolderSet<Item> items,
     }
 
     /**
-     * Returns whether this {@code RodType} has no associated items.
+     * Returns whether this {@code RodType} has an associated item (i.e. is
+     * not the empty/sentinel item).
      *
-     * @return {@code true} if at least one item is defined, {@code false} otherwise
+     * @return {@code true} if a real item is defined, {@code false} otherwise
      */
     public boolean isNotEmptyItem() {
-        return this.items.size() >= 1;
+        return this.item.value() != Items.AIR;
     }
 
     /**
      * Fluent builder for creating an immutable {@link RodType} instance.
      * <p>
-     * Every numeric value ({@code baseRodHeat}, {@code proximityRodHeat},
-     * {@code rodTimer}, {@code ratio}) can be set either as a fixed primitive
-     * (evaluated once, at build time) or as a {@link Supplier} (re-evaluated on
-     * every call to the corresponding accessor). The primitive overloads are
-     * pure convenience: {@code baseRodHeat(5)} is equivalent to
-     * {@code baseRodHeat(() -> 5)}. Use the {@link Supplier} overloads to back a
-     * value with a live source such as a config option, so changes are picked up
-     * without rebuilding the {@code RodType}.
+     * Every heat/timing value ({@code baseRodHeat}, {@code proximityRodHeat},
+     * {@code rodTimer}, {@code ratio}) can be set either as a fixed
+     * primitive (evaluated once, at build time) or as a {@link Supplier}
+     * (re-evaluated on every call to the corresponding {@link RodType}
+     * accessor). The primitive overloads are pure convenience: they simply
+     * wrap the given value in a constant supplier, e.g.
+     * {@code baseRodHeat(5)} is equivalent to {@code baseRodHeat(() -> 5)}.
+     * Use the {@link Supplier} overloads to back a value with a live source
+     * such as a config option (see {@code CNItems} for examples), so that
+     * changes are picked up without rebuilding the {@code RodType}.
+     * <p>
+     * {@code item}, {@code type}, {@code baseRodHeat}, {@code proximityRodHeat}
+     * and {@code rodTimer} are required; {@code ratio} defaults to a
+     * constant {@code 1} and never needs to be set explicitly. Call
+     * {@link #build()} once all required values are configured.
      */
     public static class Builder {
-        private final List<Holder<Item>> items = new ArrayList<>();
-        private Supplier<Integer> baseRodHeat = () -> 0;
-        private Supplier<Float> proximityRodHeat = () -> 0f;
-        private Supplier<Integer> rodTimer = () -> 0;
-        private Supplier<Integer> ratio = () -> 1;
-        private TypeRod type = TypeRod.FUEL;
-
-        private boolean itemsSet = false;
-        private boolean baseRodHeatSet = false;
-        private boolean proximityRodHeatSet = false;
-        private boolean rodTimerSet = false;
-        private boolean typeSet = false;
+        private Holder<Item> item = null;
+        private Supplier<Integer> baseRodHeat = null;
+        private Supplier<Float> proximityRodHeat = null;
+        private Supplier<Integer> rodTimer = null;
+        private Supplier<Integer> ratio = null;
+        private TypeRod type = TypeRod.NONE;
 
         /**
-         * Sets the base heat for the rod.
+         * Sets a fixed base heat value, evaluated once at build time.
+         * Equivalent to {@code baseRodHeat(() -> baseRodHeat)}.
          *
-         * @param baseRodHeat base heat value
+         * @param baseRodHeat constant base heat value
          * @return this builder
          */
         public Builder baseRodHeat(int baseRodHeat) {
@@ -157,43 +158,47 @@ public record RodType(HolderSet<Item> items,
         }
 
         /**
-         * Sets the base heat for the rod, backed by a live source.
+         * Sets a dynamic base heat value, re-evaluated every time
+         * {@link RodType#baseRodHeat()} is called (e.g. to reflect a live
+         * config option instead of a value frozen at registration time).
          *
-         * @param baseRodHeat supplier of the base heat value
+         * @param baseRodHeat supplier producing the base heat value on demand
          * @return this builder
          */
         public Builder baseRodHeat(Supplier<Integer> baseRodHeat) {
             this.baseRodHeat = baseRodHeat;
-            this.baseRodHeatSet = true;
             return this;
         }
 
         /**
-         * Sets the heat contributed by nearby rods.
+         * Sets a fixed proximity heat value (heat contributed by nearby rods),
+         * evaluated once at build time.
+         * Equivalent to {@code proximityRodHeat(() -> proximityRodHeat)}.
          *
-         * @param proximityRodHeat proximity heat value
+         * @param proximityRodHeat constant proximity heat value
          * @return this builder
          */
         public Builder proximityRodHeat(float proximityRodHeat) {
-            return proximityRodHeat(() -> proximityRodHeat);
+            return proximityRodHeat(() -> proximityRodHeat)  ;
         }
 
         /**
-         * Sets the heat contributed by nearby rods, backed by a live source.
+         * Sets a dynamic proximity heat value, re-evaluated every time
+         * {@link RodType#proximityRodHeat()} is called.
          *
-         * @param proximityRodHeat supplier of the proximity heat value
+         * @param proximityRodHeat supplier producing the proximity heat value on demand
          * @return this builder
          */
         public Builder proximityRodHeat(Supplier<Float> proximityRodHeat) {
             this.proximityRodHeat = proximityRodHeat;
-            this.proximityRodHeatSet = true;
             return this;
         }
 
         /**
-         * Sets the timer (duration) for the rod's behavior.
+         * Sets a fixed timer (duration) for the rod's behavior, evaluated
+         * once at build time. Equivalent to {@code rodTimer(() -> rodTimer)}.
          *
-         * @param rodTimer duration in ticks or mod-specific units
+         * @param rodTimer constant duration in ticks or mod-specific units
          * @return this builder
          */
         public Builder rodTimer(int rodTimer) {
@@ -201,22 +206,23 @@ public record RodType(HolderSet<Item> items,
         }
 
         /**
-         * Sets the timer (duration) for the rod's behavior, backed by a live source.
+         * Sets a dynamic timer (duration) for the rod's behavior,
+         * re-evaluated every time {@link RodType#rodTimer()} is called.
          *
-         * @param rodTimer supplier of the duration
+         * @param rodTimer supplier producing the duration on demand
          * @return this builder
          */
         public Builder rodTimer(Supplier<Integer> rodTimer) {
             this.rodTimer = rodTimer;
-            this.rodTimerSet = true;
             return this;
         }
 
         /**
-         * Sets the weight this rod carries when resolving the reactor's
-         * fuel/cooler thermal balance (see {@code HeatBalance}).
+         * Sets a fixed heat ratio, evaluated once at build time. Optional:
+         * defaults to a constant {@code 1} if never called.
+         * Equivalent to {@code ratio(() -> ratio)}.
          *
-         * @param ratio weight of a single rod of this type
+         * @param ratio constant heat ratio value
          * @return this builder
          */
         public Builder ratio(int ratio) {
@@ -224,13 +230,29 @@ public record RodType(HolderSet<Item> items,
         }
 
         /**
-         * Sets the thermal balance weight, backed by a live source.
+         * Sets a dynamic heat ratio, re-evaluated every time
+         * {@link RodType#ratio()} is called. Optional: defaults to a
+         * constant {@code 1} if never called.
          *
-         * @param ratio supplier of the weight
+         * @param ratio supplier producing the heat ratio on demand
          * @return this builder
          */
         public Builder ratio(Supplier<Integer> ratio) {
             this.ratio = ratio;
+            return this;
+        }
+
+        /**
+         * Sets the rod category directly. Prefer the {@link #coolerRodType()}
+         * and {@link #fuelRodType()} convenience methods for the common
+         * cases; use this overload only to set {@link TypeRod#NONE}
+         * explicitly (e.g. for a fallback/sentinel rod type).
+         *
+         * @param type the rod category to assign
+         * @return this builder
+         */
+        public Builder type(TypeRod type) {
+            this.type = type;
             return this;
         }
 
@@ -240,9 +262,7 @@ public record RodType(HolderSet<Item> items,
          * @return this builder
          */
         public Builder coolerRodType() {
-            this.type = TypeRod.COOLER;
-            this.typeSet = true;
-            return this;
+            return type(TypeRod.COOLER);
         }
 
         /**
@@ -251,42 +271,46 @@ public record RodType(HolderSet<Item> items,
          * @return this builder
          */
         public Builder fuelRodType() {
-            this.type = TypeRod.FUEL;
-            this.typeSet = true;
-            return this;
+            return type(TypeRod.FUEL);
         }
 
         /**
-         * Adds one or more items that represent this rod type.
+         * Sets the item that represents this rod type. Calling this again
+         * replaces the previously set item.
          *
-         * @param items array of {@link ItemLike} elements to associate
+         * @param item the item to associate with this rod type
          * @return this builder
          */
-        public Builder addItems(ItemLike... items) {
-            for (ItemLike provider : items)
-                this.items.add(provider.asItem().builtInRegistryHolder());
-            if (items.length > 0) this.itemsSet = true;
+        public Builder item(ItemLike item) {
+            this.item = item.asItem().builtInRegistryHolder();
             return this;
         }
 
         /**
          * Builds the immutable {@link RodType} instance.
+         * <p>
+         * Validates that {@code item} and {@code type}, {@code baseRodHeat},
+         * {@code proximityRodHeat} and {@code rodTimer} have all been set
+         * (either as a fixed value or as a dynamic {@link Supplier});
+         * {@code ratio} is exempt since it defaults to a constant
+         * {@code 1}.
          *
-         * @throws IllegalStateException if required fields are missing
+         * @throws IllegalStateException if one or more required fields are missing,
+         *         naming every missing field in the exception message
          * @return the created instance
          */
         public RodType build() {
             List<String> missing = new ArrayList<>();
-            if (!itemsSet || items.isEmpty()) missing.add("items");
-            if (!typeSet) missing.add("type");
-            if (!baseRodHeatSet) missing.add("baseRodHeat");
-            if (!proximityRodHeatSet) missing.add("proximityRodHeat");
-            if (!rodTimerSet) missing.add("rodTimer");
+            if (item == null) missing.add("item");
+            if (type == null) missing.add("type");
+            if (baseRodHeat == null) missing.add("baseRodHeat");
+            if (proximityRodHeat == null) missing.add("proximityRodHeat");
+            if (rodTimer == null) missing.add("rodTimer");
 
             if (!missing.isEmpty())
                 throw new IllegalStateException("Missing required RodType fields: " + String.join(", ", missing));
 
-            return new RodType(HolderSet.direct(items), baseRodHeat, proximityRodHeat, rodTimer, ratio, type);
+            return new RodType(item, baseRodHeat, proximityRodHeat, rodTimer, ratio, type);
         }
     }
 
@@ -314,51 +338,20 @@ public record RodType(HolderSet<Item> items,
     public static final class TypeRodPredicate {
         public static final Predicate<ItemStack> IS_NOT_NULL = Objects::nonNull;
 
-        public static final Predicate<ItemStack> IS_FUEL = s -> {
-            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
-            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.FUEL.tag) || type == TypeRod.FUEL);
-        };
+        public static boolean isFuel(ItemStack stack, Level level) {
+            return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.FUEL;
+        }
 
-        public static final Predicate<ItemStack> IS_COOLED = s -> {
-            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
-            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.COOLER.tag) || type == TypeRod.COOLER);
-        };
-
-        /** @return whether the given resolved rod type is a fuel rod. */
         public static boolean isFuel(RodType rodType) {
             return rodType != null && rodType.type() == TypeRod.FUEL;
         }
 
-        /** @return whether the given resolved rod type is a cooler rod. */
+        public static boolean isCooled(ItemStack stack, Level level) {
+            return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.COOLER;
+        }
+
         public static boolean isCooled(RodType rodType) {
             return rodType != null && rodType.type() == TypeRod.COOLER;
-        }
-
-        /**
-         * Level-aware variant of {@link #IS_FUEL}: resolves the rod type through
-         * the world registries first, so datapack-defined rod types are honoured.
-         */
-        public static boolean isFuel(ItemStack stack, Level level) {
-            if (!IS_NOT_NULL.test(stack) || stack.isEmpty()) return false;
-            if (stack.is(CNItemTags.FUEL.tag)) return true;
-            return isFuel(resolveRodType(stack.getItem(), level));
-        }
-
-        /**
-         * Level-aware variant of {@link #IS_COOLED}: resolves the rod type through
-         * the world registries first, so datapack-defined rod types are honoured.
-         */
-        public static boolean isCooled(ItemStack stack, Level level) {
-            if (!IS_NOT_NULL.test(stack) || stack.isEmpty()) return false;
-            if (stack.is(CNItemTags.COOLER.tag)) return true;
-            return isCooled(resolveRodType(stack.getItem(), level));
-        }
-
-        public static String tooltipKey(ItemStack stack) {
-            if (!IS_NOT_NULL.test(stack)) return "unknown";
-            if (IS_FUEL.test(stack)) return "fuel";
-            if (IS_COOLED.test(stack)) return "cooled";
-            return "unknown";
         }
 
         public static String tooltipKey(ItemStack stack, Level level) {
@@ -371,7 +364,14 @@ public record RodType(HolderSet<Item> items,
 
     @Override
     public String toString() {
-        return "RodType [items: " + this.items() +
+        String itemName = this.item.unwrapKey()
+            .map(k -> k.location().toString())
+            .orElseGet(() -> {
+                ResourceLocation rl = BuiltInRegistries.ITEM.getKey(this.item.value());
+                return rl != null ? rl.toString() : this.item.value().toString();
+            });
+
+        return "RodType [item: " + itemName +
                 ", baseRodHeat: " + this.baseRodHeat().get() +
                 ", proximityRodHeat: " + this.proximityRodHeat().get() +
                 ", rodTimer: " + this.rodTimer().get() +
