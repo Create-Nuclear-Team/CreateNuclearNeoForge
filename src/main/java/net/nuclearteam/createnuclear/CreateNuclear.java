@@ -6,6 +6,7 @@ import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -50,6 +51,7 @@ public class CreateNuclear {
             .setTooltipModifierFactory(item ->
                     new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
                             .andThen(TooltipModifier.mapNull(KineticStats.create(item)))
+                            .andThen(RodsStats.create(item))
             );
 
     public CreateNuclear(IEventBus eventBus, ModContainer modContainer) {
@@ -104,6 +106,7 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
+        CNOpenPipeEffectHandlers.registerDefaults();
         // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
         // CRUSHED_URANIUM) are only bound once the registry events have finished.
         CNRadiationValues.register();

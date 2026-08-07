@@ -293,6 +293,7 @@
   "createnuclear.tooltip.item.fuel.rod": "Fuel Rod: ",
   "createnuclear.tooltip.item.unknown.rod": "Unknown: ",
   "createnuclear.tooltip.proximityRodHeat": "Proximity Rod Heat: %.2f Q",
+  "createnuclear.tooltip.ratio": "Rod Value for ratio: %d",
   "createnuclear.tooltip.rodTimer": "Rod Duration: %d tick",
   "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
   "createnuclear.tooltip.typeRod": "Rod Type: %s",

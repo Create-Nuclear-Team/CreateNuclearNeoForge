@@ -8,7 +8,7 @@ Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 290 |
+| Fichiers `.java` | 296 | 294 |
 | Ressources | 1 132 | 1 115 |
 
 ### Journal
@@ -17,18 +17,24 @@ Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`
 |---|---|---|
 | 7 août | §3.1 Jauges DisplayLink — **fait** | `3f99c87` |
 | 7 août | Bug de persistance du contrôleur (hors roadmap, trouvé en chemin) | `a8d1f1b` |
-| 7 août | §1 Alignement des 8 noms de fichiers divergents — **fait** | voir §1 |
+| 7 août | §1 Alignement des 8 noms de fichiers divergents — **fait** | `b5534d2` + `b1ca4644` (Forge) |
+| 7 août | §3.8 Divers (4 fichiers) — **fait** | voir §3.8 |
 
 ---
 
 ## 0. Comment lire ce document
 
-Un `diff` brut des arborescences donne **42 fichiers Forge sans équivalent NeoForge**.
-Ce chiffre est trompeur :
+**Au départ**, un `diff` brut des arborescences donnait **42 fichiers Forge sans équivalent
+NeoForge**. Ce chiffre était trompeur :
 
-- **8 existent, sous un autre nom** → §1, à ne jamais reporter comme manquants ;
+- **8 existaient, sous un autre nom** → §1, **réglé** : les noms sont désormais alignés, ces
+  fichiers ne polluent plus le diff ;
 - **4 sont remplacés par un équivalent 1.21 meilleur** → §2, à ne surtout pas « re-porter » ;
-- **30 manquent réellement** → §3, c'est le vrai travail.
+- **30 manquaient réellement** → §3, c'est le vrai travail.
+
+**Aujourd'hui**, le même `diff` en donne **21**. L'écart avec les 42 du départ se décompose ainsi :
+8 renommages (§1) + 9 fichiers portés au chantier 1 (§3.1) + 4 au chantier 2 (§3.8).
+Sur ces 21 restants, **4 ne sont pas à porter** (§2) : il reste donc **17 fichiers de vrai travail**.
 
 S'y ajoutent des écarts *à l'intérieur* de fichiers présents des deux côtés (§4), invisibles
 d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des bugs du réacteur.
@@ -275,7 +281,25 @@ avant de porter.
 
 ---
 
-### 3.8 Divers — 4 fichiers
+### 3.8 ~~Divers — 4 fichiers~~ ✅ FAIT le 7 août
+
+> **Ce que le diagnostic ci-dessous ratait.** Comme pour les jauges DisplayLink (§3.1), le vrai
+> problème n'était pas seulement l'absence de fichiers, mais une feature **entièrement morte** :
+> `RadiationEffectHandler` existait déjà côté NeoForge, complet et correct — mais
+> `CNOpenPipeEffectHandlers` manquait, donc **il n'était référencé nulle part**. Un tuyau ouvert
+> Create crachant de l'uranium n'irradiait donc personne. C'est le deuxième cas identique en deux
+> chantiers : **côté NeoForge, chercher systématiquement les classes jamais référencées.**
+>
+> Deux écarts avec le diagnostic d'origine :
+> - **trois** blocs portent `UraniumOreItem` côté Forge, pas deux : `uranium_ore` (3),
+>   `deepslate_uranium_ore` (3) et surtout `raw_uranium_block` (**27**), qui avait été oublié ;
+> - la clé de lang `tooltip.ratio` **manquait** côté NeoForge (les cinq autres clés `tooltip.*`
+>   des barres étaient déjà là). Sans elle, `RodsStats` aurait affiché la clé brute.
+
+<details>
+<summary>Diagnostic d'origine</summary>
+
+#### Divers — 4 fichiers
 
 | Fichier | Ce qui manque en jeu | Point d'accroche |
 |---|---|---|
@@ -285,6 +309,21 @@ avant de porter.
 | `CNOpenPipeEffectHandlers` | effets appliqués par les tuyaux ouverts Create | `CreateNuclear.java:105` — `CNOpenPipeEffectHandlers.registerDefaults()` |
 
 **Difficulté : faible** pour les quatre. Ce sont de bons premiers tickets.
+
+</details>
+
+> ⚠️ **`RodsTooltipHandler` et `RodsStats` ne font pas doublon**, malgré les apparences.
+> `RodsStats` est branché sur `setTooltipModifierFactory` de Registrate, qui ne couvre **que les
+> items du mod**. `RodsTooltipHandler` écoute l'`ItemTooltipEvent` et sert **uniquement les items
+> externes** (autres mods, ou `RodType` définis par datapack et résolus au runtime) — d'où le
+> `return` anticipé quand le namespace est `createnuclear`. **Ne pas « simplifier » en supprimant
+> l'un des deux ni en inversant la condition : on double le tooltip des barres du mod.**
+> Le commentaire est présent dans le fichier des deux côtés.
+
+**À tester en jeu** (rien de tout cela n'est couvert par les gametests) :
+1. tooltip d'une barre d'uranium/graphite → cinq lignes de stats, type en vert (FUEL) ou cyan ;
+2. porter du `raw_uranium_block` en inventaire → la radiation monte (27 × la taille du stack) ;
+3. tuyau ouvert Create crachant de l'uranium → irradie les entités dans la zone.
 
 ---
 
@@ -321,7 +360,7 @@ ligne à ligne, contrairement au domaine réacteur.
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
 | ~~1~~ | ~~**Jauges DisplayLink**~~ ✅ | 9 | faible | Fait le 7 août — `3f99c87` |
-| 2 | **Divers (§3.8)** | 4 | faible | Quatre gains rapides et indépendants |
+| ~~2~~ | ~~**Divers (§3.8)**~~ ✅ | 4 | faible | Fait le 7 août |
 | 3 | **Datagen recettes** | 2 | faible | Peut bloquer la progression du joueur |
 | 4 | **Worldgen config** | 2 | faible/moy. | Silencieux mais fausse la génération |
 | 5 | **Compat Alex's Caves** | 2 | faible | Isolé, sans risque |
