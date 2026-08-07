@@ -24,7 +24,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-public class PlayerInteracteReactorFluidInput {
+public class PlayerInteractReactorFluidInput {
     public static InteractionResult interact(Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack, boolean onClient, BlockHitResult ray) {
         FluidExchange exchange = null;
         ReactorFluidInputEntity be = (ReactorFluidInputEntity) level.getBlockEntity(pos);

@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.rod;
+package net.nuclearteam.createnuclear.content.multiblock.rod;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;

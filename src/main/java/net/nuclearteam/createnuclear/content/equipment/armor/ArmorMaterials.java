@@ -18,7 +18,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class CNArmorMaterials {
+public class ArmorMaterials {
     private static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, CreateNuclear.MOD_ID);
 
     public static final Holder<ArmorMaterial>  ANTI_RADIATION_SUIT = register(

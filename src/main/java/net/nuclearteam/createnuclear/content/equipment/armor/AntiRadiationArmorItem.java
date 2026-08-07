@@ -60,25 +60,25 @@ public class AntiRadiationArmorItem extends ArmorItem {
 
     public static class Helmet extends AntiRadiationArmorItem implements IGoggleHelmet {
         public Helmet(Properties p) {
-            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.HELMET, p);
+            super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.HELMET, p);
         }
     }
 
     public static class Chestplate extends AntiRadiationArmorItem {
         public Chestplate(Properties p) {
-            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.CHESTPLATE, p);
+            super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.CHESTPLATE, p);
         }
     }
 
     public static class Leggings extends AntiRadiationArmorItem {
         public Leggings(Properties p) {
-            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.LEGGINGS, p);
+            super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.LEGGINGS, p);
         }
     }
 
     public static class Boot extends AntiRadiationArmorItem {
         public Boot(Properties p) {
-            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.BOOTS, p);
+            super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.BOOTS, p);
         }
     }
 

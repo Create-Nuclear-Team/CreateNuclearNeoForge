@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
-import net.nuclearteam.createnuclear.content.rod.CNRodTypes;
+import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
 
 import java.util.ArrayList;
 import java.util.List;

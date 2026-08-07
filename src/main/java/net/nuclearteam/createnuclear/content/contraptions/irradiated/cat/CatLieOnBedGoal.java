@@ -10,10 +10,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 
 @ParametersAreNonnullByDefault
-public class IrradiatedCatLieOnBedGoal extends MoveToBlockGoal {
+public class CatLieOnBedGoal extends MoveToBlockGoal {
     private final IrradiatedCat irradiatedCat;
 
-    public IrradiatedCatLieOnBedGoal(IrradiatedCat cat, double speedModifier, int searchRange) {
+    public CatLieOnBedGoal(IrradiatedCat cat, double speedModifier, int searchRange) {
         super(cat, speedModifier, searchRange, 6);
         this.irradiatedCat = cat;
         this.verticalSearchStart = -2;

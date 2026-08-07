@@ -17,6 +17,7 @@ Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`
 |---|---|---|
 | 7 août | §3.1 Jauges DisplayLink — **fait** | `3f99c87` |
 | 7 août | Bug de persistance du contrôleur (hors roadmap, trouvé en chemin) | `a8d1f1b` |
+| 7 août | §1 Alignement des 8 noms de fichiers divergents — **fait** | voir §1 |
 
 ---
 
@@ -34,21 +35,43 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 
 ---
 
-## 1. Faux positifs — présents, mais renommés
+## 1. ~~Faux positifs — présents, mais renommés~~ ✅ RÉSOLU le 7 août
 
-Aucune action. Deux d'entre eux ne diffèrent que par une **faute de frappe** côté NeoForge :
-la corriger casserait des références, ce n'est pas prioritaire, mais c'est bon à savoir.
+**Les 8 noms sont désormais identiques des deux côtés.** Cette section ne décrit plus un écart
+à connaître, mais un travail fait — elle est conservée pour l'historique.
 
-| Forge | NeoForge |
+Sept renommages ont eu lieu **côté NeoForge**, pour s'aligner sur Forge (référence) :
+
+| Avant (NeoForge) | Après (= Forge) | Motif |
+|---|---|---|
+| `content/rod/CNRodTypes` | `content/multiblock/rod/CNRodTypes` | package différent |
+| `foundation/damage**s**Types/` | `foundation/damageTypes/` | le **dossier** seul était fautif — le `package` déclaré dans le fichier était déjà correct, donc dossier et package se contredisaient |
+| `CNArmorMaterials` | `ArmorMaterials` | préfixe superflu |
+| `infrastructure/config/CExplo**s**e` | `CExplode` | faute de frappe |
+| `PlayerInteract**e**ReactorFluidInput` | `PlayerInteractReactorFluidInput` | faute de frappe |
+| `IrradiatedCatLieOnBedGoal` | `CatLieOnBedGoal` | préfixe superflu |
+| `IrradiatedCatSitOnBlockGoal` | `CatSitOnBlockGoal` | préfixe superflu |
+
+Le huitième était l'inverse — **la faute était côté Forge**, donc c'est **Forge** qui a été
+renommé, pour que les deux convergent vers l'orthographe correcte :
+
+| Avant (Forge) | Après (= NeoForge) |
 |---|---|
-| `content/multiblock/rod/CNRodTypes` | `content/rod/CNRodTypes` |
-| `foundation/damageTypes/CNDamageSources` | `foundation/damage**s**Types/CNDamageSources` |
-| `content/equipment/armor/ArmorMaterials` | `CNArmorMaterials` |
-| `infrastructure/config/CExplode` | `CExplo**s**e` ⚠️ faute de frappe |
-| `input/fluid/PlayerInteract**R**eactorFluidInput` | `PlayerInteract**e**ReactorFluidInput` ⚠️ faute de frappe |
-| `content/biome/BiomeIrrad**a**tionExtractorItem` | `content/biome/BiomeIrrad**ia**tionExtractorItem` *(la faute est côté Forge)* |
-| `irradiated/cat/CatLieOnBedGoal` | `IrradiatedCatLieOnBedGoal` |
-| `irradiated/cat/CatSitOnBlockGoal` | `IrradiatedCatSitOnBlockGoal` |
+| `content/biome/BiomeIrrad**a**tionExtractorItem` | `BiomeIrrad**ia**tionExtractorItem` |
+
+> ⚠️ **Trois de ces noms masquent volontairement une classe vanilla** :
+> `ArmorMaterials` (`net.minecraft.world.item.ArmorMaterials`), `CatLieOnBedGoal` et
+> `CatSitOnBlockGoal` (`net.minecraft.world.entity.ai.goal.*`). Les fichiers concernés importent
+> le package vanilla en wildcard (`import net.minecraft.world.item.*;`,
+> `import net.minecraft.world.entity.ai.goal.*;`) — c'est **sans danger** parce qu'en Java une
+> classe du même package l'emporte sur un import à la demande, et qu'aucun de ces fichiers
+> n'utilise la classe vanilla homonyme. Forge vit avec cette situation depuis toujours.
+> **Mais si un jour l'un de ces fichiers a besoin de la version vanilla, il faudra la qualifier
+> complètement** — un `import` simple ne suffira pas.
+>
+> `BiomeIrradiationExtractorItem.TAG` vaut `"biome_restore"` et l'item est enregistré sous
+> `biome_irradiation_extractor` : le renommage Forge **ne touche donc aucune ressource**, ni
+> aucun monde existant.
 
 ---
 

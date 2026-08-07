@@ -21,7 +21,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
-import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
+import net.nuclearteam.createnuclear.content.equipment.armor.ArmorMaterials;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.content.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
@@ -77,7 +77,7 @@ public class CreateNuclear {
         CNEntityType.register();
         CNPaletteBlocks.register();
 
-        CNArmorMaterials.register(modEventBus);
+        ArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
         RadiationCapability.register(modEventBus);
 
