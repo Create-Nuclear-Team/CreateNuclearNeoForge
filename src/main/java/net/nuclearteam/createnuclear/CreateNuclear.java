@@ -96,7 +96,6 @@ public class CreateNuclear {
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         modEventBus.addListener(EventPriority.HIGHEST, CreateNuclearDatagen::gatherDataHighPriority);
-        CNTriggers.register(modEventBus);
 
         //DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
@@ -115,6 +114,7 @@ public class CreateNuclear {
 
         if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {
             CNAdvancement.register();
+            CNTriggers.register();
         }
     }
 
