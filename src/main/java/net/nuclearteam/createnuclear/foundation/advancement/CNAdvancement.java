@@ -7,6 +7,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.critereon.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -359,39 +360,40 @@ public class CNAdvancement implements DataProvider {
             .after(REACTOR_COOLER)
             .whenIconCollected()
     )
-
-            ;
+    ;
 
     private final PackOutput output;
-    private final net.minecraft.core.HolderLookup.Provider registries;
+    private final CompletableFuture<HolderLookup.Provider> registries;
 
     private static CreateNuclearAdvancement create(String id, UnaryOperator<Builder> b) {
         return new CreateNuclearAdvancement(id, b);
     }
 
-    public CNAdvancement(PackOutput output, CompletableFuture<net.minecraft.core.HolderLookup.Provider> registries) {
+    public CNAdvancement(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         this.output = output;
-        this.registries = registries.join();
+        this.registries = registries;
     }
 
     @Override
     public CompletableFuture<?> run(CachedOutput cache) {
-        PackOutput.PathProvider pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "advancement");
-        List<CompletableFuture<?>> futures = new ArrayList<>();
+        return this.registries.thenCompose(provider -> {
+            PackOutput.PathProvider pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "advancement");
+            List<CompletableFuture<?>> futures = new ArrayList<>();
+            Set<ResourceLocation> set = Sets.newHashSet();
 
-        Set<ResourceLocation> set = Sets.newHashSet();
-        Consumer<AdvancementHolder> consumer = (advancement) -> {
-            ResourceLocation id = advancement.id();
-            if (!set.add(id))
-                throw new IllegalStateException("Duplicate advancement " + id);
-            Path path = pathProvider.json(id);
-            futures.add(DataProvider.saveStable(cache, this.registries, Advancement.CODEC, advancement.value(), path));
-        };
+            Consumer<AdvancementHolder> consumer = (advancement) -> {
+                ResourceLocation id = advancement.id();
+                if (!set.add(id))
+                    throw new IllegalStateException("Duplicate advancement " + id);
+                Path path = pathProvider.json(id);
+                futures.add(DataProvider.saveStable(cache, provider, Advancement.CODEC, advancement.value(), path));
+            };
 
-        for (CreateNuclearAdvancement advancement : ENTRIES)
-            advancement.save(consumer);
+            for (CreateNuclearAdvancement advancement : ENTRIES)
+                advancement.save(consumer, provider);
 
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+            return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+        });
     }
 
     @Override

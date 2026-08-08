@@ -51,7 +51,7 @@ public class CreateNuclearDatagen {
 //        generator.addProvider(event.includeServer(), new CNShapelessRecipeGen(output, lookupProvider));
 
 
-        generator.addProvider(event.includeClient(), new CNAdvancement(output, lookupProvider));
+        generator.addProvider(event.includeServer(), new CNAdvancement(output, lookupProvider));
         generator.addProvider(event.includeClient(), CNSoundEvents.provider(generator));
 
         if (event.includeServer()) {
