@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = CreateNuclear.MOD_ID)
 public class RadiationCapability implements INBTSerializable<CompoundTag> {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, CreateNuclear.MOD_ID);
     // serializable(), not builder(): builder() attaches no serializer, so the state was never
