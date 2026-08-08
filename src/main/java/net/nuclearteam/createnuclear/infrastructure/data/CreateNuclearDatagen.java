@@ -53,6 +53,7 @@ public class CreateNuclearDatagen {
 
         generator.addProvider(event.includeServer(), new CNAdvancement(output, lookupProvider));
         generator.addProvider(event.includeClient(), CNSoundEvents.provider(generator));
+        generator.addProvider(event.includeServer(), new CNDamageTypeTagsProvider(output, lookupProvider, existingFileHelper));
 
         if (event.includeServer()) {
             CNRecipeProvider.registerAllProcessing(generator, output, lookupProvider);

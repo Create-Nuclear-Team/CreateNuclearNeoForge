@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface CameraAccessor {
     // Exposes the private Camera#move so it can be called from outside the class
     @Invoker("move")
-    void callMove(double distanceOffset, double verticalOffset, double horizontalOffset);
+    void callMove(float distanceOffset, float verticalOffset, float horizontalOffset);
 }

@@ -44,6 +44,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNEffects;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -52,6 +53,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @SuppressWarnings({"deprecation", "unused"})
 public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, IBE<EnrichingCampfireBlockEntity> {
+    private static final double CAMPFIRE_DOSE = 5.0D;
+
     public static final MapCodec<EnrichingCampfireBlock> CODEC = RecordCodecBuilder.mapCodec(
             (enrichChampFireBlock) ->
                     enrichChampFireBlock
@@ -84,8 +87,8 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (state.getValue(LIT) && entity instanceof LivingEntity) {
-            ((LivingEntity) entity).addEffect(new MobEffectInstance(CNEffects.RADIATION.getDelegate(), 100, 0));
+        if (state.getValue(LIT) && entity instanceof LivingEntity livingEntity) {
+            RadiationCapability.applyContagion(livingEntity, CAMPFIRE_DOSE, 100);
         }
         super.entityInside(state, level, pos, entity);
     }

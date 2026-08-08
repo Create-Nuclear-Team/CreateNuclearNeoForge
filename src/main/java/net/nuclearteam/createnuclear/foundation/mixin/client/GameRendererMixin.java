@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.mixin.client;
 
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.nuclearteam.createnuclear.CNClientProxy;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +29,7 @@ public abstract class GameRendererMixin {
 
     // Triggers the white flash render (preScreenRender)
     @Inject(
-            method = {"Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V"},
+            method = {"Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"},
             remap = true,
             at = @At(
                     value = "INVOKE",
@@ -36,7 +37,7 @@ public abstract class GameRendererMixin {
                     shift = At.Shift.AFTER
             )
     )
-    public void CN$render(float partialTick, long nanos, boolean idk, CallbackInfo ci) {
-        CNClientProxy.preScreenRender(partialTick);
+    public void CN$render(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        CNClientProxy.preScreenRender(deltaTracker.getGameTimeDeltaPartialTick(false));
     }
 }

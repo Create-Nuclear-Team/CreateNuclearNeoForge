@@ -32,3 +32,14 @@
 /time set day
 /gamemode spectator
 /gamemode creative
+/effect give Dev createnuclear:iodine
+/effect give Dev createnuclear:radiation
+/time set day
+/effect clear Dev
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation 30000
+/effect give Dev minecraft:regeneration infinite 255 true
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite
+/effect give Dev minecraft:saturation infinite 255 true
+/effect give Dev createnuclear:radiation infinite

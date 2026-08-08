@@ -16,9 +16,9 @@ public class CNDamageSources {
     public static DamageSource radiation(Level level) {
         return source(CNDamageTypes.RADIATION, level);
     }
-    /*public static DamageSource fanRadiation(Level level) {
+    public static DamageSource fanRadiation(Level level) {
         return source(CNDamageTypes.FAN_RADIATION, level);
-    }*/
+    }
 
     private static DamageSource source(ResourceKey<DamageType> key, LevelReader level) {
         Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
