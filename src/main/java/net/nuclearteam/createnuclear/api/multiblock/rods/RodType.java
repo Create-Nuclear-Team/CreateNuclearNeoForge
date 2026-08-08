@@ -104,7 +104,7 @@ public record RodType(Holder<Item> item,
                     ? fromItem
                     : world.registryAccess()
                         .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
-                        .getHolderOrThrow(CNRodTypes.FALLBACK)
+                        .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_ROD)
                         .value();
             });
     }

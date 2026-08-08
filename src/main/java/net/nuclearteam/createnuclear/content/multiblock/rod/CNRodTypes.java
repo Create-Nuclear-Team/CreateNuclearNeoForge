@@ -9,8 +9,6 @@ import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import static net.nuclearteam.createnuclear.api.ItemRodTypesValue.DEFAULT_ROD_TYPE;
 
 public class CNRodTypes {
-    public static final ResourceKey<RodType> FALLBACK = ResourceKey.create(CreateNuclearRegistries.ROD_TYPE, CreateNuclear.asResource("fallback"));
-
     /**
      * Static registry of rod types ({@code RodType}) for the CreateNuclear mod.
      *

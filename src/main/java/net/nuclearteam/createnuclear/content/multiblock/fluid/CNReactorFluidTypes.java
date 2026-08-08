@@ -11,8 +11,6 @@ import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import static net.nuclearteam.createnuclear.api.ReactorFluidTypesValue.DEFAULT_REACTOR_FLUID_TYPE;
 
 public class CNReactorFluidTypes {
-    public static final ResourceKey<ReactorFluidType> FALLBACK = ResourceKey.create(CreateNuclearRegistries.FLUID_TYPE, CreateNuclear.asResource("fallback"));
-
     /**
      * Static registry of reactor fluid types ({@link ReactorFluidType}) for the CreateNuclear mod.
      *
