@@ -47,7 +47,7 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 |---|---|
 | `content/radiation/capability/IRadiationCapability` | **Data attachments NeoForge** — `RadiationCapability` expose `AttachmentType<RadiationCapability> RADIATION`, lu via `entity.getData(RADIATION)` |
 | `content/radiation/capability/RadiationProvider` | idem — la plomberie `ICapabilityProvider` de Forge n'a pas d'équivalent, ni de raison d'exister |
-| `foundation/advancement/CriterionTriggerBase` | **`SimpleCriterionTrigger` vanilla** — `SimpleCreateNuclearTrigger` en hérite directement |
+| `foundation/advancement/CriterionTriggerBase` | ~~**`SimpleCriterionTrigger` vanilla** — `SimpleCreateNuclearTrigger` en hérite directement~~ Suivre Create donc modification du code par rapport au maj de Create |
 | `foundation/utility/SimplexNoise` | **`net.minecraft.world.level.levelgen.synth.SimplexNoise`** — `Maths` utilise déjà celui de vanilla |
 
 ### 1.2 Présents sous un autre nom ou dans un autre package
@@ -102,6 +102,8 @@ qui fonctionnent aujourd'hui — à faire avec un test en jeu de chaque animal.
 
 **Point d'accroche.** `NuclearExplosionEntity` côté Forge :
 
+le mod n'existe pas vraiment en 1.21.1
+
 ```java
 if (Mods.ALEXS_CAVE.isLoaded()) {
     this.alexscaveHandler = new AlexscaveCompat();
@@ -126,7 +128,7 @@ de l'explosion (accès à la caméra + hook sur le `GameRenderer`).
 
 NeoForge a à la place `AntiRadiationArmorTextureMixin`, qui n'existe pas côté Forge : les deux
 versions ont donc **divergé sur les mixins client**. Comparer les deux `createnuclear.mixins.json`
-avant de porter.
+avant de porter.: obligatoir etant donnée le fonctionnement de minecraft a changé entre la 1.20.1 et la 1.21.1
 
 **Difficulté : moyenne.** Les mixins sont sensibles aux versions et cassent silencieusement.
 À porter avec un test visuel explicite.

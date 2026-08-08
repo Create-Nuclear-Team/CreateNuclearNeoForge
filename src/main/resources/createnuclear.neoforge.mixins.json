@@ -10,7 +10,9 @@
   ],
   "client": [
     "client.RadiationHeartMixin",
-    "client.AntiRadiationArmorTextureMixin"
+    "client.AntiRadiationArmorTextureMixin",
+    "client.CameraAccessor",
+    "client.GameRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

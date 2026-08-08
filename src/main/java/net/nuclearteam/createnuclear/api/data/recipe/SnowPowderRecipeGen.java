@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.data.recipe;
+package net.nuclearteam.createnuclear.api.data.recipe;
 
 import com.simibubi.create.api.data.recipe.ProcessingRecipeGen;
 import com.simibubi.create.api.data.recipe.StandardProcessingRecipeGen;

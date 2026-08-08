@@ -1,12 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
-import com.simibubi.create.Create;
 import com.simibubi.create.api.data.recipe.ProcessingRecipeGen;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
-import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider;
-import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
@@ -14,16 +8,10 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 public abstract class CNRecipeProvider extends RecipeProvider {
 
@@ -47,7 +35,6 @@ public abstract class CNRecipeProvider extends RecipeProvider {
         GENERATORS.add(new CNSnowPowderRecipeGen(output, registries));
         GENERATORS.add(new CNWashingRecipeGen(output, registries));
         GENERATORS.add(new CNDeployingRecipeGen(output, registries));
-
 
         gen.addProvider(true, new DataProvider() {
 
