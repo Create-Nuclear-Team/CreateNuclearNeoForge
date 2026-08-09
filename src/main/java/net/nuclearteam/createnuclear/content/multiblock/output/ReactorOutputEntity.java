@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollVa
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -146,7 +147,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         @Override
         protected Vec3 getSouthLocation() {
-            return net.createmod.catnip.math.VecHelper.voxelSpace(8, 8, 12.5);
+            return VecHelper.voxelSpace(8, 8, 12.5);
         }
 
         @Override

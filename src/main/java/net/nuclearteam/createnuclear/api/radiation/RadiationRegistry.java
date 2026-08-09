@@ -7,6 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
+
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,10 +46,10 @@ public class RadiationRegistry {
         return 0D;
     }
 
-    public static double getRadiation(ItemStack stack, LivingEntity entity) {
+    public static double getRadiation(ItemStack stack, @Nullable LivingEntity entity) {
         return get(stack) * stack.getCount();
     }
-    public static double getRadiation(ResourceKey<Biome> biome, LivingEntity entity) {
+    public static double getRadiation(ResourceKey<Biome> biome, @Nullable LivingEntity entity) {
         return get(biome);
     }
 

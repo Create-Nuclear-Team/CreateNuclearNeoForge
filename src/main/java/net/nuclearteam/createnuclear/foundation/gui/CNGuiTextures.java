@@ -24,19 +24,19 @@ public enum CNGuiTextures implements ScreenElement {
     public int width, height;
     public int startX, startY;
 
-    private CNGuiTextures(String location, int width, int height) {
+    CNGuiTextures(String location, int width, int height) {
         this(location, 0, 0, width, height);
     }
 
-    private CNGuiTextures(int startX, int startY) {
+    CNGuiTextures(int startX, int startY) {
         this("icons", startX * 16, startY * 16, 16, 16);
     }
 
-    private CNGuiTextures(String location, int startX, int startY, int width, int height) {
+    CNGuiTextures(String location, int startX, int startY, int width, int height) {
         this(CreateNuclear.MOD_ID, location, startX, startY, width, height);
     }
 
-    private CNGuiTextures(String namespace, String location, int startX, int startY, int width, int height) {
+    CNGuiTextures(String namespace, String location, int startX, int startY, int width, int height) {
         this.location = ResourceLocation.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;

@@ -63,7 +63,7 @@ public class CNFluids {
                             .explosionResistance(100f)
                     )
                     .source(BaseFlowingFluid.Source::new)
-                    .bucket((s, p) -> new RadiationBucketItem(s instanceof Fluid ? (Fluid) s : ((java.util.function.Supplier<? extends Fluid>) s).get(), p, 20))
+                    .bucket((s, p) -> new RadiationBucketItem(s instanceof Fluid ? (Fluid) s : ((Supplier<? extends Fluid>) s).get(), p, 20))
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
                     .tag(CNTags.forgeItemTag("buckets/uranium"))
                     .lang("Uranium Bucket")

@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.biome;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -99,7 +101,7 @@ public class BiomeIrradiationExtractorItem extends Item {
         int next = Mth.clamp(current + amount, 0, getMaxCharge());
 
         // Utilisation de la nouvelle API des composants pour stocker les données NBT
-        stack.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY, customData ->
+        stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, customData ->
                 customData.update(tag -> tag.putInt(TAG, next))
         );
     }
@@ -108,7 +110,7 @@ public class BiomeIrradiationExtractorItem extends Item {
         if (stack == null || stack.isEmpty()) return defaultValue;
 
         // Récupération sécurisée via le composant CustomData de la 1.21
-        net.minecraft.world.item.component.CustomData customData = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
         if (customData == null) return defaultValue;
 
         CompoundTag tag = customData.copyTag();

@@ -6,6 +6,7 @@ import com.simibubi.create.AllSoundEvents.ConfiguredSoundEvent;
 import com.simibubi.create.AllSoundEvents.SoundEntry;
 import com.simibubi.create.Create;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
@@ -292,7 +293,7 @@ public class CNSoundEvents {
 
         @Override
         public Holder<SoundEvent> getMainEventHolder() {
-            return net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(event);
+            return BuiltInRegistries.SOUND_EVENT.wrapAsHolder(event);
         }
 
         @Override
@@ -372,7 +373,7 @@ public class CNSoundEvents {
 
         @Override
         public Holder<SoundEvent> getMainEventHolder() {
-            return net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(compiledEvents.get(0).event());
+            return BuiltInRegistries.SOUND_EVENT.wrapAsHolder(compiledEvents.get(0).event());
         }
 
         protected ResourceLocation getIdOf(int i) {
