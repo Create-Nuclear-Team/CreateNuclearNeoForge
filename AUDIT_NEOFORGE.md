@@ -29,7 +29,7 @@ En revanche, les points ci-dessous sont de **vraies erreurs de logique** (invers
 
 | # | Fichier:ligne | Problème | Priorité |
 |---|---|---|---|
-| B1 | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:56-65,71-73` | Les comptes de barres uranium/graphite sont inversés et un `+3` magique est ajouté lors de l'appel à `sendValueUpdate`, puis `sendValueUpdate` renvoie `countGraphiteRod` deux fois au lieu de `countUraniumRod` pour le dernier paramètre : le comptage des barres envoyé au serveur est corrompu. | 🔴 |
+| B1 | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:56-65,71-73` | Les comptes de barres uranium/graphite sont inversés et un `+3` magique est ajouté lors de l'appel à `sendValueUpdate`, puis `sendValueUpdate` renvoie `countCooledRod` deux fois au lieu de `countFuelRod` pour le dernier paramètre : le comptage des barres envoyé au serveur est corrompu. | 🔴 |
 | B2 | `content/radiation/capability/RadiationCapability.java:220-223` | Dans `applyEffects`, la branche `radiationLevel3` et la branche `else` utilisent toutes deux `amplifierLevel2.get()` (copier-coller) : il manque un `amplifierLevel3`, l'amplificateur d'effet plafonne au niveau 2 quel que soit le niveau réel de radiation. | 🟠 |
 | B3 | `content/multiblock/controller/manager/ReactorInputFluidManager.java:129-130,148-149` | `int tank = h.getTanks(); h.getFluidInTank(tank);` utilise le *nombre* de tanks comme *index* (valides : `0..getTanks()-1`) → accès systématiquement hors bornes. | 🟠 |
 | B4 | `lib/multiblock/manager/MultiBlockCache.java:22-24` | `isCached()` a une sémantique inversée : `return cachedResult == null` renvoie `true` quand **rien n'est en cache**. (Classe par ailleurs non utilisée, cf. §1.) | 🟡 |

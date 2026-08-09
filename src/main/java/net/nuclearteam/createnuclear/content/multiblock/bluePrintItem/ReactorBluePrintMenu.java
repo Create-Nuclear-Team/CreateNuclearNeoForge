@@ -15,7 +15,6 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
 
@@ -23,7 +22,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
     /**
      * Grid position of each of the 57 pattern slots, index-matched to {@link PatternData#slot()}
-     * and to {@code DefaultHeatCalculator#FORMATTED_PATTERN} — the reactor's proximity-heat
+     * and to {@code DefaultHeatCalculator#FORMATTED_PATTERN}: the reactor's proximity-heat
      * calculation resolves neighbours by this exact index, so the array must never be reordered
      * or resized independently of that grid.
      */
@@ -72,12 +71,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             emptyPattern[i] = new PatternData(i, glassPane);
         }
 
-        ReactorBluePrintData defaultData = new ReactorBluePrintData(
-                0, 0,
-                CNConfigs.server().rods.graphiteRodLifetime.get(),
-                CNConfigs.server().rods.uraniumRodLifetime.get(),
-                emptyPattern, emptyPattern
-        );
+        ReactorBluePrintData defaultData = new ReactorBluePrintData(0, 0, emptyPattern);
         reactorBluePrintData = contentHolder.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, defaultData);
 
         // Classified via RodType, not via the CNItemTags.COOLER/FUEL item tags: a rod can be
@@ -125,11 +119,11 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     protected void saveData(ItemStack contentHolder) {
         Level level = playerInventory.player.level();
 
-        // `pattern` keeps the grid exactly as the player laid it out; `patternAll` is the
-        // normalized view where every empty slot AND every non-rod item becomes a glass
-        // pane, so consumers can assume it only ever holds real rods (see PatternReader).
+        // `pattern` keeps the grid exactly as the player laid it out. The normalized
+        // `patternAll` view (empty slots and non-rod items replaced by glass panes) is
+        // no longer built or stored here: ReactorBluePrintData#patternAll(Level) derives
+        // it from `pattern` on every call instead. See PatternReader.
         PatternData[] pattern = new PatternData[POSITIONS.length];
-        PatternData[] patternAll = new PatternData[POSITIONS.length];
         ItemStack glassPane = new ItemStack(Items.GLASS_PANE);
         int countGraphiteRod = 0;
         int countUraniumRod = 0;
@@ -139,7 +133,6 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
             if (stack.isEmpty() || stack.getCount() < 1 || stack.getCount() > 99) {
                 pattern[i] = new PatternData(i, glassPane);
-                patternAll[i] = new PatternData(i, glassPane);
                 continue;
             }
 
@@ -150,15 +143,9 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             if (isFuel) countUraniumRod++;
 
             pattern[i] = new PatternData(i, stack);
-            patternAll[i] = new PatternData(i, (isFuel || isCooler) ? stack : glassPane);
         }
 
-        ReactorBluePrintData data = new ReactorBluePrintData(
-                countGraphiteRod, countUraniumRod,
-                CNConfigs.server().rods.graphiteRodLifetime.get(),
-                CNConfigs.server().rods.uraniumRodLifetime.get(),
-                pattern, patternAll
-        );
+        ReactorBluePrintData data = new ReactorBluePrintData(countGraphiteRod, countUraniumRod, pattern);
         contentHolder.set(CNDataComponents.REACTOR_BLUE_PRINT_DATA, data);
     }
 

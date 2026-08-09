@@ -17,16 +17,13 @@ public record PatternData(int slot, ItemStack stack) {
      * codec, any blueprint sitting in a controller made the block entity throw at chunk-save time,
      * so the controller silently lost its blueprint on every world reload.
      * <p>
-     * The encoding of non-empty stacks is identical between the two codecs — only the empty stack
-     * changes, from "rejected" to {@code {}} — so blueprints already on disk still load.
+     * The encoding of non-empty stacks is identical between the two codecs: only the empty stack
+     * changes, from "rejected" to {@code {}}, so blueprints already on disk still load.
      */
     public static final Codec<PatternData> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.INT.fieldOf("slot").forGetter(PatternData::slot),
-            ItemStack.OPTIONAL_CODEC
-                .fieldOf("Stack")
-                .forGetter(PatternData::stack)
-        ).apply(i, PatternData::new)
-    );
+        Codec.INT.fieldOf("slot").forGetter(PatternData::slot),
+        ItemStack.OPTIONAL_CODEC.fieldOf("Stack").forGetter(PatternData::stack)
+    ).apply(i, PatternData::new));
 
     /**
      * Uses {@link ItemStack#OPTIONAL_STREAM_CODEC} for the same reason as {@link #CODEC}:
@@ -34,12 +31,11 @@ public record PatternData(int slot, ItemStack stack) {
      * on the empty stack, and this component is {@code networkSynchronized}, so an unfilled pattern
      * failed to encode as soon as the blueprint was sent to a client.
      */
-    public static final StreamCodec<RegistryFriendlyByteBuf, PatternData> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.INT, PatternData::slot,
-                    ItemStack.OPTIONAL_STREAM_CODEC, PatternData::stack,
-                    PatternData::new
-            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, PatternData> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT, PatternData::slot,
+        ItemStack.OPTIONAL_STREAM_CODEC, PatternData::stack,
+        PatternData::new
+    );
 
     public static ItemStack getDefaultStack() {
         return DEFAULT_STACK;

@@ -25,6 +25,7 @@ import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
@@ -139,6 +140,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return Math.round(this.configuredPattern.getOrDefault(CNDataComponents.HEAT, 0f));
     }
 
+    private ReactorBluePrintData getConfiguredPatternData() {
+        return getConfiguredPattern().getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY);
+    }
+
     /** @return the first loaded fluid, or {@code null} if no fluid is present. */
     private BigFluidStack currentFluidStack() {
         return bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
@@ -250,7 +255,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if (configuredPattern.isEmpty() || configuredPattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA) == null) {
+        if (getConfiguredPatternData() == ReactorBluePrintData.EMPTY) {
             return false;
         }
 
@@ -384,13 +389,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      * {@code ReactorBluePrintMenu#saveData}.
      */
     private int getConfiguredPatternCoolerRodCount() {
-        var data = configuredPattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA);
-        return data == null ? 0 : data.countGraphiteRod();
+        return getConfiguredPatternData().countCooledRod();
     }
 
     private int getConfiguredPatternFuelRodCount() {
-        var data = configuredPattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA);
-        return data == null ? 0 : data.countUraniumRod();
+        return getConfiguredPatternData().countFuelRod();
     }
 
     /**
@@ -464,7 +467,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     private boolean isEmptyConfiguredPattern() {
-        return configuredPattern.isEmpty() || configuredPattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA) == null;
+        return getConfiguredPatternData() == ReactorBluePrintData.EMPTY;
     }
 
     public void addInput(BlockPos inputPos) {

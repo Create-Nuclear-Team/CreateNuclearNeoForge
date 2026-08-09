@@ -81,7 +81,7 @@ public class DefaultHeatCalculatorGameTest {
 
         ItemStack blueprint = new ItemStack(CNItems.REACTOR_BLUEPRINT.get());
         blueprint.set(CNDataComponents.REACTOR_BLUE_PRINT_DATA,
-                new ReactorBluePrintData(0, 0, 0, 0, pattern, pattern));
+                new ReactorBluePrintData(0, 0, pattern));
         return blueprint;
     }
 

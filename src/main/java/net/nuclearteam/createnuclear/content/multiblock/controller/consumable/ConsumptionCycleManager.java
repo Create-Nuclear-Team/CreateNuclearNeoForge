@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNDataComponents;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
 
 import java.util.*;
@@ -25,7 +26,7 @@ public class ConsumptionCycleManager {
     }
 
     public void resetCycle(ItemStack pattern, Level level, ReactorInputManagerI manager) {
-        Map<Item, Integer> counts = PatternReader.readItemCounts(pattern);
+        Map<Item, Integer> counts = PatternReader.readItemCounts(pattern, level);
         List<ConsumableTimer> updated = new ArrayList<>();
 
         for (Map.Entry<Item, Integer> entry : counts.entrySet()) {
@@ -113,7 +114,7 @@ public class ConsumptionCycleManager {
     }
 
     private void buildTimers(ItemStack pattern, Level level) {
-        PatternReader.readItemCounts(pattern).forEach((item, count) -> {
+        PatternReader.readItemCounts(pattern, level).forEach((item, count) -> {
             RodType rodType = RodType.resolveRodType(item, level);
             if (!rodType.isNotEmptyItem())
                 return;
@@ -129,7 +130,7 @@ public class ConsumptionCycleManager {
 
     private Map<String, Integer> readItemIds(ItemStack pattern, Level level) {
         Map<String, Integer> result = new HashMap<>();
-        PatternReader.readItemCounts(pattern).forEach((item, count) -> {
+        PatternReader.readItemCounts(pattern, level).forEach((item, count) -> {
             RodType rt = RodType.resolveRodType(item, level);
             if (rt.isNotEmptyItem())
                 result.put(BuiltInRegistries.ITEM.getKey(item).getPath(), count);
@@ -147,7 +148,7 @@ public class ConsumptionCycleManager {
      *                           checked this tick (used to throttle the check's frequency)
      */
     public void update(ItemStack pattern, Level level, ReactorInputManagerI inputManager, boolean checkPatternChange) {
-        boolean emptyPattern = pattern.isEmpty() || pattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA) == null;
+        boolean emptyPattern = pattern.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) == ReactorBluePrintData.EMPTY;
         if (isEmpty() && !emptyPattern) {
             startCycle(pattern, level);
         }

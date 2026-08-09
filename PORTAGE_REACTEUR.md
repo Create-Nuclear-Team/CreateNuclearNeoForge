@@ -162,6 +162,83 @@ Cœur du modèle : équilibre 6:1 fuel/cooler, surchauffe qui s'accélère (`ove
 > `saveData` construit désormais deux tableaux distincts. `getItemStorage()` continue de lire
 > `pattern()` (brut), comme la version Forge qui lit l'élément NBT `pattern`.
 
+#### Lot 2bis — Migration NBT → Data Components du blueprint ✅ FAIT (9 août 2026)
+
+Le lot 2 ci-dessus portait la lecture du pattern ; ce qui suit va plus loin et retravaille le
+**stockage** du blueprint lui-même (`bluePrintItem/`), au-delà d'un simple portage d'API.
+
+**Point de départ.** À l'ouverture de ce chantier, le blueprint NeoForge était dans un état
+intermédiaire : `ReactorBluePrintData`/`PatternData` (les vrais Data Components) coexistaient
+avec des restes NBT jamais nettoyés après leur introduction — un composant
+`CNDataComponents.PATTERN` qui ne faisait que réemballer une `CompoundTag` (jamais écrit,
+toujours lu vide), un paquet réseau (`ReactorBluePrintItemPacket`) hérité du portage Forge dont
+**tous les champs étaient write-only** côté client (`heat`, compteurs, `progress`,
+`sendUpdate` : aucun n'était relu par un rendu ou une logique quelconque), et quatre Data
+Components orphelins (`URANIUM_TIME`, `GRAPHITE_TIME`, `COUNT_GRAPHITE_ROD`,
+`COUNT_URANIUM_ROD`) enregistrés mais jamais lus ni écrits.
+
+**Ce qui a été fait :**
+- Suppression complète du paquet réseau et de son enregistrement dans `CNPackets` : ce menu
+  n'a structurellement besoin d'aucun paquet, dans aucun sens. C'est un menu à un seul joueur
+  possible (item tenu en main), l'édition du pattern passe déjà par la synchronisation de slots
+  vanilla, et `saveData()` (`MenuBase#removed`, dans Create) écrit directement sur le
+  `contentHolder` serveur sans aller-retour réseau.
+- Suppression de `CNDataComponents.PATTERN` et des quatre composants orphelins.
+- `ReactorBluePrintData` réduit à `(int countCooledRod, int countFuelRod, PatternData[] pattern)` :
+  `patternAll` n'est plus persisté ni synchronisé, il est dérivé à la demande
+  (`patternAll(Level)`) depuis `pattern`, ce qui élimine par construction le risque de
+  divergence entre les deux vues qui avait motivé la correction du lot 2. `graphiteTime`/
+  `uraniumTime` sont retirés aussi : ce n'étaient que des constantes de config recopiées sur
+  chaque blueprint, jamais lues nulle part.
+- Ajout d'un sentinel `ReactorBluePrintData.EMPTY`, qui remplace sept réimplémentations
+  indépendantes de « ce blueprint est-il configuré ? » (`configuredPattern.get(...) == null`,
+  dupliqué dans `ReactorControllerBlockEntity` ×4, `ReactorControllerBlock`,
+  `ReactorHeatUpdateCoordinator`, `ConsumptionCycleManager`) par un seul point de vérité,
+  comparé par identité (`== EMPTY`), sur le même principe que `ItemStack.EMPTY`.
+
+**Bug trouvé et corrigé, propre à NeoForge :** un blueprint contenant des barres de thorium
+perdait silencieusement ces barres à la réouverture du menu (confirmé par un dump NBT
+`/setblock` montrant le pattern correctement sauvegardé, mais absent une fois le menu rouvert).
+Cause : `THORIUM_ROD` est enregistré `.fuelRodType()` côté `RodType` (`CNItems.java`), mais son
+`.tag(...)` n'incluait pas `CNItemTags.FUEL.tag` — contrairement à `URANIUM_ROD`/`GRAPHITE_ROD`,
+qui ont bien leur tag. `ReactorBluePrintMenu#initAndReadInventory` filtrait la réaffichage sur
+ce tag plutôt que sur `RodType`, donc le thorium passait la sauvegarde mais échouait
+silencieusement à la relecture. Corrigé à deux niveaux : le tag manquant ajouté dans
+`CNItems.java`, et le filtre de réaffichage réécrit pour utiliser `RodType`/`TypeRodPredicate`
+partout (comptage, `pattern`, `patternAll`, réaffichage), la même source de vérité que
+`saveData` utilisait déjà pour `patternAll`.
+
+**Bug de config trouvé au passage, sans lien avec les Data Components :** `CNCCommon` déclarait
+sa propre instance de `CRods` (`Type.COMMON`), en plus de celle déjà présente dans `CNCServer`
+(`Type.SERVER`) — deux fichiers de config distincts pour la même donnée conceptuelle. Absent
+côté Forge, où `CRods` ne vit que dans le config serveur. `ReactorBluePrintMenu` lisait la
+copie `COMMON`, `RodType`/`CNItems` la copie `SERVER` : un admin modifiant l'une sans l'autre
+aurait désynchronisé silencieusement la durée de vie affichée sur le blueprint de celle
+réellement utilisée par le calcul de chaleur. Le champ dupliqué a été retiré de `CNCCommon`,
+`ReactorBluePrintMenu` lit désormais `CNConfigs.server().rods`, comme le reste du code.
+
+> **Différence assumée entre Forge et NeoForge, à ne pas « corriger » lors d'une synchro.**
+> Forge stocke le blueprint en NBT brut sur l'`ItemStack` (`getOrCreateTag().put("pattern", ...)`).
+> NeoForge le stocke en Data Component typé (`ReactorBluePrintData`, `Codec` + `StreamCodec`).
+> Ce n'est pas un écart à réduire : NBT muté en place sur un `ItemStack` casse silencieusement
+> en 1.21 (voir §5.1, `copyTag()` renvoie une copie défensive), et les Data Components sont la
+> direction que 1.21 impose pour ce genre de donnée structurée. Une synchro Forge → NeoForge sur
+> `bluePrintItem/` ne doit **jamais** réintroduire de `CompoundTag`/`getOrCreateTag()` ; elle doit
+> traduire chaque nouveau champ NBT Forge en champ du record `ReactorBluePrintData`, avec son
+> propre `Codec`/`StreamCodec`, sur le modèle de `PatternData`.
+>
+> Différence secondaire assumée : le paquet réseau `ReactorBluePrintItemPacket` que Forge
+> utilise n'a pas d'équivalent côté NeoForge, par choix, pas par oubli — voir le lot 2bis
+> ci-dessus. S'il réapparaît un jour côté Forge avec un vrai usage (affichage de statistiques),
+> ne pas le traduire tel quel : passer par la synchronisation de menu vanilla
+> (`ContainerData`/`DataSlot`) plutôt que par un paquet personnalisé.
+
+**Ce qu'il reste, honnêtement :** aucun bug connu à ce stade sur `bluePrintItem/` après cette
+passe. Le point réellement ouvert est la **couverture de test** : les 29 gametests ne couvrent
+pas le cas qui a produit le bug du thorium (un `RodType` enregistré sans le tag `CNItemTags`
+correspondant). Ajouter un cas de ce genre permettrait à une future régression similaire
+d'échouer un test plutôt que de n'être trouvée qu'en jeu.
+
 ### Lot 3 — Services (`service/`, 12 fichiers sur 14) ✅ FAIT
 `IHeatService` / `DefaultHeatService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
 

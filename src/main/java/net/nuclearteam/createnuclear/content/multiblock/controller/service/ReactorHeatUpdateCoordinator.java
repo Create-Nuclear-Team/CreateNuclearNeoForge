@@ -33,8 +33,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
      * {@link ReactorBluePrintData}. Replaces the Forge check on an empty NBT tag.
      */
     private static boolean isEmptyPattern(ItemStack configuredPattern) {
-        return configuredPattern.isEmpty()
-                || configuredPattern.get(CNDataComponents.REACTOR_BLUE_PRINT_DATA) == null;
+        return configuredPattern.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) == ReactorBluePrintData.EMPTY;
     }
 
     /**
@@ -52,7 +51,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
 
     @Override
     public HeatBalance calculateHeatBalance(ItemStack configuredPattern, ReactorDisplayState displayState, Level level) {
-        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
+        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern, level);
         Map<Item, Integer> currentItems = displayState != null && displayState.items() != null
                 ? displayState.items() : Collections.emptyMap();
 
@@ -89,9 +88,9 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
      *
      * @return {@code true} if {@code check} succeeded for every pattern entry
      */
-    private static boolean checkPatternAvailability(ItemStack configuredPattern, ReactorDisplayState displayState,
+    private static boolean checkPatternAvailability(ItemStack configuredPattern, ReactorDisplayState displayState, Level level,
                                                     PatternEntryCheck check) {
-        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
+        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern, level);
         Map<Item, Integer> currentItems = displayState != null && displayState.items() != null
                 ? displayState.items() : Collections.emptyMap();
 
@@ -114,7 +113,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
         }
 
         boolean[] hasAnyFuel = {false};
-        boolean allFuelAvailable = checkPatternAvailability(configuredPattern, displayState,
+        boolean allFuelAvailable = checkPatternAvailability(configuredPattern, displayState, level,
             (item, requiredCount, availableCount) -> {
                 RodType rodType = RodType.resolveRodType(item, level);
                 if (rodType.isNotEmptyItem() && rodType.type() == RodType.TypeRod.FUEL) {
@@ -134,7 +133,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
         int heat = 0;
         boolean emptyPattern = isEmptyPattern(configuredPattern);
         if (!emptyPattern && assembled) {
-            boolean allAvailable = checkPatternAvailability(configuredPattern, displayState,
+            boolean allAvailable = checkPatternAvailability(configuredPattern, displayState, level,
                     (item, requiredCount, availableCount) -> availableCount >= requiredCount);
             if (allAvailable) {
                 heat = (int) heatService.calculateHeat(fluidStack, heatBalance, previousHeat, inventory, level, displayState);
