@@ -20,29 +20,29 @@ public class IrradiatedBiomes {
         BiomeSpecialEffects.Builder effectBuilder = new BiomeSpecialEffects.Builder();
 
         effectBuilder
-                // Water: murky green
-                .waterColor(0x3B5133)
-                .waterFogColor(0x0A0E0A)
+            // Water: murky green
+            .waterColor(0x3B5133)
+            .waterFogColor(0x0A0E0A)
 
-                // Fog: sickly radioactive green (kept bright so it stays visible)
-                .fogColor(0x485E3E)
+            // Fog: sickly radioactive green (kept bright so it stays visible)
+            .fogColor(0x485E3E)
 
-                // Sky: washed-out grey-green (still lets the sun/moon and day-night cycle show through)
-                .skyColor(0x324132)
+            // Sky: washed-out grey-green (still lets the sun/moon and day-night cycle show through)
+            .skyColor(0x324132)
 
-                // Grass: sulfur yellow / scorched
-                .grassColorOverride(0x8C8F5B)
+            // Grass: sulfur yellow / scorched
+            .grassColorOverride(0x8C8F5B)
 
-                // Foliage: withered olive
-                .foliageColorOverride(0x565E3E)
+            // Foliage: withered olive
+            .foliageColorOverride(0x565E3E)
 
-                .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
-                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
-                // Plays continuously for as long as the player stands in the biome, under the
-                // Ambient/Environment volume slider. Deliberately NOT also set as .backgroundMusic():
-                // that would start a second, unsynchronised copy of the same file in the MUSIC
-                // category, and the two would phase against each other.
-                .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
+            .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
+            .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+            // Plays continuously for as long as the player stands in the biome, under the
+            // Ambient/Environment volume slider. Deliberately NOT also set as .backgroundMusic():
+            // that would start a second, unsynchronised copy of the same file in the MUSIC
+            // category, and the two would phase against each other.
+            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
         ;
 
         return new Biome.BiomeBuilder()

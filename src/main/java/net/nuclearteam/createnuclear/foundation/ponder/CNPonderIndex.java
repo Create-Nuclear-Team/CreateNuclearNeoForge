@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.foundation.ponder;
 
-
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
@@ -8,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.infrastructure.ponder.scenes.CNPonderReactorScenes;
-
 
 public class CNPonderIndex {
 

@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear;
 
 import com.tterrag.registrate.util.entry.EntityEntry;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -16,14 +17,15 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.Irradi
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorModel;
+import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 
 public class CNEntityType {
 
-    public static final EntityEntry<net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity> NUCLEAR_EXPLOSION = CreateNuclear.REGISTRATE
-        .entity("nuclear_explosion", net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity::new, MobCategory.MISC)
+    public static final EntityEntry<NuclearExplosionEntity> NUCLEAR_EXPLOSION = CreateNuclear.REGISTRATE
+        .entity("nuclear_explosion", NuclearExplosionEntity::new, MobCategory.MISC)
         .properties(p -> p.sized(1.0f, 1.0f))
         .lang("Nuclear Explosion")
-        .renderer(() -> net.minecraft.client.renderer.entity.NoopRenderer::new)
+        .renderer(() -> NoopRenderer::new)
         .register();
 
    public static final EntityEntry<IrradiatedCat> IRRADIATED_CAT = CreateNuclear.REGISTRATE

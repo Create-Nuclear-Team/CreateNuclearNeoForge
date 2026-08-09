@@ -20,11 +20,9 @@ public class CreateNuclearClient {
         IEventBus neoEventBus = NeoForge.EVENT_BUS;
 
         modEventBus.addListener(CreateNuclearClient::clientInit);
-
     }
 
     public static void clientInit(final FMLClientSetupEvent event) {
         PonderIndex.addPlugin(new CreateNuclearPonderPlugin());
-
     }
 }

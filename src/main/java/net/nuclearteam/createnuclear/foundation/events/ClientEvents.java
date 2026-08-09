@@ -88,15 +88,15 @@ public class ClientEvents {
         Player player = event.getEntity();
         PlayerModel<?> model = event.getRenderer().getModel();
 
-        if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet) {
+        if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof AntiRadiationArmorItem.Helmet) {
             model.hat.visible = false;
         }
-        if (player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate) {
+        if (player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof AntiRadiationArmorItem.Chestplate) {
             model.jacket.visible = false;
             model.rightSleeve.visible = false;
             model.leftSleeve.visible = false;
         }
-        if (player.getItemBySlot(EquipmentSlot.LEGS).getItem() instanceof net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings) {
+        if (player.getItemBySlot(EquipmentSlot.LEGS).getItem() instanceof AntiRadiationArmorItem.Leggings) {
             model.rightPants.visible = false;
             model.leftPants.visible = false;
         }

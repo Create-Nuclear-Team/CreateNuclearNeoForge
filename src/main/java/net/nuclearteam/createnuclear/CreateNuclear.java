@@ -78,7 +78,7 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
-        RadiationCapability.register(modEventBus);
+        CNAttachmentTypes.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
 
@@ -96,7 +96,6 @@ public class CreateNuclear {
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         modEventBus.addListener(EventPriority.HIGHEST, CreateNuclearDatagen::gatherDataHighPriority);
-        CNTriggers.register(modEventBus);
 
         //DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
@@ -106,6 +105,8 @@ public class CreateNuclear {
         // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
         // CRUSHED_URANIUM) are only bound once the registry events have finished.
         CNRadiationValues.register();
+
+        event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
     }
 
     public static void onRegister(final RegisterEvent event) {
@@ -115,6 +116,7 @@ public class CreateNuclear {
 
         if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {
             CNAdvancement.register();
+            CNTriggers.register();
         }
     }
 

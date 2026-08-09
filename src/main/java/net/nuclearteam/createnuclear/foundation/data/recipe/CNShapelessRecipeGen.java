@@ -69,7 +69,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
         return new Marker();
     }
 
-    GeneratedRecipeBuilder create(com.google.common.base.Supplier<ItemLike> result) {
+    GeneratedRecipeBuilder create(Supplier<ItemLike> result) {
         return new GeneratedRecipeBuilder(currentFolder, result);
     }
 
@@ -90,7 +90,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
         });
     }
 
-    GeneratedRecipe blastCrushedMetal(com.google.common.base.Supplier<? extends ItemLike> result, com.google.common.base.Supplier<? extends ItemLike> ingredient) {
+    GeneratedRecipe blastCrushedMetal(Supplier<? extends ItemLike> result, Supplier<? extends ItemLike> ingredient) {
         return create(result::get).withSuffix("_from_crushed")
                 .viaCooking(ingredient)
                 .rewardXP(.1f)
@@ -113,7 +113,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
                 .inFurnace();
     }
 
-    GeneratedRecipe blastFurnaceRecipe(com.google.common.base.Supplier<? extends ItemLike> result, com.google.common.base.Supplier<? extends ItemLike> ingredient, String suffix, int count) {
+    GeneratedRecipe blastFurnaceRecipe(Supplier<? extends ItemLike> result, Supplier<? extends ItemLike> ingredient, String suffix, int count) {
         return create(result::get).withSuffix(suffix)
                 .returns(count)
                 .viaCooking(ingredient)
@@ -121,7 +121,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
                 .inBlastFurnace();
     }
 
-    GeneratedRecipe blastFurnaceRecipeTags(com.google.common.base.Supplier<? extends ItemLike> result, com.google.common.base.Supplier<TagKey<Item>> ingredient, String suffix, int count) {
+    GeneratedRecipe blastFurnaceRecipeTags(Supplier<? extends ItemLike> result, Supplier<TagKey<Item>> ingredient, String suffix, int count) {
         return create(result::get).withSuffix(suffix)
                 .returns(count)
                 .viaCookingTag(ingredient)
@@ -130,13 +130,13 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
     }
 
     GeneratedRecipe metalCompacting(List<ItemProviderEntry<? extends ItemLike, ? extends ItemLike>> variants,
-                                    List<com.google.common.base.Supplier<TagKey<Item>>> ingredients) {
+                                    List<Supplier<TagKey<Item>>> ingredients) {
         GeneratedRecipe result = null;
         for (int i = 0; i + 1 < variants.size(); i++) {
             ItemProviderEntry<? extends ItemLike, ? extends ItemLike> currentEntry = variants.get(i);
             ItemProviderEntry<? extends ItemLike, ? extends ItemLike> nextEntry = variants.get(i + 1);
-            com.google.common.base.Supplier<TagKey<Item>> currentIngredient = ingredients.get(i);
-            com.google.common.base.Supplier<TagKey<Item>> nextIngredient = ingredients.get(i + 1);
+            Supplier<TagKey<Item>> currentIngredient = ingredients.get(i);
+            Supplier<TagKey<Item>> nextIngredient = ingredients.get(i + 1);
 
             result = create(nextEntry).withSuffix("_from_compacting")
                     .unlockedBy(currentEntry::get)
@@ -186,11 +186,11 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
 
         private final String path;
         private String suffix;
-        private com.google.common.base.Supplier<? extends ItemLike> result;
+        private Supplier<? extends ItemLike> result;
         private ResourceLocation compatDatagenOutput;
         List<ICondition> recipeConditions;
 
-        private com.google.common.base.Supplier<ItemPredicate> unlockedBy;
+        private Supplier<ItemPredicate> unlockedBy;
         private int amount;
 
         private GeneratedRecipeBuilder(String path) {
@@ -200,7 +200,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
             this.amount = 1;
         }
 
-        public GeneratedRecipeBuilder(String path, com.google.common.base.Supplier<? extends ItemLike> result) {
+        public GeneratedRecipeBuilder(String path, Supplier<? extends ItemLike> result) {
             this(path);
             this.result = result;
         }
@@ -215,14 +215,14 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
             return this;
         }
 
-        GeneratedRecipeBuilder unlockedBy(com.google.common.base.Supplier<? extends ItemLike> item) {
+        GeneratedRecipeBuilder unlockedBy(Supplier<? extends ItemLike> item) {
             this.unlockedBy = () -> ItemPredicate.Builder.item()
                     .of(item.get())
                     .build();
             return this;
         }
 
-        GeneratedRecipeBuilder unlockedByTag(com.google.common.base.Supplier<TagKey<Item>> tag) {
+        GeneratedRecipeBuilder unlockedByTag(Supplier<TagKey<Item>> tag) {
             this.unlockedBy = () -> ItemPredicate.Builder.item()
                     .of(tag.get())
                     .build();
@@ -271,7 +271,7 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
             });
         }
 
-        GeneratedRecipe viaNetheriteSmithing(com.google.common.base.Supplier<? extends Item> base, com.google.common.base.Supplier<Ingredient> upgradeMaterial) {
+        GeneratedRecipe viaNetheriteSmithing(Supplier<? extends Item> base, Supplier<Ingredient> upgradeMaterial) {
             return register(consumer -> {
                 SmithingTransformRecipeBuilder b =
                         SmithingTransformRecipeBuilder.smithing(Ingredient.of(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
@@ -297,11 +297,11 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
                     .asItem()) : compatDatagenOutput;
         }
 
-        GeneratedCookingRecipeBuilder viaCooking(com.google.common.base.Supplier<? extends ItemLike> item) {
+        GeneratedCookingRecipeBuilder viaCooking(Supplier<? extends ItemLike> item) {
             return unlockedBy(item).viaCookingIngredient(() -> Ingredient.of(item.get()));
         }
 
-        GeneratedCookingRecipeBuilder viaCookingTag(com.google.common.base.Supplier<TagKey<Item>> tag) {
+        GeneratedCookingRecipeBuilder viaCookingTag(Supplier<TagKey<Item>> tag) {
             return unlockedByTag(tag).viaCookingIngredient(() -> Ingredient.of(tag.get()));
         }
 
@@ -444,9 +444,9 @@ public class CNShapelessRecipeGen extends BaseRecipeProvider {
                 // getResourceKey and getId
                 // byValue and toId
                 // Holder.Reference: key
-                if (BuiltInRegistries.RECIPE_SERIALIZER instanceof com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor<?> mra) {
+                if (BuiltInRegistries.RECIPE_SERIALIZER instanceof MappedRegistryAccessor<?> mra) {
                     @SuppressWarnings("unchecked")
-                    com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor<RecipeSerializer<?>> mra$ = (MappedRegistryAccessor<RecipeSerializer<?>>) mra;
+                    MappedRegistryAccessor<RecipeSerializer<?>> mra$ = (MappedRegistryAccessor<RecipeSerializer<?>>) mra;
 
                     int wrappedId = mra$.getToId().getOrDefault(wrappedSerializer, -1);
                     ResourceKey<RecipeSerializer<?>> wrappedKey = mra$.getByValue().get(wrappedSerializer).key();

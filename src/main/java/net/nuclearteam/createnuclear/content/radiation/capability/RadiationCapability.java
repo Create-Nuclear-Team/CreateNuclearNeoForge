@@ -1,8 +1,11 @@
 package net.nuclearteam.createnuclear.content.radiation.capability;
 
-import net.minecraft.core.HolderLookup;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -14,41 +17,37 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.nuclearteam.createnuclear.CNAttributes;
-import net.nuclearteam.createnuclear.CNEffects;
-import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.CNTags.CNEntityTags;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
 import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Supplier;
+import java.util.*;
 
-@EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
-public class RadiationCapability implements INBTSerializable<CompoundTag> {
-    public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, CreateNuclear.MOD_ID);
-    // serializable(), not builder(): builder() attaches no serializer, so the state was never
-    // written to disk and never restored on load.
-    public static final Supplier<AttachmentType<RadiationCapability>> RADIATION = ATTACHMENT_TYPES.register("radiation",
-            () -> AttachmentType.serializable(RadiationCapability::new).build());
+@EventBusSubscriber(modid = CreateNuclear.MOD_ID)
+public class RadiationCapability {
+   public static final Codec<RadiationCapability> CODEC = RecordCodecBuilder.create(i -> i.group(
+       Codec.DOUBLE.optionalFieldOf("radiation", 0D).forGetter(RadiationCapability::getRadiation),
+       Codec.LONG.optionalFieldOf("hash", 0L).forGetter(RadiationCapability::getInventoryHash),
+       ResourceLocation.CODEC.optionalFieldOf("lastBiome").forGetter(c -> Optional.ofNullable(c.getLastBiomeLocation())),
+       Codec.DOUBLE.optionalFieldOf("contagionDose", 0D).forGetter(RadiationCapability::getContagionDose),
+       Codec.INT.optionalFieldOf("contagionTicks", 0).forGetter(RadiationCapability::getContagionTicks)
+   ).apply(i, RadiationCapability::create));
 
-    public static void register(IEventBus modEventBus) {
-        ATTACHMENT_TYPES.register(modEventBus);
-    }
+   public static final StreamCodec<RegistryFriendlyByteBuf, RadiationCapability> STREAM_CODEC = StreamCodec.composite(
+       ByteBufCodecs.DOUBLE, RadiationCapability::getRadiation,
+       ByteBufCodecs.VAR_LONG, RadiationCapability::getInventoryHash,
+       ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC), c -> Optional.ofNullable(c.getLastBiomeLocation()),
+       ByteBufCodecs.DOUBLE, RadiationCapability::getContagionDose,
+       ByteBufCodecs.VAR_INT, RadiationCapability::getContagionTicks,
+       RadiationCapability::create
+   );
 
     private double radiation;
     private long inventoryHash;
@@ -71,26 +70,15 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
     public int getContagionTicks() { return this.contagionTicks; }
     public void setContagionTicks(int ticks) { this.contagionTicks = ticks; }
 
-    @Override
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        CompoundTag tag = new CompoundTag();
-        tag.putDouble("radiation", this.getRadiation());
-        tag.putLong("hash", this.getInventoryHash());
-        if (this.getLastBiomeLocation() != null) {
-            tag.putString("lastBiome", this.getLastBiomeLocation().toString());
-        }
-        tag.putDouble("contagionDose", this.getContagionDose());
-        tag.putInt("contagionTicks", this.getContagionTicks());
-        return tag;
-    }
+    private static RadiationCapability create(double radiation, long hash, Optional<ResourceLocation> lastBiome, double contagionDose, int contagionTicks) {
+        RadiationCapability cap = new RadiationCapability();
+        cap.setRadiation(radiation);
+        cap.setInventoryHash(hash);
+        cap.setLastBiomeLocation(lastBiome.orElse(null));
+        cap.setContagionDose(contagionDose);
+        cap.setContagionTicks(contagionTicks);
 
-    @Override
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
-        this.setRadiation(nbt.getDouble("radiation"));
-        this.setInventoryHash(nbt.getLong("hash"));
-        this.setLastBiomeLocation(nbt.contains("lastBiome") ? ResourceLocation.tryParse(nbt.getString("lastBiome")) : null);
-        this.setContagionDose(nbt.getDouble("contagionDose"));
-        this.setContagionTicks(nbt.getInt("contagionTicks"));
+        return cap;
     }
 
     @SubscribeEvent
@@ -101,7 +89,7 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
     }
 
     public static void applyContagion(LivingEntity entity, double doseValue, int durationTicks) {
-        RadiationCapability cap = entity.getData(RADIATION);
+        RadiationCapability cap = entity.getData(CNAttachmentTypes.RADIATION);
         cap.setContagionDose(doseValue);
         cap.setContagionTicks(durationTicks);
     }
@@ -114,7 +102,7 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
         // guarding first keeps immune/blacklisted entities from accumulating one every tick.
         if (!canBeIrradiated(entity)) return;
 
-        RadiationCapability cap = entity.getData(RADIATION);
+        RadiationCapability cap = entity.getData(CNAttachmentTypes.RADIATION);
 
         if (entity instanceof Player player) {
             long newHash = InventoryHashUtil.compute(player);
@@ -122,6 +110,7 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
                 cap.setInventoryHash(newHash);
                 cap.setRadiation(Math.max(0, computeItemRadiation(player)));
             }
+            player.syncData(CNAttachmentTypes.RADIATION);
         } else {
             cap.setRadiation(Math.max(0, computeItemRadiation(entity)));
         }
@@ -179,12 +168,12 @@ public class RadiationCapability implements INBTSerializable<CompoundTag> {
 
     private static double getRawBiomeRadiation(ResourceKey<Biome> biomeKey) {
         if (biomeKey == null) return 0;
-        return RadiationRegistry.get(biomeKey);
+        return RadiationRegistry.getRadiation(biomeKey, null);
     }
 
     public static boolean canBeIrradiated(LivingEntity entity) {
         if (entity.isSpectator()) return false;
-        if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) return false;
+        if (entity.getType().is(CNEntityTags.IRRADIATED_IMMUNE.tag)) return false;
         if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return false;
         if (getEntityBlacklist().contains(entity.getType())) return false;
         return getRadiationResistance(entity) < 1.0;

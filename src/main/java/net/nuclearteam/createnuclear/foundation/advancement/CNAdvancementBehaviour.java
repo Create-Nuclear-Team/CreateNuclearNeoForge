@@ -1,20 +1,22 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
+import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
+import com.simibubi.create.foundation.advancement.CreateAdvancement;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class CNAdvancementBehaviour extends BlockEntityBehaviour {
     public static final BehaviourType<CNAdvancementBehaviour> TYPE = new BehaviourType<>();
@@ -29,7 +31,7 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
     }
 
     public void add(CreateNuclearAdvancement ...advancement) {
-        this.advancements.addAll(Arrays.asList(advancement));
+        Collections.addAll(this.advancements, advancement);
     }
 
     public boolean isOwnerPresent() {
@@ -61,11 +63,57 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
         }
     }
 
+    public void awardPlayerIfNear(CreateNuclearAdvancement advancement, int maxDistance) {
+        Player player = getPlayer();
+        if (player == null)
+            return;
+        if (player.distanceToSqr(Vec3.atCenterOf(getPos())) > maxDistance * maxDistance)
+            return;
+        award(advancement, player);
+    }
+
     public void awardPlayer(CreateNuclearAdvancement advancement) {
         Player player = getPlayer();
         if (player == null)
             return;
         award(advancement, player);
+    }
+
+    private void award(CreateNuclearAdvancement advancement, Player player) {
+        if (!advancements.contains(advancement)) advancement.awardTo(player);
+        removeAwarded();
+    }
+
+    private Player getPlayer() {
+        if (playerId == null) return null;
+        return getWorld().getPlayerByUUID(playerId);
+    }
+
+    @Override
+    public void write(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(nbt, registries, clientPacket);
+
+        if (playerId != null)
+            nbt.putUUID("Owner", playerId);
+    }
+
+    @Override
+    public void read(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(nbt, registries, clientPacket);
+
+        if (nbt.contains("Owner"))
+            playerId = nbt.getUUID("Owner");
+    }
+
+    public static void tryAward(BlockGetter reader, BlockPos pos, CreateAdvancement advancement) {
+        AdvancementBehaviour behaviour = BlockEntityBehaviour.get(reader, pos, AdvancementBehaviour.TYPE);
+        if (behaviour != null)
+            behaviour.awardPlayer(advancement);
+    }
+
+    @Override
+    public BehaviourType<?> getType() {
+        return TYPE;
     }
 
     public static void setPlacedBy(Level worldIn, BlockPos pos, LivingEntity placer) {
@@ -76,38 +124,5 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
             return;
         if (placer instanceof ServerPlayer)
             behaviour.setPlayer(placer.getUUID());
-    }
-
-    // Remarques 1.21 : la signature de write/read dans BlockEntityBehaviour a probablement changé pour inclure HolderLookup.Provider
-    // On retire le @Override pour l'instant pour corriger l'erreur de compilation, 
-    // Il faudra vérifier la signature exacte de Create 1.21
-    public void write(CompoundTag nbt, boolean clientPacket) {
-        if (playerId != null)
-            nbt.putUUID("Owner", playerId);
-    }
-
-    public void read(CompoundTag nbt, boolean clientPacket) {
-        if (nbt.contains("Owner"))
-            playerId = nbt.getUUID("Owner");
-    }
-
-    @Override
-    public BehaviourType<?> getType() {
-        return TYPE;
-    }
-
-    private Player getPlayer() {
-        if (playerId == null) return null;
-        return getWorld().getPlayerByUUID(playerId);
-    }
-
-    private void award(CreateNuclearAdvancement advancement, Player player) {
-        if (!advancement.isAlreadyAwardedTo(player)) advancement.awardTo(player);
-        removeAwarded();
-    }
-
-    @Override
-    public String toString() {
-        return "CNAdvancementBehaviour: [playerId => " + playerId + ", advancement => " + advancements.toArray() + "]";
     }
 }

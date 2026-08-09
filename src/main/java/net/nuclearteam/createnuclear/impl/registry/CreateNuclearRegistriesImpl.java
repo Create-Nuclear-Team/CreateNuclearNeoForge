@@ -14,8 +14,6 @@ import org.jetbrains.annotations.ApiStatus.Internal;
  * registered, so datagen cannot clone them ("No cloner for createnuclear:fluids/type") and they
  * would never be loaded from datapacks at runtime.
  */
-// NewRegistry inherits from IModBusEvent, so the mod bus is picked automatically; passing an
-// explicit `bus` is deprecated for removal since 1.21.1.
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID)
 public class CreateNuclearRegistriesImpl {
     private CreateNuclearRegistriesImpl() {}
@@ -24,15 +22,15 @@ public class CreateNuclearRegistriesImpl {
     @SubscribeEvent
     public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(
-                CreateNuclearRegistries.ROD_TYPE,
-                RodType.CODEC,
-                RodType.CODEC
+            CreateNuclearRegistries.ROD_TYPE,
+            RodType.CODEC,
+            RodType.CODEC
         );
 
         event.dataPackRegistry(
-                CreateNuclearRegistries.FLUID_TYPE,
-                ReactorFluidType.CODEC,
-                ReactorFluidType.CODEC
+            CreateNuclearRegistries.FLUID_TYPE,
+            ReactorFluidType.CODEC,
+            ReactorFluidType.CODEC
         );
     }
 }

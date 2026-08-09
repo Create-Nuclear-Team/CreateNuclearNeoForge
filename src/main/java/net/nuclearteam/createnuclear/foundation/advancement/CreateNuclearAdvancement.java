@@ -1,11 +1,13 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
+import com.simibubi.create.foundation.advancement.CreateAdvancement;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,10 +18,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.minecraft.core.HolderLookup.Provider;
 
-import java.util.Optional;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 @SuppressWarnings("unused")
@@ -29,9 +33,10 @@ public class CreateNuclearAdvancement {
     static final String LANG = "advancement." + CreateNuclear.MOD_ID + ".";
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
-    private final Advancement.Builder builder;
+    private final Advancement.Builder builder = Advancement.Builder.advancement();
     private SimpleCreateNuclearTrigger builtinTrigger;
     private CreateNuclearAdvancement parent;
+    private final Builder createNuclearBuilder = new Builder();
 
     AdvancementHolder datagenResult;
 
@@ -41,22 +46,16 @@ public class CreateNuclearAdvancement {
 
 
     public CreateNuclearAdvancement(String id, UnaryOperator<Builder> b) {
-        this.builder = Advancement.Builder.advancement();
         this.id = id;
 
-        Builder t = new Builder();
-        b.apply(t);
+        b.apply(createNuclearBuilder);
 
-        if (!t.externalTrigger) {
+        if (!createNuclearBuilder.externalTrigger) {
             builtinTrigger = CNTriggers.addSimple(id + "_builtin");
-            builder.addCriterion("0", builtinTrigger.instance());
+            builder.addCriterion("0", builtinTrigger.createCriterion(builtinTrigger.instance()));
         }
 
-        builder.display(t.icon, Component.translatable(titleKey()),
-                Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
-                id.equals("root") ? BACKGROUND : null, t.type.frame, t.type.toast, t.type.announce, t.type.hide);
-
-        if (t.type == TaskType.SECRET)
+        if (createNuclearBuilder.type == TaskType.SECRET)
             description += SECRET_SUFFIX;
 
         CNAdvancement.ENTRIES.add(this);
@@ -92,9 +91,23 @@ public class CreateNuclearAdvancement {
         builtinTrigger.trigger(sp);
     }
 
-    void save(Consumer<AdvancementHolder> t) {
+    void save(Consumer<AdvancementHolder> t, HolderLookup.Provider registries) {
         if (parent != null)
-            builder.parent(CreateNuclear.asResource(parent.id));
+            builder.parent(parent.datagenResult);
+
+        if (createNuclearBuilder.func != null)
+            createNuclearBuilder.icon(createNuclearBuilder.func.apply(registries));
+
+        builder.display(
+                createNuclearBuilder.icon,
+                Component.translatable(titleKey()),
+                Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
+                id.equals("root") ? BACKGROUND : null,
+                createNuclearBuilder.type.advancementType,
+                createNuclearBuilder.type.toast,
+                createNuclearBuilder.type.announce,
+                createNuclearBuilder.type.hide
+        );
         datagenResult = builder.save(t, CreateNuclear.asResource(id).toString());
     }
 
@@ -113,13 +126,13 @@ public class CreateNuclearAdvancement {
 
         ;
 
-        private final AdvancementType frame;
+        private final AdvancementType advancementType;
         private final boolean toast;
         private final boolean announce;
         private final boolean hide;
 
         TaskType(AdvancementType frame, boolean toast, boolean announce, boolean hide) {
-            this.frame = frame;
+            this.advancementType = frame;
             this.toast = toast;
             this.announce = announce;
             this.hide = hide;
@@ -132,6 +145,7 @@ public class CreateNuclearAdvancement {
         private boolean externalTrigger;
         private int keyIndex;
         private ItemStack icon;
+        private Function<Provider, ItemStack> func;
 
         Builder special(TaskType type) {
             this.type = type;
@@ -153,6 +167,11 @@ public class CreateNuclearAdvancement {
 
         Builder icon(ItemStack stack) {
             icon = stack;
+            return this;
+        }
+
+        Builder icon(Function<Provider, ItemStack> func) {
+            this.func = func;
             return this;
         }
 
