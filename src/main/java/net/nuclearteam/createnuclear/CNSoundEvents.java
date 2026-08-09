@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.AllSoundEvents.ConfiguredSoundEvent;
 import com.simibubi.create.AllSoundEvents.SoundEntry;
 import com.simibubi.create.Create;
@@ -17,6 +18,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.nio.file.Path;
@@ -33,121 +35,97 @@ public class CNSoundEvents {
     public static final Map<ResourceLocation, SoundEntry> ALL = new HashMap<>();
 
     public static final SoundEntry
-            REACTOR_CASING_BREAK = create("reacteur/casing", "break")
-            .subtitle("Break Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
 
-    REACTOR_CASING_STEP = create("reacteur/casing", "step")
-            .subtitle("Step on Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-    REACTOR_CASING_PLACE = create("reacteur/casing", "place")
-            .subtitle("Place Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-    REACTOR_CASING_HIT = create("reacteur/casing", "hit")
-            .subtitle("Hit Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-    REACTOR_CASING_FALL = create("reacteur/casing", "fall")
-            .subtitle("Reactor Casing Fall")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-    REACTOR_ACTIVATION = create("reacteur/activation")
+        REACTOR_ACTIVATION = create("reacteur/activation")
             .subtitle("Reactor Activation")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    REACTOR_RUNNING = create("reacteur/running")
+        REACTOR_RUNNING = create("reacteur/running")
             .subtitle("Reactor Running")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    REACTOR_SHUT_OFF = create("reacteur/shut_off")
+        REACTOR_SHUT_OFF = create("reacteur/shut_off")
             .subtitle("Reactor Shut Off")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    REACTOR_ALARM_ONESHOT = create("alarm/reactor", "alarm")
+        REACTOR_ALARM_ONESHOT = create("alarm/reactor", "alarm")
             .subtitle("Reactor Alarm")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    REACTOR_ALARM_LOOP = create("alarm/alarm")
+        REACTOR_ALARM_LOOP = create("alarm/alarm")
             .subtitle("Reactor Alarm Loop")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    NUCLEAR_EXPLOSION = create("explosion/nuclear_explosion")
+        NUCLEAR_EXPLOSION = create("explosion/nuclear_explosion")
             .subtitle("Nuclear Explosion")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    NUCLEAR_EXPLOSION_LARGE = create("explosion/large_nuclear_explosion")
+        NUCLEAR_EXPLOSION_LARGE = create("explosion/large_nuclear_explosion")
             .subtitle("Large Nuclear Explosion")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    NUCLEAR_EXPLOSION_RINGING = create("explosion/ringing")
+        NUCLEAR_EXPLOSION_RINGING = create("explosion/ringing")
             .subtitle("Nuclear Explosion Ringing")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    NUCLEAR_EXPLOSION_RUMBLE = create("explosion/nuclear_explosion_rumble")
+        NUCLEAR_EXPLOSION_RUMBLE = create("explosion/nuclear_explosion_rumble")
             .subtitle("Nuclear Explosion Rumble")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
+        MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
             .subtitle("Motor Assemble")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
+        MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
             .subtitle("Motor Disassemble")
             .category(SoundSource.BLOCKS)
             .build(),
 
-    NUCLEAR_EXPLOSION_RUMBLE_2 = create("explosion/rumble")
+        NUCLEAR_EXPLOSION_RUMBLE_2 = create("explosion/rumble")
             .subtitle("Nuclear Explosion Rumble")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    NUCLEAR_EXPLOSION_MAIN = create("explosion/main")
+        NUCLEAR_EXPLOSION_MAIN = create("explosion/main")
             .subtitle("Nuclear Explosion Main")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    NUCLEAR_EXPLOSION_SHOCKWAVE = create("explosion/shockwave")
+        NUCLEAR_EXPLOSION_SHOCKWAVE = create("explosion/shockwave")
             .subtitle("Nuclear Explosion Shockwave")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    GEIGER_HIGH = create("geiger/high")
+        GEIGER_HIGH = create("geiger/high")
             .subtitle("Geiger High")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    GEIGER_LOW = create("geiger/low")
+        GEIGER_LOW = create("geiger/low")
             .subtitle("Geiger Low")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    GEIGER_MEDIUM = create("geiger/medium")
+        GEIGER_MEDIUM = create("geiger/medium")
             .subtitle("Geiger Medium")
             .category(SoundSource.AMBIENT)
             .build(),
 
-    BIOME_WASTELAND = create("biomes/wasteland")
+        BIOME_WASTELAND = create("biomes/wasteland")
             .subtitle("Wasteland")
             .category(SoundSource.AMBIENT)
             .build()
-            ;
+        ;
 
     private static SoundEntryBuilder create(String... pathParts) {
         String name = String.join("_", pathParts);
@@ -179,9 +157,14 @@ public class CNSoundEvents {
     }
 
     public static void playItemPickup(Player player) {
-        player.level()
-                .playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f,
-                        1f + player.level().random.nextFloat());
+        player.level().playSound(
+            null,
+            player.blockPosition(),
+            SoundEvents.ITEM_PICKUP,
+            SoundSource.PLAYERS,
+            .2f,
+            1f + player.level().random.nextFloat()
+        );
     }
 
     public static class SoundEntryProvider implements DataProvider {
@@ -291,7 +274,7 @@ public class CNSoundEvents {
     private static class CustomSoundEntry extends SoundEntry {
 
         protected List<ResourceLocation> variants;
-        protected SoundEvent event;
+        protected DeferredHolder<SoundEvent, SoundEvent> event;
 
         public CustomSoundEntry(ResourceLocation id, List<ResourceLocation> variants, String subtitle,
                                 SoundSource category, int attenuationDistance) {
@@ -301,23 +284,23 @@ public class CNSoundEvents {
 
         @Override
         public void prepare() {
-            event = SoundEvent.createVariableRangeEvent(id);
+            event = DeferredHolder.create(Registries.SOUND_EVENT, id);
         }
 
         @Override
         public void register(RegisterEvent.RegisterHelper<SoundEvent> helper) {
-            ResourceLocation location = id;
-            helper.register(location, event);
-        }
-
-        @Override
-        public SoundEvent getMainEvent() {
-            return event;
+            ResourceLocation location = event.getId();
+            helper.register(location, SoundEvent.createVariableRangeEvent(location));
         }
 
         @Override
         public Holder<SoundEvent> getMainEventHolder() {
-            return net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(event);
+            return event;
+        }
+
+        @Override
+        public SoundEvent getMainEvent() {
+            return event.get();
         }
 
         @Override
@@ -349,12 +332,12 @@ public class CNSoundEvents {
 
         @Override
         public void play(Level world, Player entity, double x, double y, double z, float volume, float pitch) {
-            world.playSound(entity, x, y, z, event, category, volume, pitch);
+            world.playSound(entity, x, y, z, event.get(), category, volume, pitch);
         }
 
         @Override
         public void playAt(Level world, double x, double y, double z, float volume, float pitch, boolean fade) {
-            world.playLocalSound(x, y, z, event, category, volume, pitch, fade);
+            world.playLocalSound(x, y, z, event.get(), category, volume, pitch, fade);
         }
 
     }
@@ -362,7 +345,7 @@ public class CNSoundEvents {
     private static class WrappedSoundEntry extends SoundEntry {
 
         private List<ConfiguredSoundEvent> wrappedEvents;
-        private List<WrappedSoundEntry.CompiledSoundEvent> compiledEvents;
+        private List<CompiledSoundEvent> compiledEvents;
 
         public WrappedSoundEntry(ResourceLocation id, String subtitle,
                                  List<ConfiguredSoundEvent> wrappedEvents, SoundSource category, int attenuationDistance) {
@@ -376,28 +359,28 @@ public class CNSoundEvents {
             for (int i = 0; i < wrappedEvents.size(); i++) {
                 ConfiguredSoundEvent wrapped = wrappedEvents.get(i);
                 ResourceLocation location = getIdOf(i);
-                SoundEvent event = SoundEvent.createVariableRangeEvent(location);
-                compiledEvents.add(new WrappedSoundEntry.CompiledSoundEvent(event, wrapped.volume(), wrapped.pitch()));
+                DeferredHolder<SoundEvent, SoundEvent> event = DeferredHolder.create(Registries.SOUND_EVENT, location);
+                compiledEvents.add(new CompiledSoundEvent(event, wrapped.volume(), wrapped.pitch()));
             }
         }
 
         @Override
         public void register(RegisterEvent.RegisterHelper<SoundEvent> helper) {
-            for (WrappedSoundEntry.CompiledSoundEvent compiledEvent : compiledEvents) {
-                ResourceLocation location = compiledEvent.event().getLocation();
-                helper.register(location, compiledEvent.event());
+            for (CompiledSoundEvent compiledEvent : compiledEvents) {
+                ResourceLocation location = compiledEvent.event().getId();
+                helper.register(location, SoundEvent.createVariableRangeEvent(location));
             }
+        }
+
+        @Override
+        public Holder<SoundEvent> getMainEventHolder() {
+            return compiledEvents.getFirst().event();
         }
 
         @Override
         public SoundEvent getMainEvent() {
             return compiledEvents.get(0)
-                    .event();
-        }
-
-        @Override
-        public Holder<SoundEvent> getMainEventHolder() {
-            return net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(compiledEvents.get(0).event());
+                    .event().get();
         }
 
         protected ResourceLocation getIdOf(int i) {
@@ -429,7 +412,7 @@ public class CNSoundEvents {
         @Override
         public void play(Level world, Player entity, double x, double y, double z, float volume, float pitch) {
             for (WrappedSoundEntry.CompiledSoundEvent event : compiledEvents) {
-                world.playSound(entity, x, y, z, event.event(), category, event.volume() * volume,
+                world.playSound(entity, x, y, z, event.event().get(), category, event.volume() * volume,
                         event.pitch() * pitch);
             }
         }
@@ -437,12 +420,12 @@ public class CNSoundEvents {
         @Override
         public void playAt(Level world, double x, double y, double z, float volume, float pitch, boolean fade) {
             for (WrappedSoundEntry.CompiledSoundEvent event : compiledEvents) {
-                world.playLocalSound(x, y, z, event.event(), category, event.volume() * volume,
+                world.playLocalSound(x, y, z, event.event().get(), category, event.volume() * volume,
                         event.pitch() * pitch, fade);
             }
         }
 
-        private record CompiledSoundEvent(SoundEvent event, float volume, float pitch) {
+        private record CompiledSoundEvent(DeferredHolder<SoundEvent, SoundEvent> event, float volume, float pitch) {
         }
 
     }
