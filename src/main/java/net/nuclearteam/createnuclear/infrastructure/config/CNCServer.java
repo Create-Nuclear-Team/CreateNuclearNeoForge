@@ -11,13 +11,12 @@ public class CNCServer extends ConfigBase {
 
     @Override
     public String getName() {
-        return "server";
+        return "Server";
     }
 
     private static class Comments {
         static String rods = "Modify rod durations and related parameters.";
-        static String explode = "[WIP] Modify explosion parameters.";
-        static String radiation = "Enable or disable radiation effects emitted by mod items.";
+        static String radiation = "Enable or disable radiation effects emitted by mod items. ";
         static String notify = "Notification settings for reactor warnings.";
         static String reactorHeat = "Heat thresholds for different reactor sizes";
         static String biomeRestore = "Control how irradiated biomes are restored back to their original biome.";

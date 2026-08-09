@@ -198,7 +198,7 @@ public class CNItems {
                 .rodTimer(() -> CNConfigs.server().rods.thoriumRodLifetime.get())
                 .ratio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
                 .fuelRodType()))
-            .tag(CNTags.forgeItemTag("rods"))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
 
         NITRATE = CreateNuclear.REGISTRATE

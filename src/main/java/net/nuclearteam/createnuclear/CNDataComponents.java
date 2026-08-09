@@ -45,31 +45,6 @@ public class CNDataComponents {
             builder -> builder.persistent(ReactorBluePrintData.CODEC).networkSynchronized(ReactorBluePrintData.STREAM_CODEC)
     );
 
-    public static final DataComponentType<CompoundTag> PATTERN = register(
-            "pattern",
-            builder -> builder.persistent(CompoundTag.CODEC).networkSynchronized(ByteBufCodecs.COMPOUND_TAG)
-    );
-
-    public static final DataComponentType<Integer> URANIUM_TIME = register(
-            "uranium_time",
-            builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
-    );
-
-    public static final DataComponentType<Integer> GRAPHITE_TIME = register(
-            "graphite_time",
-            builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
-    );
-
-    public static final DataComponentType<Integer> COUNT_GRAPHITE_ROD = register(
-            "count_graphite_rod",
-            builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
-    );
-
-    public static final DataComponentType<Integer> COUNT_URANIUM_ROD = register(
-            "count_uranium_rod",
-            builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.INT)
-    );
-
     public static final DataComponentType<Cloths> CLOTH_COLOR = register(
         "cloth_color",
         b -> b.persistent(StringRepresentable.fromEnum(Cloths::values)).networkSynchronized(NeoForgeStreamCodecs.enumCodec(Cloths.class))
