@@ -23,3 +23,10 @@
 /gamemode creative
 /gamemode survival
 /gamemode creative
+/locate biome createnuclear:irradiated_land
+/summon createnuclear:nuclear_explosion
+/fillbiome
+/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
+/gamemode survival
+/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
+/effect give Dev createnuclear:radiation

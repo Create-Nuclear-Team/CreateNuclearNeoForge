@@ -147,7 +147,7 @@ public class NuclearExplosionEntity extends Entity {
         float itemDropModifier = 0.025F / Math.min(1, this.getSize());
 
 
-        net.minecraft.world.level.Explosion dummyExplosion = new net.minecraft.world.level.Explosion(level(), this, this.getX(), this.getY(), this.getZ(), 10.0F, false, net.minecraft.world.level.Explosion.BlockInteraction.DESTROY);
+        Explosion dummyExplosion = new Explosion(level(), this, this.getX(), this.getY(), this.getZ(), 10.0F, false, Explosion.BlockInteraction.DESTROY);
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {

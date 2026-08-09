@@ -57,8 +57,8 @@ public abstract class CNRecipeProvider extends RecipeProvider {
             @Override
             public CompletableFuture<?> run(CachedOutput dc) {
                 return CompletableFuture.allOf(GENERATORS.stream()
-                        .map(gen -> gen.run(dc))
-                        .toArray(CompletableFuture[]::new));
+                    .map(gen -> gen.run(dc))
+                    .toArray(CompletableFuture[]::new));
             }
         });
     }

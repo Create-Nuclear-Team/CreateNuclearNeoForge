@@ -1,10 +1,7 @@
 package net.nuclearteam.createnuclear;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -57,7 +54,7 @@ public class CNClientProxy {
             bufferbuilder.addVertex((float)screenWidth, (float)screenHeight, -90.0F).setUv(1.0F, 1.0F);
             bufferbuilder.addVertex((float)screenWidth, 0.0F, -90.0F).setUv(1.0F, 0.0F);
             bufferbuilder.addVertex(0.0F, 0.0F, -90.0F).setUv(0.0F, 0.0F);
-            com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+            BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
 
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();

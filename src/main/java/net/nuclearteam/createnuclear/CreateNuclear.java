@@ -23,11 +23,13 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.content.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule.BiomeTagRule;
 import org.slf4j.Logger;
 
 import com.simibubi.create.api.registrate.CreateRegistrateRegistrationCallback;
@@ -76,7 +78,7 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
-        RadiationCapability.register(modEventBus);
+        CNAttachmentTypes.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
 
@@ -94,21 +96,27 @@ public class CreateNuclear {
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         modEventBus.addListener(EventPriority.HIGHEST, CreateNuclearDatagen::gatherDataHighPriority);
-        CNTriggers.register(modEventBus);
 
         //DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
+        // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
+        // CRUSHED_URANIUM) are only bound once the registry events have finished.
+        CNRadiationValues.register();
+
+        event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
     }
 
     public static void onRegister(final RegisterEvent event) {
         CNSoundEvents.register(event);
         CNFanProcessingTypes.register();
+        BiomeTagRule.register(event);
 
         if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {
             CNAdvancement.register();
+            CNTriggers.register();
         }
     }
 
