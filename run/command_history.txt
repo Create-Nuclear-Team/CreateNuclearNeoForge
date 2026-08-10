@@ -43,3 +43,8 @@
 /effect give Dev createnuclear:radiation infinite
 /effect give Dev minecraft:saturation infinite 255 true
 /effect give Dev createnuclear:radiation infinite
+/effect give Dev createnuclear:radiation
+/playsound createnuclear:alarm/alarm
+/playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
+/playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
+/playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2

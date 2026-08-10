@@ -24,17 +24,17 @@ public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
 
     protected GeneratedRecipe itemApplication(String name, Ingredient ingredient, ItemLike input, ItemLike output) {
         return create(CreateNuclear.asResource(name), b ->
-                b.require(input)
-                        .require(ingredient)
-                        .output(output)
+            b.require(input)
+                .require(ingredient)
+                .output(output)
         );
     }
 
     protected GeneratedRecipe itemApplication(String name, Item ingredient, ItemLike input, ItemLike output) {
         return create(CreateNuclear.asResource(name), b ->
-                b.require(input)
-                        .require(ingredient)
-                        .output(output)
+            b.require(input)
+                .require(ingredient)
+                .output(output)
         );
     }
 

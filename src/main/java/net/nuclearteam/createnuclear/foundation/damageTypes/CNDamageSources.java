@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.damageTypes;
+package net.nuclearteam.createnuclear.foundation.damagesTypes;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;

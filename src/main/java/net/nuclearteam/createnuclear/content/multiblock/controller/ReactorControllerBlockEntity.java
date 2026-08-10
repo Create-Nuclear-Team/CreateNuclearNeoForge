@@ -6,11 +6,21 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
+import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
+import net.createmod.catnip.platform.CatnipServices;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -138,6 +148,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     public int getConfiguredPatternHeat() {
         if (this.configuredPattern.isEmpty()) return 0;
         return Math.round(this.configuredPattern.getOrDefault(CNDataComponents.HEAT, 0f));
+    }
+
+    public CompoundTag getConfiguredPatternTag() {
+        return this.configuredPattern.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
     }
 
     private ReactorBluePrintData getConfiguredPatternData() {

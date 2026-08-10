@@ -82,7 +82,7 @@ public class CreateNuclear {
 
         ArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
-        RadiationCapability.register(modEventBus);
+        CNAttachmentTypes.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
 
@@ -111,6 +111,8 @@ public class CreateNuclear {
         // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
         // CRUSHED_URANIUM) are only bound once the registry events have finished.
         CNRadiationValues.register();
+
+        event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
     }
 
     public static void onRegister(final RegisterEvent event) {

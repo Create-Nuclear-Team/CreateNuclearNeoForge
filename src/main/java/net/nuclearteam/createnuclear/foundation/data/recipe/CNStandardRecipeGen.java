@@ -484,9 +484,9 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
                 // getResourceKey and getId
                 // byValue and toId
                 // Holder.Reference: key
-                if (BuiltInRegistries.RECIPE_SERIALIZER instanceof com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor<?> mra) {
+                if (BuiltInRegistries.RECIPE_SERIALIZER instanceof MappedRegistryAccessor<?> mra) {
                     @SuppressWarnings("unchecked")
-                    com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor<RecipeSerializer<?>> mra$ = (MappedRegistryAccessor<RecipeSerializer<?>>) mra;
+                    MappedRegistryAccessor<RecipeSerializer<?>> mra$ = (MappedRegistryAccessor<RecipeSerializer<?>>) mra;
 
                     int wrappedId = mra$.getToId().getOrDefault(wrappedSerializer, -1);
                     ResourceKey<RecipeSerializer<?>> wrappedKey = mra$.getByValue().get(wrappedSerializer).key();
