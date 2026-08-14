@@ -1355,3 +1355,50 @@ suivant, sans événement dédié à câbler.
   implémente `MutatingHost`** — aucun des trois mobs irradiés existants (`IrradiatedWolf/Cat/
   Chicken`, tous `TamableAnimal`) n'a été pensé pour ça à l'origine (même remarque que dans les
   "points ouverts" de l'addendum précédent).
+
+---
+
+# Addendum 3 — Justification fictionnelle du gain de comportement par kill (pas encore tranchée)
+
+> Note issue d'une session de suite, sur une question de cohérence narrative (pas de réalisme,
+> de fiction) posée par l'utilisateur à propos de l'addendum "synthèse générative par observation"
+> ci-dessus : est-ce que le mécanisme "un mob irradié tue un Warden, en récupère une capacité type
+> sonar" tient debout comme histoire pour une créature *mutée par la radiation*, ou est-ce un
+> emprunt technique (le `VibrationSystem` du Warden existe déjà côté vanilla) habillé après coup ?
+
+## Le problème identifié
+
+"Absorber la capacité de ce qu'on tue" est un trope de body-horror/looter générique (The Thing,
+Rogue chez Marvel, les jeux où manger un ennemi donne son pouvoir) — **pas** un trope spécifique à
+la fiction nucléaire. Godzilla, les goules de Fallout, les mutants de S.T.A.L.K.E.R. mutent
+l'organisme **lui-même** (gigantisme, déformation, nouvelles capacités émergeant de sa propre
+biologie) ; aucun de ces référents ne donne de mécanisme pour voler un trait à un tiers. Justifier
+le sonar par "il a tué un Warden donc il a son sonar" est donc plausible en survol, mais plaqué :
+ça raconte une histoire de vol de pouvoir qui se trouve avoir de la radiation en toile de fond, pas
+une histoire de radiation.
+
+## Piste de recadrage (non tranchée)
+
+Remplacer la causalité "transfert direct depuis la victime" par "la radiation accélère le taux de
+mutation, et le stress extrême d'un combat de survie contre une menace inhabituelle **déclenche**
+cette mutation accélérée dans une direction qui répond à cette menace précise" :
+
+- La radiation est l'accélérateur d'évolution dirigée — cohérent avec le reste du corpus (c'est
+  déjà son rôle dans `RadiationCapability`/Addendum 2).
+- Le combat contre la victime est le **signal de stress** qui oriente la mutation suivante vers une
+  réponse à ce type de menace précis — pas une pompe qui transfère littéralement une capacité.
+- Mécaniquement, **aucun changement** : c'est toujours `LivingDeathEvent` → `CombatLog` du combat →
+  motif structurel détecté → `BehaviorNode` synthétisé (cf. addendum "synthèse générative" plus
+  haut). Un kill de Warden produit déjà, sans qu'aucune ligne ne nomme "Warden", le motif
+  structurel *"la victime a engagé le killer sans ligne de vue directe"* — la même signature
+  qu'un Warden traquant par vibration laisserait dans le `CombatLog`. Le sonar "s'hérite" donc du
+  vécu du combat, pas d'un `if victim instanceof Warden` explicite : fiction recadrée et contrainte
+  de généricité (aucune connaissance d'`EntityType` précis dans le synthétiseur) restent
+  compatibles sans effort supplémentaire.
+
+## Statut
+
+Idée jugée intéressante par l'utilisateur, **pas implémentée, pas définitivement adoptée** — à
+retenir comme angle par défaut si/quand ce pan du prototype est repris, mais rien dans le code des
+addendums précédents ne dépend de ce choix narratif précis (il ne change que le texte de flavor,
+pas `BehaviorSynthesizer`/`CombatLog`).
