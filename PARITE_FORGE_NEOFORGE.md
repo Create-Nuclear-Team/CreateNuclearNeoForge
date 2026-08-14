@@ -14,8 +14,8 @@ Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, vo
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 302 |
-| Ressources | 1 132 | 1 119 |
+| Fichiers `.java` | 296 | 301 |
+| Ressources | 1 132 | 1 120 |
 
 ---
 
@@ -111,11 +111,10 @@ qui fonctionnent aujourd'hui — à faire avec un test en jeu de chaque animal.
 
 Des fichiers sans équivalent Forge sont apparus depuis le 7 août sans être suivis ici. La
 plupart sont vivants et légitimes (infrastructure data attachments/components, goals IA du chat
-irradié) ; deux méritent une action :
+irradié) ; ceux ci-dessous méritent une action :
 
 | Fichier | Constat |
 |---|---|
-| `content/multiblock/frame/ReactorGaugeOverrides.java` | **Orpheline.** `addOverrideModels(...)` n'est appelée par aucun provider de datagen — même piège que celui décrit au §0, un point d'enregistrement manquant |
 | `content/contraptions/irradiated/wolf/IrradiatedWoldCollarLayer.java` (note : coquille « Wold » pour « Wolf ») | **Orpheline.** Jamais ajoutée via `addLayer(...)` à `IrradiatedWolfRenderer` — tentative de feature (collier coloré du loup irradié apprivoisé) commencée et jamais branchée. N'existe pas côté Forge |
 | `foundation/data/recipe/CNShapelessRecipeGen.java` | **Présente mais désactivée.** Dans `infrastructure/data/CreateNuclearDatagen.java` (~ligne 51), l'appel `generator.addProvider(event.includeServer(), new CNShapelessRecipeGen(...))` est **commenté**. Les recettes shapeless qu'elle génère (dont des objets en tissu type `ClothItem`) ne sont donc jamais produites en jeu |
 
@@ -123,9 +122,15 @@ irradié) ; deux méritent une action :
 `IrradiatedCatRelaxOnOwnerGoal`, `IrradiatedCatTemptGoal`), `FluidLockManager`,
 `EasingHudOverlay`, `CNDamageTypeTagsProvider` : tous référencés et vivants, rien à signaler.
 
-> ⚠️ **Icône du mod absente.** `META-INF/neoforge.mods.toml` référence `logoFile = "logo.png"`,
-> mais ce fichier n'existe nulle part dans le repo — ni sous ce nom, ni sous `icon.png` (présent
-> côté Forge, absent côté NeoForge). Le mod n'a probablement pas d'icône dans l'écran des mods.
+> ✅ **`ReactorGaugeOverrides.java` a disparu du code depuis la dernière mise à jour** — le
+> fichier orphelin signalé précédemment a été retiré (reste seulement mentionné dans ce doc et
+> dans `PORTAGE_REACTEUR.md`/`AUDIT_NEOFORGE.md`). Pas encore vérifié si la feature du gauge de
+> cadre a été branchée ailleurs ou simplement abandonnée — à confirmer si le besoin ressurgit.
+>
+> ⚠️ **Correction : le mod a bien une icône.** `src/main/resources/META-INF/icon.png` existe
+> côté NeoForge — la mention précédente de ce doc affirmant son absence était fausse. Seul
+> `logo.png` (référencé par `logoFile = "logo.png"` dans `neoforge.mods.toml`) reste introuvable
+> dans le repo ; à vérifier si `logoFile` doit simplement pointer vers `icon.png`.
 
 ---
 
@@ -229,8 +234,8 @@ les gametests.**
 | 1 | **Rebrancher `CNShapelessRecipeGen` (§2.2)** | 1 ligne | faible | Isolé, sans risque — juste décommenter et tester en jeu |
 | 2 | **Namespace `create` des recettes crushing/washing (§3.1)** | 2 générateurs | faible | Isolé, écrase des recettes de Create tant que non corrigé |
 | 3 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 4 | **Brancher ou supprimer `ReactorGaugeOverrides` et `IrradiatedWoldCollarLayer` (§2.2)** | 2 | faible | Dead code à trancher : finir la feature ou la retirer |
-| 5 | **Ajouter `logo.png` (§2.2)** | 1 ressource | faible | Cosmétique mais visible dès l'écran des mods |
+| 4 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
+| 5 | **Fournir `logo.png` ou repointer `logoFile` vers `icon.png` (§2.2)** | 1 ressource/config | faible | Cosmétique mais visible dès l'écran des mods |
 | 6 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
 Les tests en jeu du §4 passent avant tout ça.
@@ -320,14 +325,14 @@ statut « porté et validé » de [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md), 
 ce statut tient toujours après les commits récents (« clean up dead imports/logic... after
 RodType alignment », etc.).
 
-### 8.1 Parité des fichiers
+### 7.1 Parité des fichiers
 
 Les deux arborescences contiennent **exactement les 41 mêmes fichiers `.java`**, mêmes noms,
 mêmes sous-dossiers (`consumable/`, `display/`, `manager/`, `service/`, `snapshot/`). Aucun
 fichier Forge orphelin, aucun ajout NeoForge sans équivalent. Aucune classe du dossier n'a un
 compte de référence à 0 ailleurs dans `src` — pas de piège du §0 ici.
 
-### 8.2 Divergences internes
+### 7.2 Divergences internes
 
 21 fichiers sur 41 diffèrent contre l'original Forge ; 20 sont identiques à l'octet. Les 21
 divergences se répartissent en :
@@ -348,31 +353,20 @@ divergences se répartissent en :
 **Conclusion sur ce sous-dossier : le statut « porté et validé » tient.** Aucune divergence
 interne trouvée n'est une régression de logique métier.
 
-### 8.3 Bug trouvé — hors dossier `controller` mais qui l'impacte directement
+### 7.3 Bug trouvé le 14 août, corrigé depuis — hors dossier `controller` mais qui l'impactait directement
 
 En remontant l'usage de `rodType.ratio()` (appelé dans `ReactorHeatUpdateCoordinator`,
-`calculateHeatBalance`) jusqu'à sa définition dans `api/multiblock/rods/RodType.java` :
+`calculateHeatBalance`) jusqu'à sa définition dans `api/multiblock/rods/RodType.java`, un bug
+latent avait été repéré : `Builder.ratio` valait `null` par défaut au lieu de `() -> 1` comme
+promis par la Javadoc de `build()`, exposant tout `RodType` construit sans `.ratio(...)`
+explicite à une `NullPointerException` au premier calcul de heat balance.
 
-- `Builder.ratio` (ligne 141) vaut `null` par défaut — alors que côté Forge, `Builder.ratio`
-  défaut à `() -> 1`.
-- La Javadoc de `Builder.build()` (ligne 290) affirme toujours *« `ratio` is exempt since it
-  defaults to a constant 1 »*, mais `build()` (ligne 308) passe `ratio` tel quel au record, sans
-  jamais substituer de valeur par défaut si `null`.
-- **Conséquence :** tout `RodType` construit sans appel explicite à `.ratio(...)` a un champ
-  `ratio == null`, et `rodType.ratio().get()` lève une `NullPointerException` au premier calcul
-  de heat balance dans le contrôleur.
-- **État actuel : latent, pas déclenché.** Les trois `RodType.Builder` réels (`CNItems` —
-  uranium, graphite, thorium) appellent tous `.ratio(() -> CNConfigs...)` explicitement. La
-  surcharge de convenance `ItemRodTypesValue.setRodTypeInfos(int, int, int, TypeRod)`, qui ne
-  fixe jamais `ratio`, n'est appelée nulle part actuellement.
-- **Risque :** toute future tige ajoutée sans `.ratio(...)` (via datapack, nouvel item, ou usage
-  de cette surcharge à 4 paramètres) fait planter le tick suivant du contrôleur. La Javadoc
-  induit activement en erreur.
-- **Correctif suggéré :** dans `Builder.build()`, `Objects.requireNonNullElse(ratio, () -> 1)`
-  pour honorer la Javadoc, ou lever une exception explicite si `ratio == null` plutôt que de
-  laisser planter au premier usage en aval.
+> ✅ **Corrigé.** Commit `970503b` (« fix(rods): default RodType.Builder.ratio to 1 to prevent
+> an NPE on unset rods ») — `Builder.ratio` vaut désormais `private Supplier<Integer> ratio =
+> () -> 1;` (ligne 141), conforme à la Javadoc et au comportement Forge. Rien à faire de plus
+> sur ce point.
 
-### 8.4 Point pré-existant relevé au passage (ni régression ni lié au portage)
+### 7.4 Point pré-existant relevé au passage (ni régression ni lié au portage)
 
 `ReactorControllerBlock.java` (~ligne 140 NeoForge, ~130 Forge) : `state.setValue(ASSEMBLED, false)`
 — `setValue` renvoie un `BlockState` immuable qui n'est ni réassigné ni appliqué via
@@ -386,7 +380,7 @@ traite que des écarts Forge/NeoForge.
 ## 8. Vérifier l'état à tout moment
 
 ```bash
-# Fichiers Forge sans équivalent NeoForge — doit en lister 15 (4 du §1.1, 2 du §1.2, 9 du §2)
+# Fichiers Forge sans équivalent NeoForge — doit en lister 11 (3 du §1.1, 3 du §1.2, 5 du §2)
 cd ~/Documents/Ynov/Ydays
 diff <(cd CreateNuclearForge/src && find . -name '*.java' | sort) \
      <(cd CreateNuclearNeoForge/src && find . -name '*.java' | sort)
