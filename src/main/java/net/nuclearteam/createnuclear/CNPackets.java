@@ -7,15 +7,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItemPacket;
-import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerPacket;
 
 import java.util.Locale;
 
 public enum CNPackets implements BasePacketPayload.PacketTypeProvider {
     CONFIGURE_REACTOR_PATTERN(ReactorBluePrintItemPacket.class, ReactorBluePrintItemPacket.STREAM_CODEC),
-
-    // To client
-    TRIGGER_EVENT_TEXT_OVERLAY(EventTriggerPacket.class, EventTriggerPacket.STREAM_CODEC),
     ;
 
     private final CatnipPacketRegistry.PacketType<?> type;

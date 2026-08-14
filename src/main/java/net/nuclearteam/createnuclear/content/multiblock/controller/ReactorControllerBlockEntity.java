@@ -469,9 +469,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4, true);
                             return;
                         } else {
-                            EventTriggerPacket packet = new EventTriggerPacket(600);
-                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-                            CatnipServices.NETWORK.sendToClientsAround((ServerLevel) level, getBlockPos(), 32, packet);
 
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0, false);
                             isTotal = false;
