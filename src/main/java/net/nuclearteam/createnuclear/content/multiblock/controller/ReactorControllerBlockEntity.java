@@ -406,6 +406,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return getConfiguredPatternData().countCooledRod();
     }
 
+
     private int getConfiguredPatternFuelRodCount() {
         return getConfiguredPatternData().countFuelRod();
     }

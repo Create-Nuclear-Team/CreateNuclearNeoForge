@@ -48,3 +48,11 @@
 /data get storage
 /data get entity Dev
 /data get block -459 63 531
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect clear Dev
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect give Dev minecraft:regeneration infinite 255 true
+/effect clear Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite 0 true
