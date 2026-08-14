@@ -12,7 +12,7 @@ Périmètre : domaine réacteur uniquement (`content/multiblock/**` + dépendanc
 > `ReactorControllerBlockEntity` : 868 lignes monolithiques → 424 lignes déléguantes,
 > divergence vs Forge ramenée de **864 lignes à 76** (toutes des adaptations 1.21).
 >
-> Gametests : `./gradlew runGameTestServer` → **29 tests, tous verts** (`EXIT=0`).
+> Gametests : `./gradlew runGameTestServer` → **31 tests, tous verts** (`EXIT=0`).
 > Utilisable en CI bloquante.
 >
 > Ce qui reste hors périmètre est inventorié en **§9**.
@@ -544,7 +544,7 @@ Les deux gametests Forge (`DefaultHeatCalculatorGameTest`, `ReactorInputFluidMan
 
 ### Lot 8 — Gametests ✅ FAIT
 
-`./gradlew runGameTestServer` — **29 tests, tous verts** (`EXIT=0`).
+`./gradlew runGameTestServer` — **31 tests, tous verts** (`EXIT=0`, re-confirmé le 14 août 2026).
 
 Les 4 tests du modèle thermique passent, dont `threeByThreeDiamond` croisé avec le calculateur
 du wiki communautaire. C'est la première validation à l'exécution du portage.
@@ -552,7 +552,11 @@ du wiki communautaire. C'est la première validation à l'exécution du portage.
 > À l'écriture du lot, la suite comptait 31 tests dont 2 échouant volontairement : les marqueurs
 > `*_expectedContract` du bug `extractFluids`, qui échouait identiquement sur Forge. Ce bug est
 > corrigé depuis dans les deux repos (§9.4), les marqueurs sont donc passés au vert et les deux
-> tests qui figeaient le comportement bogué ont été supprimés.
+> tests qui figeaient le comportement bogué ont été supprimés — ramenant la suite à 29. Des tests
+> de régression supplémentaires (Lot 2bis/9 : sérialisation à chaleur nulle, pattern à slots vides
+> qui survit à la sauvegarde et à la synchro réseau) ont depuis été ajoutés, ramenant le total à
+> **31** au 14 août 2026 — un chiffre différent de celui d'origine mais pour une raison saine
+> (couverture élargie), pas une régression.
 
 **Adaptations du portage :**
 - `loadPattern` écrit un `ReactorBluePrintData` typé (57 `PatternData`) au lieu du tag NBT `pattern`.
@@ -706,7 +710,8 @@ que le code renvoyait true sur toute extraction partielle — documente désorma
 contrat.
 
 **`runGameTestServer` sort maintenant en code 0 des deux côtés** (Forge 28 tests,
-NeoForge 29) : il peut servir de garde-fou CI.
+NeoForge 31 au 14 août 2026 — des tests de régression ont été ajoutés depuis, voir Lot 8) :
+il peut servir de garde-fou CI.
 
 ### 9.5 Ordre suggéré pour la suite
 
