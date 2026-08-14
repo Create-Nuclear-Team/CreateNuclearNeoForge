@@ -1,17 +1,14 @@
 package net.nuclearteam.createnuclear.content.radiation;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
-import net.nuclearteam.createnuclear.CNEffects;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damagesTypes.CNDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
     private static final int CONTAGION_DURATION_TICKS = 300;

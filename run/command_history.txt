@@ -1,6 +1,3 @@
-/gamemode creative
-/particle createnuclear:irradiated_particles
-/particle create:air
 /particle create:air_flow
 /particle
 /particle createnuclear:irradiated_particles ~ ~1 ~ 0 0 0 0 104
@@ -48,3 +45,6 @@
 /playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
+/data get storage
+/data get entity Dev
+/data get block -459 63 531

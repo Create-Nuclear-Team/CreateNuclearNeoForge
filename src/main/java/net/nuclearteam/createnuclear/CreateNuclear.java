@@ -107,9 +107,6 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        CNOpenPipeEffectHandlers.registerDefaults();
-        // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
-        // CRUSHED_URANIUM) are only bound once the registry events have finished.
         CNRadiationValues.register();
 
         event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);

@@ -25,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
-import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damagesTypes.CNDamageSources;
 
 import javax.annotation.Nullable;
 import java.util.List;
