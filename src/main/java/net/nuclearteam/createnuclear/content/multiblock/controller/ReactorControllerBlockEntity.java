@@ -102,7 +102,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorAlarmManagerI alarmManager;
     private final ReactorFrameDisplayManagerI frameDisplayManager;
 
-   private ReactorDisplayState displayState = ReactorDisplayState.EMPTY;
+    private ReactorDisplayState displayState = ReactorDisplayState.EMPTY;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
@@ -405,7 +405,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int getConfiguredPatternCoolerRodCount() {
         return getConfiguredPatternData().countCooledRod();
     }
-
 
     private int getConfiguredPatternFuelRodCount() {
         return getConfiguredPatternData().countFuelRod();
