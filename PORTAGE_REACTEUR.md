@@ -54,39 +54,54 @@ Le portage ne part donc pas de zéro : il porte sur la couche logique, pas sur l
 
 ---
 
-## 3. Divergences d'API bloquantes — à traiter EN PREMIER
+## 3. Divergences d'API bloquantes — ✅ TRAITÉ (résolu au Lot 0)
 
-Ces cinq points doivent être réglés avant de porter le moindre service, sinon rien ne compile.
+Ces cinq points devaient être réglés avant de porter le moindre service, sinon rien ne compilait.
+**Ils l'ont tous été au Lot 0** (§4) ; voir le récapitulatif en §3.6.
 
-### 3.1 `RodType` — modèle différent
+### 3.1 `RodType` — ✅ RÉSOLU (déjà fait au Lot 0, constat obsolète)
 
-| Forge | NeoForge |
-|---|---|
-| `Holder<Item> item` (une barre par type) | `HolderSet<Item> items` (plusieurs barres par type) |
-| `baseRodHeat()` → `Supplier<Integer>`, appelé `.get()` | `baseRodHeat()` → `int` direct |
-| `proximityRodHeat()` → `Supplier<Float>` | `proximityRodHeat()` → `float` direct |
-| `rodTimer()` → `Supplier<Integer>` | `rodTimer()` → `int` direct |
-| **`ratio()` présent** | **`ratio()` absent** |
-| `TypeRodPredicate.isFuel(RodType)` / `isCooled(RodType)` | uniquement `IS_FUEL` / `IS_COOLED` sur `ItemStack` |
+> **Ce constat n'est plus vrai.** Il décrivait l'état d'avant le Lot 0 (§4). Depuis, `RodType`
+> NeoForge a été aligné sur Forge et les deux fichiers sont désormais **structurellement
+> identiques** : même `record`, mêmes champs, même builder, même `ratio()`, mêmes prédicats.
+> Vérifié le 14 août 2026 par lecture côte à côte des deux fichiers.
 
-**À faire :** ajouter `ratio()` à `RodType` NeoForge (+ builder + codec + config), ajouter les surcharges `isFuel(RodType)` / `isCooled(RodType)`. Dans les services portés, supprimer les `.get()` sur `baseRodHeat`/`proximityRodHeat`/`rodTimer`.
+| | Forge | NeoForge |
+|---|---|---|
+| Champ item | `Holder<Item> item` | `Holder<Item> item` — **identique**, pas de `HolderSet` |
+| `baseRodHeat()` / `proximityRodHeat()` / `rodTimer()` | `Supplier<Integer>` / `Supplier<Float>` / `Supplier<Integer>`, appelés `.get()` | **identique** |
+| `ratio()` | présent (`Supplier<Integer>`, défaut `1`) | **présent**, identique |
+| `TypeRodPredicate` | `isFuel(RodType)` / `isCooled(RodType)` + `isFuel(ItemStack, Level)` / `isCooled(ItemStack, Level)` | **identique**, les 4 surcharges sont là |
 
-Le `HolderSet` au lieu du `Holder` n'est pas un problème : les services n'utilisent que `resolveRodType(Item, Level)`, dont la signature est identique des deux côtés.
+Seules différences réelles restantes, purement cosmétiques :
+- imports `net.neoforged.neoforge.registries.NeoForgeRegistries` / `BuiltInRegistries.ITEM.getKey(...)` (NeoForge) vs `net.minecraftforge.registries.ForgeRegistries` (Forge) dans `toString()` ;
+- NeoForge importe `HolderSet` et `CNItemTags` sans s'en servir dans ce fichier (imports morts, à nettoyer un jour, sans impact fonctionnel).
 
-### 3.2 `IHeat.HeatLevel` — pas de notion de taille de réacteur
+**Rien à faire** pour ce point : le §3.1 était un résidu documentaire d'avant le Lot 0, jamais corrigé après coup.
 
-| Forge | NeoForge |
-|---|---|
-| `of(int heat, int reactorSize)` | `of(int heat)` |
-| `isNotDanger(int heat, int reactorSize)` | **absent** |
-| `getFormattedHeatText(int heat, int reactorSize)` | `getFormattedHeatText(int heat)` |
-| `getFormattedItemText(ItemStack, Boolean, Level)` | `getFormattedItemText(ItemStack, Boolean)` |
+### 3.2 `IHeat.HeatLevel` — ✅ RÉSOLU (déjà fait au Lot 0, constat obsolète)
 
-Côté Forge, les seuils de danger dépendent de la taille du réacteur (5×5 / 7×7 / 9×9). C'est ce qui rend un 9×9 viable à haute chaleur. Côté NeoForge, le seuil est unique.
+> **Ce constat n'est plus vrai**, même diagnostic que le §3.1. Vérifié le 14 août 2026 par
+> lecture côte à côte des deux fichiers `IHeat.java`.
 
-**À faire :** porter la version taille-consciente de `IHeat.HeatLevel`, qui dépend du point suivant.
+| | Forge | NeoForge |
+|---|---|---|
+| `of(int heat, int reactorSize)` | présent, seuils lus dans `CReactorHeat` (`size5Danger`/`size7Danger`/`size9Danger`) | **identique** |
+| `isNotDanger(int heat, int reactorSize)` | présent | **identique** |
+| `getFormattedHeatText(int heat, int reactorSize)` | présent | **identique** |
+| `getFormattedItemText(ItemStack, Boolean, Level)` | présent | **identique** |
 
-### 3.3 `CReactorHeat` — fichier de config absent
+Les seuils de danger dépendent bien de la taille du réacteur (5×5 / 7×7 / 9×9) des deux côtés,
+via la config `CReactorHeat` (§3.3, elle aussi déjà portée). Seule différence : Forge importe
+`CNItemTags`, `ItemRodTypesValue` et `RodType` sans s'en servir dans ce fichier (imports morts
+côté Forge cette fois, sans impact).
+
+**Rien à faire** pour ce point.
+
+### 3.3 `CReactorHeat` — ✅ RÉSOLU (déjà fait au Lot 0, constat obsolète)
+
+`infrastructure/config/CReactorHeat.java` existe côté NeoForge avec les 3 valeurs attendues,
+identiques à Forge :
 
 ```java
 public final ConfigInt size5Danger = i(256,  0, 8192, ...);
@@ -94,25 +109,57 @@ public final ConfigInt size7Danger = i(1024, 0, 8192, ...);
 public final ConfigInt size9Danger = i(4096, 0, 8192, ...);
 ```
 
-**À faire :** créer `infrastructure/config/CReactorHeat.java` et le déclarer dans `CNCServer`/`CNConfigs`.
+Déclaré dans la config serveur, lu par `IHeat.HeatLevel.of()` (§3.2). **Rien à faire.**
 
-### 3.4 `CRods` — config incomplète
+### 3.4 `CRods` — ✅ RÉSOLU (déjà fait au Lot 0, constat obsolète)
 
-Forge expose 12 valeurs (uranium / graphite / **thorium**, avec `*HeatRatio` et `*ProximityBonus`). NeoForge n'en expose que 3 (`uraniumRodLifetime`, `graphiteRodLifetime`, `maxHeat`) et **ne connaît pas le thorium**.
+`CRods` NeoForge expose désormais les 12 valeurs, uranium / graphite / **thorium** compris,
+avec `*HeatRatio`, `*ProximityBonus`/`*ProximityMalus` et `*BaseValue` pour chacun — vérifié le
+14 août 2026 par lecture du fichier. **Rien à faire.**
 
-**À faire :** aligner `CRods` sur la version Forge. Prérequis du `ratio()` de 3.1.
+### 3.5 `ReactorControllerBlock` — ✅ RÉSOLU (déjà fait au Lot 0, constat obsolète)
 
-### 3.5 `ReactorControllerBlock` — propriété `ACTIVE` absente
-
-Forge déclare `ASSEMBLED` **et** `ACTIVE`. NeoForge n'a que `ASSEMBLED`.
-
-`ACTIVE` est recalculée chaque tick serveur et synchronisée automatiquement au client ; c'est elle qui pilote la boucle sonore de fonctionnement. Sans elle, `ReactorRunningSoundInstance` n'a rien à observer.
-
-**À faire :** ajouter `ACTIVE` au blockstate + au datagen des blockstates JSON.
+`ACTIVE` (`BooleanProperty`) est bien déclarée à côté d'`ASSEMBLED`, ajoutée au `StateDefinition`
+(`builder.add(FACING).add(ASSEMBLED).add(ACTIVE)`) et initialisée à `false` par défaut — vérifié
+le 14 août 2026. **Rien à faire.**
 
 ---
 
-## 4. Fichiers à créer — par ordre de portage
+### 3.6 Récapitulatif — tout le §3 est résolu depuis le Lot 0
+
+> **Historique.** Les 5 points ci-dessus (3.1 à 3.5) décrivaient l'état du repo **avant** le
+> Lot 0 (§4). Le Lot 0, marqué ✅ FAIT, les a tous traités — mais le présent §3 n'avait jamais
+> été mis à jour après coup pour le refléter, ce qui le rendait trompeur pour quiconque le lisait
+> sans avoir aussi lu le §4. Vérifié fichier par fichier le 14 août 2026 (contre l'état courant de
+> `CreateNuclearForge` branche `V2`) :
+
+| Point | Sujet | Statut | Fichier(s) vérifié(s) |
+|---|---|---|---|
+| 3.1 | `RodType` | ✅ résolu | `api/multiblock/rods/RodType.java` |
+| 3.2 | `IHeat.HeatLevel` | ✅ résolu | `content/multiblock/IHeat.java` |
+| 3.3 | `CReactorHeat` | ✅ résolu | `infrastructure/config/CReactorHeat.java` |
+| 3.4 | `CRods` | ✅ résolu | `infrastructure/config/CRods.java` |
+| 3.5 | `ReactorControllerBlock` (`ACTIVE`) | ✅ résolu | `content/multiblock/controller/ReactorControllerBlock.java` |
+
+Aucune divergence d'API bloquante ne subsiste sur ce périmètre. Les seuls écarts restants entre
+les deux fichiers de chaque paire sont cosmétiques (imports `neoforged` vs `minecraftforge`,
+quelques imports inutilisés d'un côté ou de l'autre).
+
+---
+
+## 4. Fichiers à créer — par ordre de portage — ✅ TRAITÉ
+
+Tous les lots (0 à 9) sont marqués faits ci-dessous, et vérifiés fichier par fichier le
+14 août 2026 (voir les encarts de vérification sous les Lots 0, 3/6). Il ne reste **rien à
+porter** dans ce périmètre.
+
+> **Non re-testé en jeu.** Le portage lui-même a été validé en jeu par mathi le 6 août 2026
+> (bandeau en tête de document). Mais la correction du bug `ReactorAlarmManager` trouvée et
+> appliquée le 14 août 2026 pendant cette passe de vérification (logique de `getBlocksPosition`/
+> `clearInvalid` qui était commentée, cf. Lot 6) est postérieure à cette validation et **n'a pas
+> encore été testée en jeu** — seule une vérification statique (diff de code) a été faite. À
+> tester : le déclenchement effectif des alarmes (`ReactorAlarm.POWERED`) quand un réacteur passe
+> en `DANGER`.
 
 ### Lot 0 — Prérequis (rien ne compile sans) ✅ FAIT
 | Fichier | Note |
@@ -234,10 +281,22 @@ réellement utilisée par le calcul de chaleur. Le champ dupliqué a été retir
 > (`ContainerData`/`DataSlot`) plutôt que par un paquet personnalisé.
 
 **Ce qu'il reste, honnêtement :** aucun bug connu à ce stade sur `bluePrintItem/` après cette
-passe. Le point réellement ouvert est la **couverture de test** : les 29 gametests ne couvrent
-pas le cas qui a produit le bug du thorium (un `RodType` enregistré sans le tag `CNItemTags`
-correspondant). Ajouter un cas de ce genre permettrait à une future régression similaire
-d'échouer un test plutôt que de n'être trouvée qu'en jeu.
+passe.
+
+> **Précision (14 août 2026) sur la cause du bug thorium ci-dessus.** `fuelRodType()` et le tag
+> `CNItemTags.FUEL` sont deux choses indépendantes par design — rien n'exige qu'un `RodType`
+> classé `FUEL` porte ce tag. Confirmé côté Forge : `THORIUM_ROD` (`CNItems.java`) porte bien les
+> deux (`.fuelRodType()` **et** `.tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)`), mais
+> `TypeRodPredicate.isFuel()` — identique dans les deux repos (§3.1) — ne regarde que
+> `RodType.resolveRodType(...).type`, jamais le tag. Même sur la version de référence, les deux ne
+> sont donc pas couplés fonctionnellement. Le tag manquant sur `THORIUM_ROD` côté NeoForge n'était
+> pas un oubli de règle du domaine, juste un oubli ponctuel pendant la migration du blueprint vers
+> les Data Components (le thorium n'avait pas encore été aligné sur `URANIUM_ROD`/`GRAPHITE_ROD` à
+> ce moment-là). Le vrai fix, celui qui compte, est la réécriture du filtre de
+> `ReactorBluePrintMenu#initAndReadInventory` pour utiliser `RodType`/`TypeRodPredicate` au lieu du
+> tag — l'ajout du tag manquant n'était qu'un correctif de circonstance, pas un invariant à garder.
+> **Un gametest générique du style « tout `RodType` fuel doit avoir le tag FUEL » n'aurait donc pas
+> de sens** et n'est plus recommandé ici.
 
 ### Lot 3 — Services (`service/`, 12 fichiers sur 14) ✅ FAIT
 `IHeatService` / `DefaultHeatService` · `IExplosionService` / `ReactorMeltdownExecutor` · `IReactorMeltdownMonitor` / `ReactorMeltdownMonitor` · `IReactorAlarmCoordinator` / `ReactorAlarmCoordinator` · `IReactorHeatUpdateCoordinator` / `ReactorHeatUpdateCoordinator` · `IFluidConsumptionRateCalculator` / `FluidConsumptionRateCalculator`
@@ -315,6 +374,50 @@ Fichiers portés avec : `ReactorControllerBlock` · `ReactorAssembler` · `CNMul
 (Forge : `REACTOR_ROD_INPUT`) — les renommer changerait l'identifiant de registre
 `createnuclear:reactor_input` et casserait les mondes existants.
 
+> **Re-vérifié le 14 août 2026**, diff réel (pas juste lecture) des 6 fichiers directement dans
+> `content/multiblock/controller/` (hors sous-packages, couverts séparément juste en dessous) :
+>
+> | Fichier | Verdict |
+> |---|---|
+> | `ReactorControllerBlock.java` | diff API seulement (`InteractionResult`→`ItemInteractionResult`/`useItemOn`, NBT→`CNDataComponents.HEAT`/`ReactorBluePrintData`, cf. différence assumée §2bis) |
+> | `ReactorControllerBlockEntity.java` | diff API seulement (`HolderLookup.Provider` sur `read`/`write`/`serializeInventory`, mêmes accès DataComponents, + javadoc ajoutée) — aucune divergence de logique |
+> | `ReactorControllerGenerator.java` | diff import seul (`neoforged` vs `minecraftforge`) |
+> | `ReactorControllerInventory.java` | **diff** : `isItemValid` réécrit en `switch` (`case 0 -> CNItems.REACTOR_BLUEPRINT.isIn(resource); default -> !super.isItemValid(...)`) au lieu du `slot == 0 && resource.is(...)` de Forge. La branche `default` est inatteignable en pratique (l'inventaire n'a qu'1 slot, `super(1, be, 1, false)`), donc le comportement observable reste identique — mais c'est une réécriture, pas un simple renommage d'import, donc listé comme diff et pas comme "identique". |
+> | `ReactorDebugDiagnostics.java` | **identique à l'octet** |
+> | `ReactorRunningSoundInstance.java` | **identique à l'octet** |
+>
+> Les chiffres « 864 lignes → 76 » plus haut datent du Lot 6 lui-même et ne sont plus à jour
+> (les deux fichiers ont grossi depuis, notamment avec le Lot 2bis) : le diff réel aujourd'hui
+> est de 95 lignes changées sur 536 (Forge) / 580 (NeoForge) lignes. La **nature** de la
+> divergence reste la même — uniquement des adaptations d'API 1.21, aucune logique métier
+> différente — donc aucune action requise, seul le chiffre exact était devenu obsolète.
+>
+> **Scan complémentaire des sous-packages `consumable/`, `display/`, `manager/`, `service/`,
+> `snapshot/`** (mêmes fichiers présents des deux côtés, aucun manquant) :
+>
+> | Sous-package | Fichiers identiques à l'octet | Fichiers en diff API/design seulement |
+> |---|---|---|
+> | `consumable/` | `ConsumableTimer`, `FluidConsumable`, `IConsumable`, `ItemConsumable` | `ConsumptionCycleManager`, `PatternReader` (réécrit pour lire `ReactorBluePrintData`, conforme à §5.1) |
+> | `display/` | — | `ReactorDisplayState`, `ReactorGoggleTooltipRenderer` (imports + javadoc, cf. lot 4) |
+> | `manager/` | `AbstractReactorIOManager`, `ReactorIOManager`, `ReactorOutputManager`, `ReactorOutputManagerI` | `ReactorAlarmManager(I)`, `ReactorFrameDisplayManager(I)`, `ReactorInputFluidManager(I)`, `ReactorInputManager(I)` |
+> | `service/` | `FluidConsumptionRateCalculator`, `IExplosionService`, `IFluidConsumptionRateCalculator`, `IHeatService`, `IReactorAlarmCoordinator`, `IReactorMeltdownMonitor`, `ReactorAlarmCoordinator`, `ReactorMeltdownExecutor`, `ReactorMeltdownMonitor` | `DefaultHeatService`, `DefaultPersistenceService`, `IPersistenceService`, `IReactorHeatUpdateCoordinator`, `ReactorHeatUpdateCoordinator` |
+> | `snapshot/` | `ReactorInputSnapshot` | `ReactorInputSnapshotBuilder` |
+>
+> Toutes ces diffs sont des adaptations d'API/design déjà couvertes ailleurs dans ce rapport
+> (§5.2, §5.1/Lot 2bis).
+>
+> ⚠️→✅ **Bug trouvé puis corrigé pendant cette vérification (14 août 2026) :**
+> `ReactorAlarmManager.getBlocksPosition(Level)` avait toute sa logique de filtrage commentée côté
+> NeoForge (l'import de `ReactorAlarmEntity` était commenté aussi, alors que la classe existe bien
+> dans les deux repos — ce n'était donc pas un problème de dépendance manquante), et renvoyait
+> systématiquement une liste vide. `clearInvalid()` était cassée pareil. Conséquence : dans
+> `ReactorAlarmCoordinator.update()` (`service/ReactorAlarmCoordinator.java` ligne 33), la boucle
+> qui pose `ReactorAlarm.POWERED` sur les blocs d'alarme quand le réacteur passe en `DANGER` ne
+> s'exécutait jamais — les alarmes ne se déclenchaient jamais en jeu, quel que soit le niveau de
+> chaleur. Re-diffé après correction : les deux méthodes sont maintenant décommentées et actives
+> des deux côtés ; seuls écarts restants, un commentaire traduit en français côté NeoForge et deux
+> commentaires supprimés — cosmétique, aucun impact fonctionnel.
+
 ### Lot 9 — Corrections issues du test en jeu ✅ FAIT
 
 Six défauts trouvés en jouant, tous corrigés. Cinq étaient des divergences NeoForge
@@ -341,6 +444,20 @@ qui rendait donc **opaque**. Tous rétablis.
 ---
 
 ## 5. Pièges de traduction 1.20.1 Forge → 1.21 NeoForge
+
+> **Nature différente des §3/§4 : ceci est un guide de référence, pas une checklist.** Rien à
+> « clôturer » au sens propre — ces trois pièges restent vrais et utiles pour tout futur travail
+> de synchro Forge → NeoForge. Vérifié le 14 août 2026 que l'état actuel du code les respecte :
+> - **§5.1** : l'Option B recommandée est bien implémentée. `CNDataComponents.HEAT` existe et
+>   `ReactorControllerBlockEntity.getConfiguredPatternHeat()` le lit ; `PatternReader` a bien été
+>   réécrit pour lire `ReactorBluePrintData` plutôt que du NBT brut (confirmé lors du scan des
+>   sous-packages en §4/Lot 6). Le piège est neutralisé dans le code actuel — `getConfiguredPatternTag()`
+>   existe encore et renvoie toujours une copie défensive, mais plus rien ne le mute : c'est un
+>   vestige inoffensif, pas un risque actif.
+> - **§5.2/§5.3** : tables de correspondance mécanique, toujours appliquées correctement partout
+>   où on les a croisées pendant les vérifications précédentes (§3, §4). Aucune action requise ;
+>   aucun changement de code fait dans cette section, donc pas de « pas encore testé en jeu » à
+>   signaler ici.
 
 ### 5.1 ⚠️ Le piège majeur : `getConfiguredPatternTag()` renvoie une copie
 
