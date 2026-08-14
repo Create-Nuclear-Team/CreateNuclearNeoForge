@@ -34,3 +34,11 @@
 /playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect clear Dev
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite 0 true
+/effect give Dev minecraft:regeneration infinite 255 true
+/effect clear Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite 0 true

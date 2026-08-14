@@ -7,7 +7,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNParticleRegistry;
 import net.nuclearteam.createnuclear.CNParticleTypes;
@@ -15,7 +14,6 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorClientExtensions;
 import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParticle;
 import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
-import net.nuclearteam.createnuclear.foundation.events.overlay.IrradiatedOverlayRendererVision;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, value = Dist.CLIENT)
 public class CNClientEvent {
@@ -24,7 +22,6 @@ public class CNClientEvent {
     @SubscribeEvent
     public static void onRegisterGui(RegisterGuiLayersEvent event) {
         HUD_RENDERER.onHudRender(event);
-        event.registerAbove(VanillaGuiLayers.CAMERA_OVERLAYS, CreateNuclear.asResource("irradiated_vision"), IrradiatedOverlayRendererVision::renderOverlay);
     }
 
     @SubscribeEvent
