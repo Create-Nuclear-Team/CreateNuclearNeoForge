@@ -138,7 +138,7 @@ public record RodType(Holder<Item> item,
         private Supplier<Integer> baseRodHeat = null;
         private Supplier<Float> proximityRodHeat = null;
         private Supplier<Integer> rodTimer = null;
-        private Supplier<Integer> ratio = null;
+        private Supplier<Integer> ratio = () -> 1;
         private TypeRod type = TypeRod.NONE;
 
         /**

@@ -6,25 +6,28 @@ en termes de **features**, et comment porter chaque bloc.
 **Ce fichier ne contient que du travail restant.** Ce qui est fait en sort — l'historique
 est dans les commits.
 
-État au **7 août 2026**, branche `V2-Reacteur`, après le portage de la poudre de neige, du
-worldgen piloté par la config et du datagen de recettes.
+État au **14 août 2026**, branche `V2-Reacteur`, après le portage de la compat Alex's Caves,
+des mixins client et de plusieurs refactors (RadiationCapability en attachment, overlay HUD,
+routage des dégâts).
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
+Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 301 |
-| Ressources | 1 132 | 1 118 |
+| Fichiers `.java` | 296 | 302 |
+| Ressources | 1 132 | 1 119 |
 
 ---
 
 ## 0. Comment lire ce document
 
-Un `diff` brut des arborescences donne **15 fichiers Forge sans équivalent NeoForge**.
+Un `diff` brut des arborescences donne **11 fichiers Forge sans équivalent NeoForge**
+(15 le 7 août — la compat Alex's Caves et les mixins client ont été portés depuis).
 Ce chiffre est trompeur :
 
-- **4 sont remplacés par un équivalent 1.21 meilleur** → §1.1, à ne surtout pas « re-porter » ;
-- **2 existent sous un autre nom ou dans un autre package** → §1.2, idem ;
-- **9 manquent réellement** → §2, c'est le vrai travail.
+- **3 sont remplacés par un équivalent 1.21 meilleur** → §1.1, à ne surtout pas « re-porter » ;
+- **3 existent sous un autre nom ou dans un autre package** → §1.2, idem ;
+- **5 manquent réellement** → §2, c'est le vrai travail restant.
 
 S'y ajoutent des écarts *à l'intérieur* de fichiers présents des deux côtés (§3), invisibles
 d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des bugs du réacteur.
@@ -39,7 +42,7 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 
 ## 1. À ne pas porter — l'équivalent existe déjà
 
-**Ne pas recréer ces fichiers.** Le `diff` d'arborescence du §7 les listera toujours.
+**Ne pas recréer ces fichiers.** Le `diff` d'arborescence du §8 les listera toujours.
 
 ### 1.1 Volontairement non portés — l'équivalent 1.21 est meilleur
 
@@ -47,26 +50,36 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 |---|---|
 | `content/radiation/capability/IRadiationCapability` | **Data attachments NeoForge** — `RadiationCapability` expose `AttachmentType<RadiationCapability> RADIATION`, lu via `entity.getData(RADIATION)` |
 | `content/radiation/capability/RadiationProvider` | idem — la plomberie `ICapabilityProvider` de Forge n'a pas d'équivalent, ni de raison d'exister |
-| `foundation/advancement/CriterionTriggerBase` | ~~**`SimpleCriterionTrigger` vanilla** — `SimpleCreateNuclearTrigger` en hérite directement~~ Suivre Create donc modification du code par rapport au maj de Create |
 | `foundation/utility/SimplexNoise` | **`net.minecraft.world.level.levelgen.synth.SimplexNoise`** — `Maths` utilise déjà celui de vanilla |
+
+> `foundation/advancement/CriterionTriggerBase` est sorti de cette liste : le fichier existe
+> désormais des deux côtés avec un contenu identique (commit `5d69829`, remplacement du
+> `SimpleCriterionTrigger` vanilla par une base trigger custom, suivant l'évolution de Create).
 
 ### 1.2 Présents sous un autre nom ou dans un autre package
 
 | Fichier Forge | Équivalent NeoForge | Pourquoi |
 |---|---|---|
 | `foundation/data/recipe/CNProcessingRecipeGen` | `foundation/data/recipe/CNRecipeProvider` | En 1.21 la classe n'hérite plus de `ProcessingRecipeGen` mais de `RecipeProvider`, et agrège les générateurs. Même rôle, nom aligné sur son parent |
-| `api/data/recipe/SnowPowderRecipeGen` | `foundation/data/recipe/SnowPowderRecipeGen` | Suit `EnrichedRecipeGen`, qui vit dans `foundation` côté NeoForge parce qu'il hérite de `StandardProcessingRecipeGen` (introduit en 1.21) |
+| `foundation/events/overlay/IrradiatedOverlayRendererVision` | `foundation/events/overlay/RadiationOverlay` | Même rôle (overlay HUD de radiation), réécrit pour hériter d'une nouvelle base `EasingHudOverlay`. Porté le 14 août (commit `fa48da6`, « restore the radiation vision overlay ») |
+| `content/multiblock/bluePrintItem/ReactorBluePrintItemPacket` | `ReactorBluePrintData` + `PatternData` | Le paquet réseau Forge (`SimplePacketBase`) est remplacé par deux records à `Codec`/`StreamCodec`, cohérent avec l'architecture data-component déjà validée en §7 pour `controller/` — mais ce sous-dossier `bluePrintItem` lui-même n'a pas été audité ligne à ligne |
 
-> ⚠️ `api/data/recipe/EnrichedRecipeGen` existe encore côté NeoForge mais **n'est référencé
-> nulle part** — c'est un vestige de la première tentative de portage, avant
-> `StandardProcessingRecipeGen`. Le vivant est celui de `foundation`. Ne pas le prendre pour
-> modèle, et le supprimer à l'occasion.
+> ✅ **Résolu depuis le 7 août.** `SnowPowderRecipeGen` n'est plus une divergence de package :
+> le commit `41f6176` (« move EnrichedRecipeGen/SnowPowderRecipeGen from foundation to the api
+> package ») l'a ramené dans `api/data/recipe`, exactement au même chemin que Forge. Le sort
+> exact de l'ancien vestige `api/data/recipe/EnrichedRecipeGen` (mentionné comme mort dans la
+> version précédente de ce doc) n'a **pas été revérifié** dans cet audit — à confirmer avant de
+> le considérer réglé.
 
 ---
 
-## 2. Les 9 fichiers réellement manquants
+## 2. Les 5 fichiers réellement manquants
 
-Classés par feature, du plus au moins impactant.
+Deux des trois chantiers listés ici le 7 août sont **désormais portés** et sont donc sortis de
+ce document : la compat Alex's Caves et les mixins client (tous les deux dans le commit
+`41f6176` du 8 août — `compat/Mods.java`, `compat/alexscave/AlexscaveCompat.java`,
+`CameraAccessor.java`, `GameRendererMixin.java` existent des deux côtés, correctement enregistrés
+dans `createnuclear.neoforge.mixins.json`). Il ne reste qu'un seul chantier réel.
 
 ---
 
@@ -94,44 +107,25 @@ qui fonctionnent aujourd'hui — à faire avec un test en jeu de chaque animal.
 
 ---
 
-### 2.2 Compat Alex's Caves — 2 fichiers
+### 2.2 Nouveautés NeoForge non documentées, à surveiller
 
-`compat/Mods` · `compat/alexscave/AlexscaveCompat`
+Des fichiers sans équivalent Forge sont apparus depuis le 7 août sans être suivis ici. La
+plupart sont vivants et légitimes (infrastructure data attachments/components, goals IA du chat
+irradié) ; deux méritent une action :
 
-**Ce qui manque en jeu :** l'explosion nucléaire n'a aucune intégration avec Alex's Caves.
+| Fichier | Constat |
+|---|---|
+| `content/multiblock/frame/ReactorGaugeOverrides.java` | **Orpheline.** `addOverrideModels(...)` n'est appelée par aucun provider de datagen — même piège que celui décrit au §0, un point d'enregistrement manquant |
+| `content/contraptions/irradiated/wolf/IrradiatedWoldCollarLayer.java` (note : coquille « Wold » pour « Wolf ») | **Orpheline.** Jamais ajoutée via `addLayer(...)` à `IrradiatedWolfRenderer` — tentative de feature (collier coloré du loup irradié apprivoisé) commencée et jamais branchée. N'existe pas côté Forge |
+| `foundation/data/recipe/CNShapelessRecipeGen.java` | **Présente mais désactivée.** Dans `infrastructure/data/CreateNuclearDatagen.java` (~ligne 51), l'appel `generator.addProvider(event.includeServer(), new CNShapelessRecipeGen(...))` est **commenté**. Les recettes shapeless qu'elle génère (dont des objets en tissu type `ClothItem`) ne sont donc jamais produites en jeu |
 
-**Point d'accroche.** `NuclearExplosionEntity` côté Forge :
+`CNAttachmentTypes`, `CNDataComponents`, les goals IA du chat (`IrradiatedCatAvoidEntityGoal`,
+`IrradiatedCatRelaxOnOwnerGoal`, `IrradiatedCatTemptGoal`), `FluidLockManager`,
+`EasingHudOverlay`, `CNDamageTypeTagsProvider` : tous référencés et vivants, rien à signaler.
 
-le mod n'existe pas vraiment en 1.21.1
-
-```java
-if (Mods.ALEXS_CAVE.isLoaded()) {
-    this.alexscaveHandler = new AlexscaveCompat();
-}
-```
-
-Le champ est typé `Object` volontairement, pour que la classe se charge même sans Alex's Caves.
-Côté NeoForge, `NuclearExplosionEntity` n'en a aucune trace.
-
-`Mods` est un petit utilitaire générique de détection de mods — utile bien au-delà de cette compat.
-
-**Difficulté : faible.** `ModList.get().isLoaded(id)` existe à l'identique en NeoForge.
-
----
-
-### 2.3 Mixins client — 2 fichiers
-
-`foundation/mixin/client/CameraAccessor` · `foundation/mixin/client/GameRendererMixin`
-
-**Ce qui manque en jeu :** un effet visuel, très probablement lié au rendu de la radiation ou
-de l'explosion (accès à la caméra + hook sur le `GameRenderer`).
-
-NeoForge a à la place `AntiRadiationArmorTextureMixin`, qui n'existe pas côté Forge : les deux
-versions ont donc **divergé sur les mixins client**. Comparer les deux `createnuclear.mixins.json`
-avant de porter.: obligatoir etant donnée le fonctionnement de minecraft a changé entre la 1.20.1 et la 1.21.1
-
-**Difficulté : moyenne.** Les mixins sont sensibles aux versions et cassent silencieusement.
-À porter avec un test visuel explicite.
+> ⚠️ **Icône du mod absente.** `META-INF/neoforge.mods.toml` référence `logoFile = "logo.png"`,
+> mais ce fichier n'existe nulle part dans le repo — ni sous ce nom, ni sous `icon.png` (présent
+> côté Forge, absent côté NeoForge). Le mod n'a probablement pas d'icône dans l'écran des mods.
 
 ---
 
@@ -141,17 +135,22 @@ Ces fichiers existent des deux côtés mais divergent fortement. **Un gros diff 
 preuve de feature manquante** : l'API 1.21 en explique une grande part. Aucun n'a été audité
 ligne à ligne, contrairement au domaine réacteur.
 
-| Fichier | Lignes divergentes |
-|---|---|
-| `CNBlocks` | 701 |
-| `CNItems` | 457 |
-| `foundation/data/recipe/CNStandardRecipeGen` | 395 |
-| `foundation/advancement/CNAdvancement` | 394 |
-| `content/contraptions/irradiated/cat/IrradiatedCat` | 384 |
-| `compat/jei/CreateNuclearJEI` | 344 |
-| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 |
-| `CNCreativeModeTabs` | 249 |
-| `content/radiation/capability/RadiationCapability` | 186 |
+| Fichier | Lignes divergentes (7 août) | Lignes divergentes (14 août) |
+|---|---|---|
+| `CNBlocks` | 701 | 707 |
+| `CNItems` | 457 | 472 |
+| `foundation/advancement/CNAdvancement` | 394 | 416 |
+| `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 |
+| `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 |
+| `compat/jei/CreateNuclearJEI` | 344 | 333 |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 |
+| `CNCreativeModeTabs` | 249 | 249 |
+| `content/radiation/capability/RadiationCapability` | 186 | 199 |
+
+Dérives modestes (+6 à +22 lignes), cohérentes avec les commits récents (`RadiationCapability`
+refactorée en attachment sérialisable/synchronisable le 9 août, routage des dégâts le 8 août).
+Rien d'alarmant, mais aucun de ces fichiers n'est audité ligne à ligne — la mise en garde
+ci-dessous reste entière.
 
 > **Ce n'est pas théorique.** Sur les six bugs trouvés en testant le réacteur en jeu, **deux
 > étaient cachés dans `CNBlocks`** : la capacité de stress de la sortie à `10240` au lieu de
@@ -164,7 +163,7 @@ ligne à ligne, contrairement au domaine réacteur.
 ### 3.1 Recettes — diff des JSON générés
 
 Le diff des `.java` cache mal les recettes manquantes ; celui des JSON générés les montre
-directement. Commande dans le §7.
+directement. Commande dans le §8.
 
 **Corrigé** (symptôme signalé : le concentré d'azote refroidi ne servait à rien) — toute la
 chaîne de l'azote était morte, **cassée aux deux bouts** :
@@ -177,24 +176,26 @@ chaîne de l'azote était morte, **cassée aux deux bouts** :
 
 Seul le fluide `LIQUID_NITROGEN` était enregistré — donc obtenable uniquement en créatif.
 
-**Reste à traiter :**
+**Reste à traiter — revérifié le 14 août, aucune de ces trois lignes n'a bougé depuis le 7 août :**
 
 | Recette Forge | Absente côté NeoForge |
 |---|---|
-| `mixing/thorium_fluid` | oui — `CNFluids.THORIUM` est enregistré mais inobtenable, même schéma que l'azote |
-| `crafting/thorium_block_from_compacting` · `crafting/thorium_ingot_from_compacting` | oui — `THORIUM_COMPACTING` manque dans `CNStandardRecipeGen` |
+| `mixing/thorium_fluid` | oui — toujours absente. Un `compacting/thorium_fluid_to_thorium_ingot.json` existe désormais (sens fluide → lingot), mais rien ne produit le fluide lui-même : `CNFluids.THORIUM` reste inobtenable hors créatif |
+| `crafting/thorium_block_from_compacting` · `crafting/thorium_ingot_from_compacting` | oui — `THORIUM_COMPACTING` manque toujours dans `CNStandardRecipeGen` |
 | `mechanical_crafting/reactor_alarm` | oui |
 
-> ⚠️ **Sept recettes partent dans le namespace `create`.** `CNCrushingRecipeGen` (6) et
-> `CNWashingRecipeGen` (1) utilisent `create(() -> ingrédient, …)`. En 1.21 cette surcharge
-> **prend `Create.ID` comme namespace par défaut**, plus celui du générateur — les JSON
-> atterrissent dans `src/generated/resources/data/create/recipe/`. Ce n'est pas un manque : les
-> recettes se chargent, mais sous l'id de Create, et **écrasent celles de Create** là où les ids
-> coïncident (`crushing/raw_copper`, `crushing/raw_zinc`, `crushing/raw_uranium_block`,
-> `splashing/crushed_raw_lead` existent dans le jar de Create). Forge n'a pas le problème :
-> l'ancienne surcharge prenait le namespace du générateur.
-> **Correctif : `create(CreateNuclear.MOD_ID, () -> ingrédient, …)`.** À faire avec un test JEI,
-> les ids de recette changent.
+> ⚠️ **La fuite de namespace `create` n'est pas corrigée, et s'est aggravée.** `CNCrushingRecipeGen`
+> et `CNWashingRecipeGen` utilisent toujours `create(() -> ingrédient, …)`, qui en 1.21 **prend
+> `Create.ID` comme namespace par défaut**. Les JSON générés le 14 août dans
+> `src/generated/resources/data/create/recipe/` couvrent désormais `crushing/{granite,
+> raw_copper,raw_thorium,raw_thorium_block,raw_uranium_block,raw_zinc}.json` et
+> `splashing/crushed_raw_lead.json` (le thorium s'est ajouté à la liste depuis le 7 août). Ce
+> n'est pas un manque : les recettes se chargent, mais sous l'id de Create, et **écrasent celles
+> de Create** là où les ids coïncident (`crushing/raw_copper`, `crushing/raw_zinc`,
+> `crushing/raw_uranium_block`, `splashing/crushed_raw_lead` existent dans le jar de Create).
+> Forge n'a pas le problème : l'ancienne surcharge prenait le namespace du générateur.
+> **Correctif toujours en attente : `create(CreateNuclear.MOD_ID, () -> ingrédient, …)`.** À
+> faire avec un test JEI, les ids de recette changent.
 
 ---
 
@@ -225,13 +226,14 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Compat Alex's Caves (§2.2)** | 2 | faible | Isolé, sans risque |
-| 2 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 3 | **Mixins client (§2.3)** | 2 | moyenne | Sensible, à faire avec test visuel |
-| 4 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Rebrancher `CNShapelessRecipeGen` (§2.2)** | 1 ligne | faible | Isolé, sans risque — juste décommenter et tester en jeu |
+| 2 | **Namespace `create` des recettes crushing/washing (§3.1)** | 2 générateurs | faible | Isolé, écrase des recettes de Create tant que non corrigé |
+| 3 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
+| 4 | **Brancher ou supprimer `ReactorGaugeOverrides` et `IrradiatedWoldCollarLayer` (§2.2)** | 2 | faible | Dead code à trancher : finir la feature ou la retirer |
+| 5 | **Ajouter `logo.png` (§2.2)** | 1 ressource | faible | Cosmétique mais visible dès l'écran des mods |
+| 6 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
-Les tests en jeu du §4 passent avant tout ça : trois chantiers viennent d'être livrés sans être
-observés une seule fois en jeu.
+Les tests en jeu du §4 passent avant tout ça.
 
 ---
 
@@ -311,7 +313,77 @@ complètement** — un `import` simple ne suffira pas.
 
 ---
 
-## 7. Vérifier l'état à tout moment
+## 7. Audit ciblé — `content/multiblock/controller` (14 août 2026)
+
+Audit ligne à ligne demandé spécifiquement sur ce sous-dossier du domaine réacteur, malgré le
+statut « porté et validé » de [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md), pour vérifier que
+ce statut tient toujours après les commits récents (« clean up dead imports/logic... after
+RodType alignment », etc.).
+
+### 8.1 Parité des fichiers
+
+Les deux arborescences contiennent **exactement les 41 mêmes fichiers `.java`**, mêmes noms,
+mêmes sous-dossiers (`consumable/`, `display/`, `manager/`, `service/`, `snapshot/`). Aucun
+fichier Forge orphelin, aucun ajout NeoForge sans équivalent. Aucune classe du dossier n'a un
+compte de référence à 0 ailleurs dans `src` — pas de piège du §0 ici.
+
+### 8.2 Divergences internes
+
+21 fichiers sur 41 diffèrent contre l'original Forge ; 20 sont identiques à l'octet. Les 21
+divergences se répartissent en :
+
+- **API 1.21 correctement anticipée** (la majorité) : data components à la place du NBT mutable
+  (`CNDataComponents.HEAT`, `ReactorBluePrintData`), `read/write(..., HolderLookup.Provider, ...)`,
+  `ItemStack.parse`/`saveOptional`, `BuiltInRegistries` à la place de `ForgeRegistries`,
+  `level.getCapability(Capabilities.ItemHandler.BLOCK, ...)`, `useItemOn`/`ItemInteractionResult`.
+  Plusieurs fichiers (`ReactorControllerBlockEntity`, `ReactorHeatUpdateCoordinator`,
+  `IReactorHeatUpdateCoordinator`, `PatternReader`) portent même des Javadoc **nouvelles**
+  expliquant explicitement pourquoi (copie défensive des `ItemStack` sous NeoForge notamment).
+- **Cosmétique** : commentaires traduits en français (`ReactorInputManager`,
+  `ReactorAlarmManager` et leurs interfaces), espaces blancs.
+- `manager/ReactorInputFluidManager.java` (~ligne 123) : alloue un `new VirtualReactorInputFluid()`
+  au lieu de réutiliser l'instance déjà créée quand `handlers` est vide. Micro-inefficacité sans
+  impact fonctionnel, pas un bug.
+
+**Conclusion sur ce sous-dossier : le statut « porté et validé » tient.** Aucune divergence
+interne trouvée n'est une régression de logique métier.
+
+### 8.3 Bug trouvé — hors dossier `controller` mais qui l'impacte directement
+
+En remontant l'usage de `rodType.ratio()` (appelé dans `ReactorHeatUpdateCoordinator`,
+`calculateHeatBalance`) jusqu'à sa définition dans `api/multiblock/rods/RodType.java` :
+
+- `Builder.ratio` (ligne 141) vaut `null` par défaut — alors que côté Forge, `Builder.ratio`
+  défaut à `() -> 1`.
+- La Javadoc de `Builder.build()` (ligne 290) affirme toujours *« `ratio` is exempt since it
+  defaults to a constant 1 »*, mais `build()` (ligne 308) passe `ratio` tel quel au record, sans
+  jamais substituer de valeur par défaut si `null`.
+- **Conséquence :** tout `RodType` construit sans appel explicite à `.ratio(...)` a un champ
+  `ratio == null`, et `rodType.ratio().get()` lève une `NullPointerException` au premier calcul
+  de heat balance dans le contrôleur.
+- **État actuel : latent, pas déclenché.** Les trois `RodType.Builder` réels (`CNItems` —
+  uranium, graphite, thorium) appellent tous `.ratio(() -> CNConfigs...)` explicitement. La
+  surcharge de convenance `ItemRodTypesValue.setRodTypeInfos(int, int, int, TypeRod)`, qui ne
+  fixe jamais `ratio`, n'est appelée nulle part actuellement.
+- **Risque :** toute future tige ajoutée sans `.ratio(...)` (via datapack, nouvel item, ou usage
+  de cette surcharge à 4 paramètres) fait planter le tick suivant du contrôleur. La Javadoc
+  induit activement en erreur.
+- **Correctif suggéré :** dans `Builder.build()`, `Objects.requireNonNullElse(ratio, () -> 1)`
+  pour honorer la Javadoc, ou lever une exception explicite si `ratio == null` plutôt que de
+  laisser planter au premier usage en aval.
+
+### 8.4 Point pré-existant relevé au passage (ni régression ni lié au portage)
+
+`ReactorControllerBlock.java` (~ligne 140 NeoForge, ~130 Forge) : `state.setValue(ASSEMBLED, false)`
+— `setValue` renvoie un `BlockState` immuable qui n'est ni réassigné ni appliqué via
+`level.setBlock(...)`. Code mort **identique des deux côtés**, donc pas une régression du
+portage, mais probablement un bug fonctionnel réel (le flag `ASSEMBLED` ne semble jamais remis à
+`false` par ce chemin). À vérifier en jeu séparément — hors périmètre de ce document qui ne
+traite que des écarts Forge/NeoForge.
+
+---
+
+## 8. Vérifier l'état à tout moment
 
 ```bash
 # Fichiers Forge sans équivalent NeoForge — doit en lister 15 (4 du §1.1, 2 du §1.2, 9 du §2)
