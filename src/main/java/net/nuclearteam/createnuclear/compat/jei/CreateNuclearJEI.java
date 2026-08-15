@@ -32,6 +32,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Recipe;
@@ -43,7 +44,9 @@ import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNRecipeTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.compat.jei.category.FanEnrichedCategory;
+import net.nuclearteam.createnuclear.compat.jei.category.FanSnowPowderCategory;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe;
+import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -72,7 +75,13 @@ public class CreateNuclearJEI implements IModPlugin {
                 .catalystStack(ProcessingViaFanCategory.getFan("fan_enriched"))
                 .doubleItemIcon(AllItems.PROPELLER.get(), CNBlocks.ENRICHING_CAMPFIRE.get())
                 .emptyBackground(178, 72)
-                .build("fan_enriched", FanEnrichedCategory::new)
+                .build("fan_enriched", FanEnrichedCategory::new),
+            snow_powder = builder(SnowPowderRecipe.class)
+                .addTypedRecipes(CNRecipeTypes.SNOW_POWDER::getType)
+                .catalystStack(ProcessingViaFanCategory.getFan("fan_snow_powder"))
+                .doubleItemIcon(AllItems.PROPELLER.get(), Items.POWDER_SNOW_BUCKET)
+                .emptyBackground(178, 72)
+                .build("fan_snow_powder", FanSnowPowderCategory::new)
         ;
     }
 

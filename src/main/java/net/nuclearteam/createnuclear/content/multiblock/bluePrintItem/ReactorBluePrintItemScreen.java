@@ -52,23 +52,5 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
         if (!ItemStack.matches(menu.player.getMainHandItem(), menu.contentHolder)) {
             menu.player.closeContainer();
         }
-
-        float coef = 0.1F;
-
-        CompoundTag tag = menu.contentHolder.getOrDefault(CNDataComponents.PATTERN, new CompoundTag());
-
-        sendValueUpdate(tag, coef,
-                tag.getInt("graphiteTime"),
-                tag.getInt("uraniumTime"),
-                tag.getInt("countUraniumRod"),
-                tag.getInt("countGraphiteRod")+3
-        );
-
-
-    }
-
-
-    private static void sendValueUpdate(CompoundTag tag, float heat, int graphiteTime, int uraniumTime, int countGraphiteRod, int countUraniumRod) {
-        CatnipServices.NETWORK.sendToServer(new ReactorBluePrintItemPacket(tag, heat, graphiteTime, uraniumTime, countGraphiteRod, countGraphiteRod));
     }
 }

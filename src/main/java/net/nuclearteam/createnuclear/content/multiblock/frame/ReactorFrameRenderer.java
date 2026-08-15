@@ -3,10 +3,12 @@ package net.nuclearteam.createnuclear.content.multiblock.frame;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import net.createmod.catnip.platform.CatnipServices;
+import net.createmod.catnip.render.FluidRenderHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorFrameDisplayManagerI;
 
 /**
  * Renders the reactor fluid dynamically inside the {@link ReactorFrame} window.
@@ -30,7 +32,9 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         ReactorControllerBlockEntity controller = be.getControllerEntity();
         if (controller == null) return;
 
-        FluidStack fluid = controller.getDisplayedFluid();
+        ReactorFrameDisplayManagerI frameDisplay = controller.getFrameDisplayManager();
+
+        FluidStack fluid = frameDisplay.getDisplayedFluid(controller.getLevel(), controller.getInputFluidManager());
         if (fluid == null || fluid.isEmpty()) return;
 
         // Local vertical bounds of the liquid volume inside this block, matching
@@ -51,10 +55,10 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         // from the bottom frame's lip (frameMinY + 4/16) to the top frame's cap
         // (frameMaxY + 9/16), so even a nearly-empty reactor still shows a sliver.
         float yMax = boxYMax;
-        if (controller.hasFrameColumn()) {
-            float ratio = controller.getDisplayedFluidFillRatio();
-            double liquidBottomWorldY = controller.getFrameColumnMinY() + 4.0 / 16.0;
-            double liquidTopWorldY = controller.getFrameColumnMaxY() + 9.0 / 16.0;
+        if (frameDisplay.hasFrameColumn()) {
+            float ratio = frameDisplay.getDisplayedFluidFillRatio(controller.getLevel(), controller.getInputFluidManager());
+            double liquidBottomWorldY = frameDisplay.getFrameColumnMinY() + 4.0 / 16.0;
+            double liquidTopWorldY = frameDisplay.getFrameColumnMaxY() + 9.0 / 16.0;
             double surfaceWorldY = liquidBottomWorldY + ratio * (liquidTopWorldY - liquidBottomWorldY);
             double localSurface = surfaceWorldY - be.getBlockPos().getY();
             if (localSurface <= boxYMin) return; // liquid level is below this block
@@ -64,10 +68,16 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         // Last arg (invertGasses) must be false: liquid nitrogen has density 0, so
         // it counts as "lighter than air" and would otherwise be flipped 180°,
         // hiding the top surface. We always fill bottom-to-top here.
-        CatnipServices.FLUID_RENDERER.renderFluidBox(
-                fluid.getFluid().defaultFluidState(), // Conversion de FluidStack en FluidState
+        // Must pass the FluidStack, not fluid.getFluid().defaultFluidState(): the FluidState
+        // overload resolves the texture and tint from the fluid's block state, which loses the
+        // stack's tint and renders water almost black in the frame windows.
+        // CatnipServices.FLUID_RENDERER is declared as FluidRenderHelper<?>, so the platform
+        // type has to be reintroduced by hand — on NeoForge it is neoforge's FluidStack.
+        @SuppressWarnings("unchecked")
+        FluidRenderHelper<FluidStack> fluidRenderer = (FluidRenderHelper<FluidStack>) CatnipServices.FLUID_RENDERER;
+
+        fluidRenderer.renderFluidBox(fluid,
                 X_MIN, boxYMin, Z_MIN, X_MAX, yMax, Z_MAX,
-                buffer, ms, light, false, false
-        );
+                buffer, ms, light, false, false);
     }
 }

@@ -2,10 +2,8 @@ package net.nuclearteam.createnuclear.content.multiblock.output;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.math.AngleHelper;
@@ -13,92 +11,112 @@ import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.nuclearteam.createnuclear.CNBlocks;
+import net.minecraft.util.Mth;
 
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
-import java.util.Objects;
-
-import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput.DIR;
-
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
-    public int speed = 1;
+    public int speed = 0;
     public float heat = 0;
 
-    ReactorControllerBlock controller = null;
-    ReactorControllerBlockEntity controllerEntity = null;
+    protected ReactorPattern pattern =  new ReactorPattern();
 
-    protected ScrollValueBehaviour generatedSpeed;
+    protected float generatedSpeed;
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    //KineticBlockEntity
+
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-        generatedSpeed = new KineticScrollValueBehaviour(CreateNuclearLang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
-        generatedSpeed.between(-1500000, 1500000);
-        generatedSpeed.setValue(speed);
-        generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
-        behaviours.add(generatedSpeed);
 
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    public void lazyTick() {
+        super.lazyTick();
 
-        BlockGetter level = getLevel();
+        determineSpeed();
+    }
 
-        if (level.getBlockState(getBlockPos().above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()) {
-            controller = (ReactorControllerBlock) level.getBlockState(getBlockPos().above(3)).getBlock();
-            controllerEntity = (ReactorControllerBlockEntity) level.getBlockEntity(getBlockPos().above(3));
-            if (controllerEntity != null) {
-                if (!controllerEntity.getAssembled() && getSpeed() != 0) {
-                    setSpeed(0);
-                }
-            }
-        } else setSpeed(0);
+    public void determineSpeed() {
+        int deterSpeed = this.speed;
+        setSpeedAndUpdate(deterSpeed);
+    }
+
+    public void setSpeedAndUpdate(int speed) {
+        if (generatedSpeed == speed) return;
+
+        generatedSpeed = (float) speed;
+
+        updateGeneratedRotation();
+		setChanged();
+    }
+
+    // Tracks the output's linked block position for persistence across reloads.
+    private BlockPos outputPos;
+
+    @Override
+    protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(compound, registries, clientPacket);
+
+        // Restore the generated rotation speed
+        generatedSpeed = compound.getFloat("generatedSpeed");
+
+        // Restore the output position, if present in the tag
+        if (compound.contains("outputPos")) {
+            this.outputPos = BlockPos.of(compound.getLong("outputPos"));
+        }
     }
 
     @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+    public void write(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(compound, registries, clientPacket);
 
-        float stressBase = calculateAddedStressCapacity();
+        // Persist the generated rotation speed
+        compound.putFloat("generatedSpeed", generatedSpeed);
 
-        CreateLang.translate("gui.goggles.generator_stats")
-                .forGoggles(tooltip);
-        CreateLang.translate("tooltip.capacityProvided")
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
-
-        float speed = getTheoreticalSpeed();
-        speed = Math.abs(speed);
-
-        float stressTotal = stressBase * speed;
-
-        CreateLang.number(stressTotal)
-                .translate("generic.unit.stress")
-                .style(ChatFormatting.AQUA)
-                .space()
-                .add(CreateLang.translate("gui.goggles.at_current_speed")
-                        .style(ChatFormatting.DARK_GRAY))
-                .forGoggles(tooltip, 1);
-        return true;
+        // Persist the output position, if set
+        if (this.outputPos != null) {
+            compound.putLong("outputPos", this.outputPos.asLong());
+        }
     }
+
+     @Override
+     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+
+         float stressBase = calculateAddedStressCapacity();
+
+         CreateLang.translate("gui.goggles.generator_stats")
+                 .forGoggles(tooltip);
+         CreateLang.translate("tooltip.capacityProvided")
+                 .style(ChatFormatting.GRAY)
+                 .forGoggles(tooltip);
+
+         float speed = getTheoreticalSpeed();
+         speed = Math.abs(speed);
+
+         float stressTotal = stressBase * speed;
+
+         CreateLang.number(stressTotal)
+                 .translate("generic.unit.stress")
+                 .style(ChatFormatting.AQUA)
+                 .space()
+                 .add(CreateLang.translate("gui.goggles.at_current_speed")
+                         .style(ChatFormatting.DARK_GRAY))
+                 .forGoggles(tooltip, 1);
+         return true;
+     }
 
     @Override
     public void initialize() {
@@ -106,44 +124,17 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
-            FindController(getBlockPos(), Objects.requireNonNull(getLevel()));
+            assert level != null;
+            pattern.findController(getBlockPos(), level, true);
         }
-    }
-
-    public void FindController(BlockPos pos, Level level){
-        if (level.getBlockState(pos.above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()){
-            ReactorControllerBlock controller = (ReactorControllerBlock)level.getBlockState(pos.above(3)).getBlock();
-            controller.Verify(controller.defaultBlockState(), pos.above(3), level, level.players(), false);
-        }
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public int getDir() {
-        BlockState state = getBlockState();
-        return state.getValue(DIR);
-    }
-
-    public void setDir(int dir, Level level, BlockPos pos) {
-        BlockState state = getBlockState();
-        level.setBlockAndUpdate(pos, state.setValue(DIR, dir));
     }
 
     @Override
     public float getGeneratedSpeed() {
-        if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
-            return 0;
-        return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
+        return Mth.clamp(generatedSpeed, 0, 1500000);
     }
 
-    @Override
-    protected Block getStressConfigKey() {
-        return super.getStressConfigKey();
-    }
-
-    class ReactorOutputValue extends ValueBoxTransform.Sided {
+    static class ReactorOutputValue extends ValueBoxTransform.Sided {
 
         @Override
         protected Vec3 getSouthLocation() {

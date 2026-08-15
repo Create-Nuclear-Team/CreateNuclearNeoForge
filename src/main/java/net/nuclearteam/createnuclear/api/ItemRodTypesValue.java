@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.api;
 import com.simibubi.create.api.registry.SimpleRegistry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import static net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod.NONE;
 
@@ -16,7 +17,7 @@ public class ItemRodTypesValue {
      * Default RodType returned when no mapping exists in the registry.
      * Built once to avoid allocating a new instance on each lookup.
      */
-    public static final RodType DEFAULT_ROD_TYPE = new RodType(HolderSet.direct(Collections.emptyList()), -1, -1, -1, NONE);
+    public static final RodType DEFAULT_ROD_TYPE = new RodType(Items.AIR.builtInRegistryHolder(), -1, -1, -1, NONE);
 
     /**
      * Get the {@link RodType} associated with the given {@link Item}.
@@ -39,7 +40,7 @@ public class ItemRodTypesValue {
      * @throws NullPointerException if {@code type} is null
      */
     public static NonNullConsumer<Item> setRodTypeInfos(RodType.Builder type) {
-        return item -> ROD_TYPE.register(item, type.addItems(item).build());
+        return item -> ROD_TYPE.register(item, type.item(item).build());
     }
 
 
@@ -71,7 +72,7 @@ public class ItemRodTypesValue {
         }
 
         return item -> {
-            RodType built = builder.addItems(item).build();
+            RodType built = builder.item(item).build();
             ROD_TYPE.register(item, built);
         };
     }

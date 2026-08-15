@@ -4,9 +4,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNDataComponents;
-import net.nuclearteam.createnuclear.CNDataComponents.ClothItemStack;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.ClothItemStack;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 
 public final class ClothTagHelper {

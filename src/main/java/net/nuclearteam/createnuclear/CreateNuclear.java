@@ -6,6 +6,7 @@ import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,7 +22,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
-import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
+import net.nuclearteam.createnuclear.content.equipment.armor.ArmorMaterials;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.content.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
@@ -29,6 +30,7 @@ import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule.BiomeTagRule;
 import org.slf4j.Logger;
 
@@ -50,6 +52,7 @@ public class CreateNuclear {
             .setTooltipModifierFactory(item ->
                     new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
                             .andThen(TooltipModifier.mapNull(KineticStats.create(item)))
+                            .andThen(RodsStats.create(item))
             );
 
     public CreateNuclear(IEventBus eventBus, ModContainer modContainer) {
@@ -66,6 +69,7 @@ public class CreateNuclear {
         REGISTRATE.registerEventListeners(modEventBus);
 
         CNSoundEvents.prepare();
+        CNDisplaySources.register();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -76,7 +80,7 @@ public class CreateNuclear {
         CNEntityType.register();
         CNPaletteBlocks.register();
 
-        CNArmorMaterials.register(modEventBus);
+        ArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
         CNAttachmentTypes.register(modEventBus);
 
@@ -89,6 +93,7 @@ public class CreateNuclear {
         CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
         CNAttributes.register(modEventBus);
+        CNPlacementModifiers.register(modEventBus);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
@@ -102,8 +107,6 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        // Runs here rather than at mod construction: the item entries it reads (e.g. Create's
-        // CRUSHED_URANIUM) are only bound once the registry events have finished.
         CNRadiationValues.register();
 
         event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);

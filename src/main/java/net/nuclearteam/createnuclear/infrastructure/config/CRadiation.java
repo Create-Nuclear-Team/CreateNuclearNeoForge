@@ -46,16 +46,16 @@ public class CRadiation extends ConfigBase {
         public void registerAll(ModConfigSpec.Builder builder) {
 
             ENTITY_BLACKLIST = builder
-                    .comment(Comments.blackListEntity)
-                    .defineListAllowEmpty(
-                            List.of("entity_blacklist"),
-                            () -> List.of(
-                                    "minecraft:armor_stand",
-                                    "minecraft:item_frame",
-                                    "minecraft:glow_item_frame"
-                            ),
-                            obj -> obj instanceof String
-                    );
+                .comment(Comments.blackListEntity)
+                .defineListAllowEmpty(
+                    List.of("entity_blacklist"),
+                    () -> List.of(
+                        "minecraft:armor_stand",
+                        "minecraft:item_frame",
+                        "minecraft:glow_item_frame"
+                    ),
+                    obj -> obj instanceof String
+                );
         }
 
         @Override

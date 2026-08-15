@@ -1,6 +1,3 @@
-/gamemode creative
-/particle createnuclear:irradiated_particles
-/particle create:air
 /particle create:air_flow
 /particle
 /particle createnuclear:irradiated_particles ~ ~1 ~ 0 0 0 0 104
@@ -29,11 +26,28 @@
 /fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
 /gamemode survival
 /fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
+/time set day
+/gamemode spectator
+/gamemode creative
+/effect give Dev createnuclear:iodine
+/effect give Dev createnuclear:radiation
+/time set day
+/effect clear Dev
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation 30000
+/effect give Dev minecraft:regeneration infinite 255 true
+/effect give Dev createnuclear:radiation
+/effect give Dev createnuclear:radiation infinite
+/effect give Dev minecraft:saturation infinite 255 true
+/effect give Dev createnuclear:radiation infinite
 /effect give Dev createnuclear:radiation
 /playsound createnuclear:alarm/alarm
 /playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
+/data get storage
+/data get entity Dev
+/data get block -459 63 531
 /effect give Dev createnuclear:radiation infinite 0 true
 /effect clear Dev
 /effect give Dev createnuclear:radiation infinite 0 true

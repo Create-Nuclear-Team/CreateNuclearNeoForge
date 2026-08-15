@@ -6,7 +6,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-//import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarmEntity;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarmEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +47,9 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
             if (!level.isLoaded(p)) continue; // On ne supprime pas si le chunk est juste déchargé
 
             BlockEntity be = level.getBlockEntity(p);
-            // Si le bloc n'existe plus ou n'est plus une alarme, on marque pour suppression
-            //if (be == null || !(be instanceof ReactorAlarmEntity)) {
-            //    toRemove.add(p);
-            //}
+            if (be == null || !(be instanceof ReactorAlarmEntity)) {
+                toRemove.add(p);
+            }
         }
         positions.removeAll(toRemove);
     }
@@ -61,10 +60,9 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
 
         List<BlockPos> validPositions = new ArrayList<>();
         for (BlockPos p : this.positions) {
-            // On vérifie que l'entité est bien chargée et du bon type
-            //if (level.isLoaded(p) && level.getBlockEntity(p) instanceof ReactorAlarmEntity) {
-            //    validPositions.add(p);
-            //}
+            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof ReactorAlarmEntity) {
+                validPositions.add(p);
+            }
         }
         return List.copyOf(validPositions);
     }

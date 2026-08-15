@@ -1,10 +1,14 @@
 package net.nuclearteam.createnuclear.content.equipment.cloth;
 
+import com.mojang.serialization.Codec;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNItems;
 
 import javax.annotation.Nullable;
@@ -22,6 +26,26 @@ public class ClothItem extends Item {
 
     public DyeColor getColor() {
         return color;
+    }
+
+    /**
+     * Wraps an ItemStack with content-based equals/hashCode, since ItemStack itself only offers
+     * identity equality and NeoForge requires data component values to implement both properly.
+     */
+    public record ClothItemStack(ItemStack stack) {
+        public static final Codec<ClothItemStack> CODEC = ItemStack.CODEC.xmap(ClothItemStack::new, ClothItemStack::stack);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClothItemStack> STREAM_CODEC = ItemStack.STREAM_CODEC.map(ClothItemStack::new, ClothItemStack::stack);
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof ClothItemStack(ItemStack stack1)
+                && ItemStack.isSameItemSameComponents(this.stack, stack1);
+        }
+
+        @Override
+        public int hashCode() {
+            return ItemStack.hashItemAndComponents(this.stack);
+        }
     }
 
     @MethodsReturnNonnullByDefault

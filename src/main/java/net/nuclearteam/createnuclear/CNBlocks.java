@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -55,7 +56,9 @@ import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGene
 import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
+import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreItem;
 
+import static com.simibubi.create.api.behaviour.display.DisplaySource.displaySource;
 import static com.simibubi.create.foundation.data.CreateRegistrate.casingConnectivity;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -80,6 +83,12 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .simpleItem()
             .transform(pickaxeOnly())
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.FUEL))
+            .transform(displaySource(CNDisplaySources.COOLER))
+            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .register();
 
     public static final BlockEntry<ReactorCore> REACTOR_CORE =
@@ -102,7 +111,11 @@ public class CNBlocks {
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME =
         CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
             .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(3F).destroyTime(2F))
+            // noOcclusion is what makes the window actually readable: without it the frame counts
+            // as a full opaque block, light stops propagating through it, and the fluid rendered
+            // inside the window comes out almost black.
+            .properties(p -> p.explosionResistance(3F).destroyTime(2F).noOcclusion())
+            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate((c, p) ->
@@ -148,6 +161,7 @@ public class CNBlocks {
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
+            .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorRodInputGenerator()::generate)
@@ -160,6 +174,7 @@ public class CNBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.explosionResistance(6F))
                     .properties(p -> p.destroyTime(2F))
+                    .addLayer(() -> RenderType::cutoutMipped)
                     .transform(pickaxeOnly())
                     .tag(BlockTags.NEEDS_DIAMOND_TOOL)
                     .blockstate(new ReactorFluidInputGenerator()::generate)
@@ -175,7 +190,7 @@ public class CNBlocks {
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
             .transform(pickaxeOnly())
             .blockstate(new ReactorOutputGenerator()::generate)
-            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
+            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 64000.0))
             .item()
             .transform(customItemModel("reactor", "output", "item"))
             .register();
@@ -188,6 +203,12 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorControllerGenerator()::generate)
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.FUEL))
+            .transform(displaySource(CNDisplaySources.COOLER))
+            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
@@ -204,6 +225,7 @@ public class CNBlocks {
         .block("reinforced_glass", ReinforcedGlassBlock::new)
         .initialProperties(() -> Blocks.GLASS)
         .properties(p -> p.explosionResistance(7.0F).destroyTime(2F))
+        .addLayer(() -> RenderType::translucent)
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_GLASS)))
         .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_GLASS)))
         .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
@@ -242,6 +264,7 @@ public class CNBlocks {
             .properties(EnrichingFireBlock.getLight())
             .tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_ENRICHED.tag)
             .loot((lt, b) -> lt.add(b, BlockLootSubProvider.noDrop()))
+            .addLayer(() -> RenderType::cutout)
             .blockstate((c, p) -> {
                 String baseFolder = "block/enriching/fire/";
                 ModelFile Floor0 = p.models().getExistingFile(p.modLoc(baseFolder + "floor0"));
@@ -403,7 +426,7 @@ public class CNBlocks {
                     .pattern("RRR")
                     .pattern("RRR")
                     .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 27))
             .tag(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
             .build()
             .register();
@@ -473,7 +496,7 @@ public class CNBlocks {
                     CNTags.forgeBlockTag("ores/uranium"),
                 CNBlockTags.URANIUM_ORES.tag
             )
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 3))
             .tag(CNItemTags.URANIUM_ORES.tag,
                     CNTags.forgeItemTag("ores/uranium"))
             .build()
@@ -499,7 +522,7 @@ public class CNBlocks {
                 CNTags.forgeBlockTag("ores/uranium"),
                 CNBlockTags.URANIUM_ORES.tag
             )
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 3))
             .tag(CNItemTags.URANIUM_ORES.tag,
                 CNTags.forgeItemTag("ores/uranium"))
             .build()

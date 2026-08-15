@@ -11,7 +11,7 @@ import net.nuclearteam.createnuclear.CNDamageTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
-import net.nuclearteam.createnuclear.content.rod.CNRodTypes;
+import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNBiomeModifiers;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNConfiguredFeatures;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacedFeatures;

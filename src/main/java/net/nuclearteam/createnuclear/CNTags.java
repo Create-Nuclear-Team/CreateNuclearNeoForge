@@ -71,6 +71,7 @@ public class CNTags {
 
     public enum CNBlockTags {
         FAN_PROCESSING_CATALYSTS_ENRICHED(MOD, "fan_processing_catalysts/enriched"),
+        FAN_PROCESSING_CATALYSTS_SNOW_POWDER(MOD, "fan_processing_catalysts/snow_powder"),
         ENRICHING_FIRE_BASE_BLOCKS,
         THORIUM_ORES,
         URANIUM_ORES,

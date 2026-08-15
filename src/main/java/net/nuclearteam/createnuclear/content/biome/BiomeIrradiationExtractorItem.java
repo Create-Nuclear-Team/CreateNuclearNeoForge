@@ -1,8 +1,6 @@
 package net.nuclearteam.createnuclear.content.biome;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -12,15 +10,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.CNDataComponents;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+@ParametersAreNonnullByDefault
 public class BiomeIrradiationExtractorItem extends Item {
     public static final String TAG = "biome_restore";
     private static final int CHARGE_PER_CLICK = 1;
@@ -37,14 +36,12 @@ public class BiomeIrradiationExtractorItem extends Item {
             return InteractionResultHolder.success(stack);
         }
 
-        if (getCharge(stack) >= getMaxCharge())
-        {
+        if (getCharge(stack) >= getMaxCharge()) {
             return InteractionResultHolder.pass(stack);
         }
 
         boolean restored = BiomeIrradiationService.restoreArea(serverLevel, player.blockPosition());
-        if (!restored)
-        {
+        if (!restored) {
             return InteractionResultHolder.pass(stack);
         }
 
@@ -67,8 +64,9 @@ public class BiomeIrradiationExtractorItem extends Item {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         if (tooltipFlag.isAdvanced() && getCharge(stack) > 0) {
             tooltipComponents.add(
-                    CreateNuclearLang.translateDirect("tooltip.biome_irradiation_extractor." + TAG, getCharge(stack), getMaxCharge())
-                            .withStyle(ChatFormatting.GRAY)
+                CreateNuclearLang
+                    .translateDirect("tooltip.biome_irradiation_extractor." + TAG, getCharge(stack), getMaxCharge())
+                    .withStyle(ChatFormatting.GRAY)
             );
         }
     }
@@ -78,18 +76,8 @@ public class BiomeIrradiationExtractorItem extends Item {
         return getCharge(stack) > 0 ? 1 : this.getDefaultMaxStackSize();
     }
 
-    @Override
-    public int getBarWidth(ItemStack stack) {
-        return Math.round(13.0f * getCharge(stack) / getMaxCharge());
-    }
-
-    @Override
-    public int getBarColor(ItemStack stack) {
-        return 0x4A90D9;
-    }
-
     public static int getCharge(ItemStack stack) {
-        return getChargeTag(stack, 0);
+        return getChargeDataComponents(stack, 0);
     }
 
     public static int getMaxCharge() {
@@ -100,20 +88,10 @@ public class BiomeIrradiationExtractorItem extends Item {
         int current = getCharge(stack);
         int next = Mth.clamp(current + amount, 0, getMaxCharge());
 
-        // Utilisation de la nouvelle API des composants pour stocker les données NBT
-        stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, customData ->
-                customData.update(tag -> tag.putInt(TAG, next))
-        );
+        stack.set(CNDataComponents.CHARGE_BIOME_IRRADIATION_EXTRACTOR, next);
     }
 
-    public static int getChargeTag(ItemStack stack, int defaultValue) {
-        if (stack == null || stack.isEmpty()) return defaultValue;
-
-        // Récupération sécurisée via le composant CustomData de la 1.21
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
-        if (customData == null) return defaultValue;
-
-        CompoundTag tag = customData.copyTag();
-        return (tag.contains(TAG)) ? tag.getInt(TAG) : defaultValue;
+    public static int getChargeDataComponents(ItemStack stack, int defaultValue) {
+        return stack.getOrDefault(CNDataComponents.CHARGE_BIOME_IRRADIATION_EXTRACTOR, defaultValue);
     }
 }

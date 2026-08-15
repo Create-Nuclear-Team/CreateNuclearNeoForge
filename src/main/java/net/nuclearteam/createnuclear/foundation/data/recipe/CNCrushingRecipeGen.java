@@ -75,8 +75,4 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
     public CNCrushingRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, CreateNuclear.MOD_ID);
     }
-
-
-
-
 }
