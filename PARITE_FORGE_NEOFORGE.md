@@ -126,13 +126,18 @@ irradié) ; ceux ci-dessous méritent une action :
 > dans `PORTAGE_REACTEUR.md`/`AUDIT_NEOFORGE.md`). Pas encore vérifié si la feature du gauge de
 > cadre a été branchée ailleurs ou simplement abandonnée — à confirmer si le besoin ressurgit.
 >
-> ⚠️ **`logoFile` toujours cassé après le commit `93975b3`.** `neoforge.mods.toml` pointe vers
-> `logoFile = "icon.png"`, mais le fichier vivait dans `src/main/resources/META-INF/icon.png` —
-> NeoForge résout `logoFile` relativement à la racine du jar (comme `assets/`, `data/`), pas au
-> dossier `META-INF/` qui contient le toml. Le fichier était donc introuvable à l'exécution malgré
-> son existence dans le repo. Corrigé en déplaçant l'image vers `src/main/resources/icon.png`
-> (racine des resources, sibling de `META-INF/`), pour matcher la convention des templates
-> NeoForge/Forge MDK.
+> ✅ **`logoFile` corrigé.** `neoforge.mods.toml` (`logoFile = "icon.png"`) pointait vers un
+> fichier qui vivait dans `src/main/resources/META-INF/icon.png` — NeoForge résout `logoFile`
+> relativement à la racine du jar (comme `assets/`, `data/`), pas au dossier `META-INF/` qui
+> contient le toml lui-même. Déplacé vers `src/main/resources/icon.png` (racine des resources,
+> sibling de `META-INF/`), la convention des templates NeoForge/Forge MDK.
+> **Piège séparé rencontré en vérifiant le fix :** `bin/main` (sortie de compilation IntelliJ,
+> distincte de `build/` géré par Gradle) peut rester figée sur une ancienne copie de
+> `neoforge.mods.toml`/des resources si la run configuration charge cette sortie au lieu de
+> `build/resources/main`. Un `Rebuild Project` (ou passer « Build and run using » sur Gradle dans
+> les réglages Gradle d'IntelliJ) est nécessaire pour voir tout changement de resources se
+> refléter en jeu — sans lien avec le portage Forge/NeoForge, à garder en tête pour tout futur
+> « ça ne marche pas alors que le fichier est bon ».
 >
 > ✅ **`CNShapelessRecipeGen.java` supprimé** (commit `93975b3`), plutôt que rebranché. Sa
 > registration dans `CreateNuclearDatagen` était déjà commentée et le générateur était mort code
