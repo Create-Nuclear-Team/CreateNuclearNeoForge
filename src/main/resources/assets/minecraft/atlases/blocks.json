@@ -23,6 +23,11 @@
     {
       "type": "single",
       "resource": "createnuclear:fluid/nitrogen_still"
+    },
+    {
+      "type": "directory",
+      "source": "models/armor",
+      "prefix": "models/armor/"
     }
   ]
 }

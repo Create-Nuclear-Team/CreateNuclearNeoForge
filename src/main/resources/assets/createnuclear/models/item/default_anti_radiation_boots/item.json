@@ -2,7 +2,7 @@
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"14": "createnuclear:item/default_anti_radiation_suit"
+		"14": "createnuclear:models/armor/default_anti_radiation_suit"
 	},
 	"elements": [
 		{

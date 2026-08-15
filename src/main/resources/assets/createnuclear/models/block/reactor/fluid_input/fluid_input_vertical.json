@@ -6,7 +6,7 @@
     "0": "createnuclear:block/reactor/fluid_input/input",
     "1": "createnuclear:block/reactor/casing/reactor_casing",
     "2": "createnuclear:block/reactor/casing/reactor_casing",
-    "particle": "createnuclear:block/reactor/input/input"
+    "particle": "createnuclear:block/reactor/fluid_input/input"
   },
   "elements": [
     {

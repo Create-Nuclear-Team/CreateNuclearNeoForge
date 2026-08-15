@@ -4,8 +4,8 @@
 	"texture_size": [96, 96],
 	"parent": "block/block",
 	"textures": {
-		"layer0": "createnuclear:item/default_anti_radiation_suit",
-		"particle": "createnuclear:item/default_anti_radiation_suit"
+		"layer0": "createnuclear:models/armor/default_anti_radiation_suit",
+		"particle": "createnuclear:models/armor/default_anti_radiation_suit"
 	},
 	"elements": [
 		{
