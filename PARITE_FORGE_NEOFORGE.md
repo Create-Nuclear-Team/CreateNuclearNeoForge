@@ -6,9 +6,9 @@ en termes de **features**, et comment porter chaque bloc.
 **Ce fichier ne contient que du travail restant.** Ce qui est fait en sort — l'historique
 est dans les commits.
 
-État au **14 août 2026**, branche `V2-Reacteur`, après le portage de la compat Alex's Caves,
-des mixins client et de plusieurs refactors (RadiationCapability en attachment, overlay HUD,
-routage des dégâts).
+État au **15 août 2026**, branche `V2`, après le portage de la compat Alex's Caves,
+des mixins client, de plusieurs refactors (RadiationCapability en attachment, overlay HUD,
+routage des dégâts) et du correctif de la fuite de namespace `create` (§3.1).
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
@@ -189,18 +189,37 @@ Seul le fluide `LIQUID_NITROGEN` était enregistré — donc obtenable uniquemen
 | `crafting/thorium_block_from_compacting` · `crafting/thorium_ingot_from_compacting` | oui — `THORIUM_COMPACTING` manque toujours dans `CNStandardRecipeGen` |
 | `mechanical_crafting/reactor_alarm` | oui |
 
-> ⚠️ **La fuite de namespace `create` n'est pas corrigée, et s'est aggravée.** `CNCrushingRecipeGen`
-> et `CNWashingRecipeGen` utilisent toujours `create(() -> ingrédient, …)`, qui en 1.21 **prend
-> `Create.ID` comme namespace par défaut**. Les JSON générés le 14 août dans
-> `src/generated/resources/data/create/recipe/` couvrent désormais `crushing/{granite,
-> raw_copper,raw_thorium,raw_thorium_block,raw_uranium_block,raw_zinc}.json` et
-> `splashing/crushed_raw_lead.json` (le thorium s'est ajouté à la liste depuis le 7 août). Ce
-> n'est pas un manque : les recettes se chargent, mais sous l'id de Create, et **écrasent celles
-> de Create** là où les ids coïncident (`crushing/raw_copper`, `crushing/raw_zinc`,
-> `crushing/raw_uranium_block`, `splashing/crushed_raw_lead` existent dans le jar de Create).
-> Forge n'a pas le problème : l'ancienne surcharge prenait le namespace du générateur.
-> **Correctif toujours en attente : `create(CreateNuclear.MOD_ID, () -> ingrédient, …)`.** À
-> faire avec un test JEI, les ids de recette changent.
+> ✅ **Corrigé.** Commit `93975b3` (« fix(recipe-gen): stop crushing/washing recipe generators
+> from leaking into the create namespace »). Cause : `ProcessingRecipeGen.create(() -> ingrédient,
+> …)`, l'overload à 2 arguments de Create, hardcode `Create.ID` comme namespace par défaut au lieu
+> du namespace du générateur — un choix différent de Forge, où l'ancienne surcharge prenait le
+> namespace du générateur. `CNCrushingRecipeGen` (6 recettes) et `CNWashingRecipeGen` (1 recette,
+> via `moddedCrushedOreCustom`) appelaient cet overload sans namespace explicite, ce qui générait
+> les JSON sous `data/create/recipe/` et **écrasait des recettes du jar de Create**
+> (`crushing/raw_copper`, `crushing/raw_zinc`, `crushing/raw_uranium_block`,
+> `splashing/crushed_raw_lead`).
+>
+> **Correctif retenu :** plutôt que de passer `CreateNuclear.MOD_ID` à chaque appel, override de
+> la seule surcharge fautive dans chacun des deux générateurs :
+> ```java
+> @Override
+> protected GeneratedRecipe create(Supplier<ItemLike> singleIngredient, UnaryOperator<B> transform) {
+>     return create(CreateNuclear.MOD_ID, singleIngredient, transform);
+> }
+> ```
+> Aucun appel existant à changer, et ça sécurise aussi les futures recettes ajoutées via ce
+> pattern ainsi que les helpers hérités de Create (`WashingRecipeGen.convert`/`crushedOre`) qui
+> passent par le même overload en interne.
+>
+> Vérifié : `find .../data/create -name '*.json'` ressort vide (hors tags) après régénération du
+> datagen ; les 7 JSON concernés sont réapparus sous `data/createnuclear/recipe/`.
+>
+> **Audité au passage, les 10 autres générateurs de recettes du projet sont sains** — chacun
+> passe par le namespace du mod pour une raison différente (surcharge par nom, `ResourceLocation`
+> explicite via `CreateNuclear.asResource(...)`, ou classe de base custom qui ne reproduit pas le
+> hardcode de Create). Seule note en passant, sans lien avec ce bug : `CNStandardRecipeGen.
+> createSpecial()` (~ligne 127) hardcode `Create.asResource(...)`, mais la méthode n'est jamais
+> appelée nulle part dans le repo — code mort, aucun impact en jeu.
 
 ---
 
@@ -232,11 +251,13 @@ les gametests.**
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
 | 1 | **Rebrancher `CNShapelessRecipeGen` (§2.2)** | 1 ligne | faible | Isolé, sans risque — juste décommenter et tester en jeu |
-| 2 | **Namespace `create` des recettes crushing/washing (§3.1)** | 2 générateurs | faible | Isolé, écrase des recettes de Create tant que non corrigé |
-| 3 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 4 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
-| 5 | **Fournir `logo.png` ou repointer `logoFile` vers `icon.png` (§2.2)** | 1 ressource/config | faible | Cosmétique mais visible dès l'écran des mods |
-| 6 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 2 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
+| 3 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
+| 4 | **Fournir `logo.png` ou repointer `logoFile` vers `icon.png` (§2.2)** | 1 ressource/config | faible | Cosmétique mais visible dès l'écran des mods |
+| 5 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+
+> ✅ Namespace `create` des recettes crushing/washing (§3.1) — corrigé, commit `93975b3`, sorti de
+> cette liste.
 
 Les tests en jeu du §4 passent avant tout ça.
 
