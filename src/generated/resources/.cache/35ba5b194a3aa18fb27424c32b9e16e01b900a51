@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-15T15:10:26.4114154	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-15T15:48:00.9151711	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -618,10 +618,8 @@ b3f8c7d4cc47db1954a7470d37e5e4e6549c9480 data/createnuclear/tags/item/anti_radia
 2e4d08932c4a84863f0198eb2845f80d8fda1221 data/createnuclear/tags/item/cloth.json
 8e6598f14a72a61cbe1e5ed2aaea229fb2dd74e6 data/createnuclear/tags/item/cooler.json
 d534438c9314e8b014bf1796060dd801f4ef4d4e data/createnuclear/tags/item/fuel.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/item/lead_ores.json
 53e435b1776a11737c64eac604fda6cd48acfc4e data/createnuclear/tags/item/stone_types/autunite.json
 35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/item/thorium_ores.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/item/uranium_ores.json
 d8d6ad7a4fc31fd68a98b368207c359fb610f417 data/create/tags/block/safe_nbt.json
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/c/tags/block/glass_blocks.json
 1fd17be1d553e7ddf20494ee1e98084f02137cc8 data/c/tags/block/ores.json
@@ -696,6 +694,7 @@ f730ea13c5c0e367d6108fee0d47d10e8c39f3f7 data/minecraft/tags/block/stairs.json
 a584f04787aadc06749c484b53947d4f78fccb96 data/minecraft/tags/block/walls.json
 2535c56fd6376328fbca0528562ecc2046a3b655 data/minecraft/tags/entity_type/fall_damage_immune.json
 a63487094743744be756ad497f483fcd4d11e9bc data/minecraft/tags/fluid/lava.json
+9b1c04e4516407eb6df9f1262fd73a71605f3bb1 data/minecraft/tags/fluid/water.json
 70955c444f864b4cf76dc7494195b95cec0c0775 data/minecraft/tags/item/slabs.json
 f730ea13c5c0e367d6108fee0d47d10e8c39f3f7 data/minecraft/tags/item/stairs.json
 a584f04787aadc06749c484b53947d4f78fccb96 data/minecraft/tags/item/walls.json

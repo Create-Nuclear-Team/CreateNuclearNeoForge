@@ -76,6 +76,11 @@ public class CreateNuclearRegistrateTags {
         ;
 
 
+        prov.tag(FluidTags.WATER)
+                .addTag(CNFluidTags.NITROGEN.tag)
+        ;
+
+
         for (CNFluidTags tag : CNFluidTags.values()) {
             if (tag.alwaysDatagen) {
                 prov.getOrCreateRawBuilder(tag.tag);

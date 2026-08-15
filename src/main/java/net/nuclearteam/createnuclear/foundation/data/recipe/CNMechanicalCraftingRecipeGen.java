@@ -58,7 +58,7 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
             .recipe(b -> b
                 .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
                 .key('G', Ingredient.of(CNBlocks.REINFORCED_GLASS))
-                .key('B', Ingredient.of(CNFluids.URANIUM.get().getBucket()))
+                .key('B', Ingredient.of(Items.BUCKET))
                 .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
                 .patternLine("CCCCC")
                 .patternLine("CSGSC")
@@ -106,7 +106,20 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
             .patternLine("CSBSC")
             .patternLine("CPSPC")
             .patternLine("CCCCC")
-    );
+    ),
+
+    REACTOR_ALARM = create(CNBlocks.REACTOR_ALARM::get)
+        .recipe(b -> b
+            .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+            .key('N', Ingredient.of(Blocks.NOTE_BLOCK))
+            .key('R', Ingredient.of(Blocks.REPEATER))
+            .key('L', Ingredient.of(Items.CLOCK))
+            .patternLine("CCCCC")
+            .patternLine("CNRNC")
+            .patternLine("CRLRC")
+            .patternLine("CNRNC")
+            .patternLine("CCCCC")
+        );
 
 
     public CNMechanicalCraftingRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {

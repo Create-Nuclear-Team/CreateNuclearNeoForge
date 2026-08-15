@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.api.data.recipe.MixingRecipeGen;
+import com.simibubi.create.content.processing.recipe.HeatCondition;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
@@ -24,6 +25,12 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
         URANIUM_FLUID = create("uranium_fluid", b -> b
             .require(CNTags.forgeItemTag("dusts/uranium"))
             .output(CNFluids.URANIUM.get(), 25)
+        ),
+
+        THORIUM_FLUID = create("thorium_fluid", b -> b
+                .require(CNTags.forgeItemTag("dusts/thorium"))
+                .output(CNFluids.THORIUM.get(), 25)
+                .requiresHeat(HeatCondition.HEATED)
         ),
 
         NITROGEN = create("liquid_nitrogen", b -> b

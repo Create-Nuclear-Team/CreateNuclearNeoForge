@@ -123,8 +123,6 @@ public class CNTags {
         CLOTH,
         FUEL,
         COOLER,
-        URANIUM_ORES,
-        LEAD_ORES,
         ANTI_RADIATION_ARMOR,
         ANTI_RADIATION_HELMET,
         THORIUM_ORES,

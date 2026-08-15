@@ -3,28 +3,28 @@
   "accept_mirrored": true,
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:bucket"
-    },
     "C": {
       "item": "createnuclear:reactor_casing"
     },
-    "G": {
-      "item": "createnuclear:reinforced_glass"
+    "L": {
+      "item": "minecraft:clock"
     },
-    "S": {
-      "tag": "c:ingots/steel"
+    "N": {
+      "item": "minecraft:note_block"
+    },
+    "R": {
+      "item": "minecraft:repeater"
     }
   },
   "pattern": [
     "CCCCC",
-    "CSGSC",
-    "CGBGC",
-    "CSGSC",
+    "CNRNC",
+    "CRLRC",
+    "CNRNC",
     "CCCCC"
   ],
   "result": {
     "count": 1,
-    "id": "createnuclear:reactor_frame"
+    "id": "createnuclear:reactor_alarm"
   }
 }

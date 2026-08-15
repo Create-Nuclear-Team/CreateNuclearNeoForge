@@ -1,6 +1,6 @@
-// 1.21.1	2026-08-15T10:45:15.2086452	CreateNuclear's Processing Recipes
+// 1.21.1	2026-08-15T15:38:30.2163806	CreateNuclear's Processing Recipes
 dda7e53d7d3c598bf66ec80b0b16f3c21ee18951 data/createnuclear/recipe/compacting/thorium_fluid_to_thorium_ingot.json
-d85b9bde5850d362e8e708e56c0d082f0fc3303f data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
+22d57898717d1a4dcca1b5be4e4cd6a23ac340c3 data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
 a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal.json
 49a7aa4b43af0c778821d656ec594f80c362fab5 data/createnuclear/recipe/crushing/crushed_raw_uranium.json
 c1e0e107502e875ee5befc176335cbd1cef7e04d data/createnuclear/recipe/crushing/granite.json
@@ -18,6 +18,7 @@ fdf6d4fce42373c414542289a73f0e206ff438f2 data/createnuclear/recipe/enriched/enri
 0c8d7d7eae585213bb7b3bb8ca4749dabafc27a3 data/createnuclear/recipe/item_application/reactor_casing_from_steel_and_brass_casing.json
 c077c12bec6544815c584cd6aee851c892d43347 data/createnuclear/recipe/mixing/liquid_nitrogen.json
 93bc6d7a40f2ccb89d8d5703c4b0f6c576d5caf8 data/createnuclear/recipe/mixing/steel.json
+51333dd8271ee83a6096e597fe9dcf4c26a2c071 data/createnuclear/recipe/mixing/thorium_fluid.json
 e52ccded5e0955ab39320129fce8f78d50f52250 data/createnuclear/recipe/mixing/uranium_fluid.json
 4e362c3fb35c7a4cf946fda91958fe6b84a59e04 data/createnuclear/recipe/pressing/graphene.json
 0883773497d77efae10821cad8506662f7331e09 data/createnuclear/recipe/snow_powder/cooled_nitrogen_concentrate.json
