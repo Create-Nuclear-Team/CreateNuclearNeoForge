@@ -422,31 +422,31 @@ public class CNItems {
         .register();
 
     public static final ItemEntry<Item> REINFORCED_GLASS_BOTTLE = CreateNuclear.REGISTRATE
-            .item("reinforced_glass_bottle", Item::new)
-            .lang("Reinforced Glass Bottle")
-            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, c.get(), 3)
-                    .unlockedBy("has_reinforced_glass", RegistrateRecipeProvider.has(CNBlocks.REINFORCED_GLASS.get()))
-                    .define('G', CNBlocks.REINFORCED_GLASS)
-                    .pattern("G G")
-                    .pattern(" G ")
-                    .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
-            .properties(p -> p.stacksTo(16))
-            .register();
+        .item("reinforced_glass_bottle", Item::new)
+        .lang("Reinforced Glass Bottle")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, c.get(), 3)
+            .unlockedBy("has_reinforced_glass", RegistrateRecipeProvider.has(CNBlocks.REINFORCED_GLASS.get()))
+            .define('G', CNBlocks.REINFORCED_GLASS)
+            .pattern("G G")
+            .pattern(" G ")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16))
+        .register();
 
     public static final ItemEntry<BiomeIrradiationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
-            .item("biome_irradiation_extractor", BiomeIrradiationExtractorItem::new)
-            .lang("Biome Irradiation Extractor")
-            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
-                    .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
-                    .define('B', CNItems.REINFORCED_GLASS_BOTTLE)
-                    .define('S', Items.NETHER_STAR)
-                    .pattern("BBB")
-                    .pattern("BSB")
-                    .pattern("BBB")
-                    .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
-            .properties(p -> p.stacksTo(16).fireResistant().setNoRepair())
-            .model(biomeRestoreModel())
-            .register();
+        .item("biome_irradiation_extractor", BiomeIrradiationExtractorItem::new)
+        .lang("Biome Irradiation Extractor")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
+            .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
+            .define('B', CNItems.REINFORCED_GLASS_BOTTLE)
+            .define('S', Items.NETHER_STAR)
+            .pattern("BBB")
+            .pattern("BSB")
+            .pattern("BBB")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16).fireResistant().setNoRepair())
+        .model(biomeRestoreModel())
+        .register();
 
     public static void register() {}
 }
