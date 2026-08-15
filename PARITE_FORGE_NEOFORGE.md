@@ -233,6 +233,60 @@ Seul le fluide `LIQUID_NITROGEN` était enregistré — donc obtenable uniquemen
 > createSpecial()` (~ligne 127) hardcode `Create.asResource(...)`, mais la méthode n'est jamais
 > appelée nulle part dans le repo — code mort, aucun impact en jeu.
 
+### 3.2 Icônes d'inventaire des armures anti-radiation colorées — divergence assumée avec Forge
+
+✅ **Corrigé le 15 août.** Symptôme : au lancement, `ModelManager` loggait `Missing textures in
+model createnuclear:default_anti_radiation_{helmet,chestplate,leggings,boots}#inventory` pour
+les 16 couleurs, alors que les fichiers PNG existaient bien sur le disque, aux bonnes dimensions
+(96×96, cohérent avec le `texture_size` déclaré dans les modèles Blockbench `item/<slot>/item`).
+Un `Rebuild Project` complet n'y changeait rien — **ce n'était pas le piège `bin/main` du §2.2**,
+malgré la ressemblance de symptôme (« le fichier est bon mais rien ne change en jeu »).
+
+**Divergence avec Forge, volontaire mais insuffisamment comprise au moment du portage.**
+`CNBuilderTransformers.coloredArmorModel` (ligne ~50) fait pointer la texture des 16 modèles
+colorés (`item/colored/<couleur>_anti_radiation_<slot>.json`) directement vers
+`createnuclear:models/armor/<couleur>_anti_radiation_suit` — la même texture que celle utilisée
+pour la couche d'armure portée sur le corps (via `AntiRadiationArmorTextureMixin` /
+`ClothTagHelper`). Forge, lui, **duplique** ces 16 textures dans un second dossier,
+`textures/item/armors/<couleur>_anti_radiation_suit.png`, et c'est ce chemin dupliqué que pointe
+son propre `CNBuilderTransformers`. Ce n'était pas une maladresse côté Forge : c'était nécessaire,
+pour la raison ci-dessous — non documentée jusqu'ici, d'où sa redécouverte à la dure ici.
+
+**Cause réelle :** l'atlas `minecraft:blocks` (`textures/atlas/blocks.png`, celui qui fournit les
+UV de tout modèle d'item 3D type Blockbench, par opposition aux icônes plates `item/generated`)
+n'inclut par défaut que certains dossiers comme sources de sprites (`textures/block/`,
+`textures/item/`, plus quelques ajouts `single` par mod). `textures/models/armor/` n'en fait
+**jamais partie** côté vanilla — ce dossier est réservé aux textures de couche d'armure, chargées
+par liaison GL directe (`HumanoidArmorLayer`), jamais par lookup d'atlas. D'où le warning : le
+fichier existe, mais n'est simplement jamais stitché dans l'atlas que ces modèles 3D interrogent
+pour leurs UV.
+
+**Correctif retenu ici (différent de Forge — sans dupliquer les textures) :** ajout de
+`src/main/resources/assets/minecraft/atlases/blocks.json`, qui déclare `models/armor` comme
+source `directory` supplémentaire de l'atlas `minecraft:blocks` :
+```json
+{ "type": "directory", "source": "models/armor", "prefix": "models/armor/" }
+```
+Les sources de plusieurs packs de ressources pour un même atlas **s'additionnent**, elles ne
+s'écrasent pas — donc sans risque pour les entrées `single` déjà présentes dans ce fichier
+(sprites de fluides `thorium`/`uranium`/`nitrogen`). **Piège rencontré en l'écrivant, à surveiller
+pour toute future entrée dans ce même fichier :** une première tentative avait imbriqué l'entrée
+dans un objet sans son propre champ `"type"` (`{ "sources": [ { "type": "directory", ... } ] }`
+au lieu de `{ "type": "directory", ... }` directement dans le tableau `"sources"` racine) — JSON
+valide mais source non reconnue par le désérialiseur, qui a fait échouer le chargement de tout le
+fichier et régresser au passage les sprites de fluides déjà fonctionnels.
+
+**Bug distinct trouvé au passage, corrigé dans le même lot :** les 4 modèles Blockbench de base
+(`models/item/default_anti_radiation_{helmet,chestplate,leggings,boots}/item.json`) déclaraient
+une texture par défaut (`layer0`/`particle`/`"14"` selon la pièce) pointant vers
+`createnuclear:item/default_anti_radiation_suit` — un fichier qui n'a **jamais existé** dans ce
+projet, ni côté Forge où le même chemin orphelin est présent à l'identique. Resté invisible côté
+Forge (et côté NeoForge avant ce fix) parce que ces 4 modèles de base ne sont jamais bakés seuls :
+ils ne servent que de `parent` aux 16 `overrides` colorés, qui redéfinissent systématiquement
+leurs propres clés de texture — donc sans effet observable, mais une référence morte à nettoyer
+si elle ressurgit un jour côté Forge. Corrigé en pointant vers
+`createnuclear:models/armor/default_anti_radiation_suit`, qui existe réellement.
+
 ---
 
 ## 4. Vérifications en jeu en attente
