@@ -31,6 +31,10 @@ public class CreateNuclearRegistrateTags {
     private static void genBlockTags(RegistrateTagsProvider<Block> provIn) {
         CreateTagsProvider<Block> prov = new CreateTagsProvider<>(provIn, Block::builtInRegistryHolder);
 
+        prov.tag(BlockTags.CAMPFIRES)
+                .add(CNBlocks.ENRICHING_CAMPFIRE.get())
+        ;
+
         prov.tag(BlockTags.FIRE)
                 .add(CNBlocks.ENRICHING_FIRE.get())
         ;
