@@ -14,20 +14,20 @@ Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, vo
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 301 |
-| Ressources | 1 132 | 1 120 |
+| Fichiers `.java` | 296 | 303 |
+| Ressources | 1 132 | 1 121 |
 
 ---
 
 ## 0. Comment lire ce document
 
-Un `diff` brut des arborescences donne **11 fichiers Forge sans équivalent NeoForge**
-(15 le 7 août — la compat Alex's Caves et les mixins client ont été portés depuis).
-Ce chiffre est trompeur :
+Un `diff` brut des arborescences donne **7 fichiers Forge sans équivalent NeoForge**
+(15 le 7 août ; 11 le 14 août — la compat Alex's Caves, les mixins client, la vache irradiée et
+`AnimalUtil` ont été portés depuis). Ce chiffre est trompeur :
 
 - **3 sont remplacés par un équivalent 1.21 meilleur** → §1.1, à ne surtout pas « re-porter » ;
 - **3 existent sous un autre nom ou dans un autre package** → §1.2, idem ;
-- **5 manquent réellement** → §2, c'est le vrai travail restant.
+- **1 manque réellement** → §2, c'est le vrai travail restant (`IrradiatedAnimal`).
 
 S'y ajoutent des écarts *à l'intérieur* de fichiers présents des deux côtés (§3), invisibles
 d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des bugs du réacteur.
@@ -73,37 +73,40 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 
 ---
 
-## 2. Les 5 fichiers réellement manquants
+## 2. Le fichier réellement manquant
 
-Deux des trois chantiers listés ici le 7 août sont **désormais portés** et sont donc sortis de
+Trois des quatre chantiers listés ici le 7 août sont **désormais portés** et sont donc sortis de
 ce document : la compat Alex's Caves et les mixins client (tous les deux dans le commit
 `41f6176` du 8 août — `compat/Mods.java`, `compat/alexscave/AlexscaveCompat.java`,
 `CameraAccessor.java`, `GameRendererMixin.java` existent des deux côtés, correctement enregistrés
-dans `createnuclear.neoforge.mixins.json`). Il ne reste qu'un seul chantier réel.
+dans `createnuclear.neoforge.mixins.json`), et la vache irradiée (commit `5350638` du 15 août).
+Il ne reste qu'un seul chantier réel : l'abstraction `IrradiatedAnimal`.
 
 ---
 
-### 2.1 Vache irradiée + abstraction des animaux — 5 fichiers
+### 2.1 Vache irradiée + abstraction des animaux — 1 fichier restant
 
-`IrradiatedCow` · `IrradiatedCowModel` · `IrradiatedCowRenderer` ·
-`IrradiatedAnimal` · `AnimalUtil`
+`IrradiatedAnimal` (le reste — `IrradiatedCow`, `IrradiatedCowModel`, `IrradiatedCowRenderer`,
+`AnimalUtil` — est fait, commit `5350638` du 15 août).
 
-**Ce qui manque en jeu :** NeoForge a le **chat**, le **poulet** et le **loup** irradiés
-(`CNEntityType` : `IRRADIATED_CAT`, `IRRADIATED_CHICKEN`, `IRRADIATED_WOLF`) — **pas la vache**.
+**✅ La vache est en jeu.** `CNEntityType.IRRADIATED_COW` enregistrée (renderer, attributs, tag
+`IRRADIATED_IMMUNE`, hitbox 0.6×0.85), `CNModelLayers.IRRADIATED_COW` branchée dans
+`registerModelLayer`, texture (`textures/entity/irradiated_cow.png`), table de butin, lang
+générée (`.lang("Irradiated Cow")`). Nourrie au yellowcake comme les autres animaux irradiés.
 
-**Le vrai enjeu est l'abstraction.** Forge a factorisé le comportement commun dans
-`IrradiatedAnimal` + `AnimalUtil` ; NeoForge ne les a pas, donc **chaque animal duplique la
-logique**. C'est ce qui explique les plus gros diffs hors réacteur (`IrradiatedCat` 384 lignes,
-`IrradiatedWolf` 333). Porter l'abstraction **en premier**, puis y ramener chat/poulet/loup,
-puis ajouter la vache — sinon on ajoute une quatrième copie du même code.
+**⚠️ L'abstraction reste partielle.** `AnimalUtil` a bien été extrait, mais ne porte que deux
+helpers étroits — `isFood(...)` (le yellowcake compte toujours comme nourriture) et
+`blockTamingWip(...)` (message « taming is WIP », interaction consommée sans apprivoiser). C'est
+utile et sans risque (nouvelle classe, rien retiré des animaux existants), mais **ce n'est pas
+la classe de base `IrradiatedAnimal`** que ce document appelait de ses vœux pour factoriser le
+gros de la logique commune. `IrradiatedCat` (344 lignes) et surtout `IrradiatedWolf` (560 lignes,
+en hausse depuis les 333 d'origine — rien n'en a été retiré) continuent de dupliquer leur
+comportement plutôt que d'hériter d'une base partagée.
 
-**Points d'accroche :**
-- `CNEntityType` — `EntityEntry<IrradiatedCow>`, renderer, `createAttributes`
-- `CNModelLayers` — `IRRADIATED_COW` + `registerLayerDefinition(..., IrradiatedCowModel::createBodyLayer)`
-- ressources : modèle, texture, lang, table de butin, œuf d'apparition
-
-**Difficulté : moyenne à élevée.** Le refactor de l'abstraction touche trois entités existantes
-qui fonctionnent aujourd'hui — à faire avec un test en jeu de chaque animal.
+**Reste à faire, si le refactor complet est toujours voulu :** extraire `IrradiatedAnimal` et y
+faire hériter chat/poulet/loup/vache. **Difficulté : moyenne à élevée**, ce refactor touche
+quatre entités qui fonctionnent aujourd'hui — à faire avec un test en jeu de chacune. Sinon,
+considérer que `AnimalUtil` est une abstraction "suffisante" pour l'instant et clore ce point.
 
 ---
 
@@ -113,9 +116,11 @@ Des fichiers sans équivalent Forge sont apparus depuis le 7 août sans être su
 plupart sont vivants et légitimes (infrastructure data attachments/components, goals IA du chat
 irradié) ; ceux ci-dessous méritent une action :
 
-| Fichier | Constat |
-|---|---|
-| `content/contraptions/irradiated/wolf/IrradiatedWoldCollarLayer.java` (note : coquille « Wold » pour « Wolf ») | **Orpheline.** Jamais ajoutée via `addLayer(...)` à `IrradiatedWolfRenderer` — tentative de feature (collier coloré du loup irradié apprivoisé) commencée et jamais branchée. N'existe pas côté Forge |
+> ✅ **`IrradiatedWoldCollarLayer.java` retirée** (commit `4918bf7`, « remove the orphaned
+> IrradiatedWoldCollarLayer render layer »). Jamais ajoutée via `addLayer(...)` à
+> `IrradiatedWolfRenderer` (`render()` était un no-op vide) — tentative de feature (collier coloré
+> du loup irradié apprivoisé) commencée et jamais branchée, n'existait pas côté Forge. Supprimée
+> plutôt que terminée.
 
 `CNAttachmentTypes`, `CNDataComponents`, les goals IA du chat (`IrradiatedCatAvoidEntityGoal`,
 `IrradiatedCatRelaxOnOwnerGoal`, `IrradiatedCatTemptGoal`), `FluidLockManager`,
@@ -316,9 +321,8 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 2 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
-| 3 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Abstraction animaux — `IrradiatedAnimal` (§2.1)** | 1 | moy./élevée | Vache livrée, `AnimalUtil` extrait ; reste la base commune si le refactor complet est toujours voulu |
+| 2 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
 > ✅ Namespace `create` des recettes crushing/washing (§3.1) — corrigé, commit `93975b3`, sorti de
 > cette liste.
@@ -328,6 +332,16 @@ les gametests.**
 >
 > ✅ `logoFile` (§2.2) — image déplacée de `META-INF/icon.png` vers `icon.png` (racine des
 > resources), seul emplacement que NeoForge résout réellement pour cette clé.
+>
+> ✅ Vache irradiée + `AnimalUtil` (§2.1) — commit `5350638`. Seule `IrradiatedAnimal`
+> (la classe de base à proprement parler) reste en jeu, désormais chantier n°1 ci-dessus.
+>
+> ✅ `IrradiatedWoldCollarLayer` (§2.2) — supprimée plutôt que branchée (dead code depuis le
+> début), commit `4918bf7`, sorti de cette liste.
+>
+> ✅ Icônes d'inventaire des armures anti-radiation colorées (§3.2) — atlas `minecraft:blocks`
+> manquait `models/armor` comme source de sprites ; corrigé le 15 août sans dupliquer les
+> textures côté Forge, détail complet en §3.2.
 
 Les tests en jeu du §4 passent avant tout ça.
 
@@ -471,7 +485,7 @@ traite que des écarts Forge/NeoForge.
 ## 8. Vérifier l'état à tout moment
 
 ```bash
-# Fichiers Forge sans équivalent NeoForge — doit en lister 11 (3 du §1.1, 3 du §1.2, 5 du §2)
+# Fichiers Forge sans équivalent NeoForge — doit en lister 7 (3 du §1.1, 3 du §1.2, 1 du §2)
 cd ~/Documents/Ynov/Ydays
 diff <(cd CreateNuclearForge/src && find . -name '*.java' | sort) \
      <(cd CreateNuclearNeoForge/src && find . -name '*.java' | sort)

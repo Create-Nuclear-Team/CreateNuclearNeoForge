@@ -4,13 +4,11 @@ package net.nuclearteam.createnuclear.foundation.events;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNParticleRegistry;
-import net.nuclearteam.createnuclear.CNParticleTypes;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorClientExtensions;
 import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParticle;
 import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
@@ -41,5 +39,10 @@ public class CNClientEvent {
         event.registerSpecial(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), new NuclearMushroomCloudParticle.Factory());
         event.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_SMOKE.get(), SmallNuclearExplosionParticle.NukeFactory::new);
         event.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_EXPLOSION.get(), SmallNuclearExplosionParticle.NukeFactory::new);
+    }
+
+    @SubscribeEvent
+    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        CNEntityType.registerModelLayer(event);
     }
 }
