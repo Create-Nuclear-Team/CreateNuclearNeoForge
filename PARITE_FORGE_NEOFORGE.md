@@ -126,6 +126,15 @@ irradié) ; ceux ci-dessous méritent une action :
 `IrradiatedCatRelaxOnOwnerGoal`, `IrradiatedCatTemptGoal`), `FluidLockManager`,
 `EasingHudOverlay`, `CNDamageTypeTagsProvider` : tous référencés et vivants, rien à signaler.
 
+> ✅ **`CommentEventClients.java` fusionnée dans `CNClientEvent` puis supprimée.** N'était pas du
+> code mort — `@EventBusSubscriber` auto-découverte par NeoForge, elle portait l'enregistrement
+> des layers de modèle d'entités (`CNEntityType.registerModelLayer`, essentiel pour l'affichage
+> de chat/poulet/loup/vache irradiés). Le problème était le découpage et le nom (coquille
+> probable de « CommonEventClients », sans équivalent Forge ni convention du projet) : côté Forge,
+> cet appel vit directement dans `CNClientEvent.registerLayers`, aux côtés du reste de
+> l'enregistrement client. La méthode `registerLayers` a été rapatriée dans `CNClientEvent`
+> (alignement avec Forge), et le fichier à part supprimé.
+
 > ✅ **`ReactorGaugeOverrides.java` a disparu du code depuis la dernière mise à jour** — le
 > fichier orphelin signalé précédemment a été retiré (reste seulement mentionné dans ce doc et
 > dans `PORTAGE_REACTEUR.md`/`AUDIT_NEOFORGE.md`). Pas encore vérifié si la feature du gauge de
