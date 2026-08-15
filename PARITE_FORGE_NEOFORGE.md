@@ -116,7 +116,6 @@ irradié) ; ceux ci-dessous méritent une action :
 | Fichier | Constat |
 |---|---|
 | `content/contraptions/irradiated/wolf/IrradiatedWoldCollarLayer.java` (note : coquille « Wold » pour « Wolf ») | **Orpheline.** Jamais ajoutée via `addLayer(...)` à `IrradiatedWolfRenderer` — tentative de feature (collier coloré du loup irradié apprivoisé) commencée et jamais branchée. N'existe pas côté Forge |
-| `foundation/data/recipe/CNShapelessRecipeGen.java` | **Présente mais désactivée.** Dans `infrastructure/data/CreateNuclearDatagen.java` (~ligne 51), l'appel `generator.addProvider(event.includeServer(), new CNShapelessRecipeGen(...))` est **commenté**. Les recettes shapeless qu'elle génère (dont des objets en tissu type `ClothItem`) ne sont donc jamais produites en jeu |
 
 `CNAttachmentTypes`, `CNDataComponents`, les goals IA du chat (`IrradiatedCatAvoidEntityGoal`,
 `IrradiatedCatRelaxOnOwnerGoal`, `IrradiatedCatTemptGoal`), `FluidLockManager`,
@@ -127,10 +126,18 @@ irradié) ; ceux ci-dessous méritent une action :
 > dans `PORTAGE_REACTEUR.md`/`AUDIT_NEOFORGE.md`). Pas encore vérifié si la feature du gauge de
 > cadre a été branchée ailleurs ou simplement abandonnée — à confirmer si le besoin ressurgit.
 >
-> ⚠️ **Correction : le mod a bien une icône.** `src/main/resources/META-INF/icon.png` existe
-> côté NeoForge — la mention précédente de ce doc affirmant son absence était fausse. Seul
-> `logo.png` (référencé par `logoFile = "logo.png"` dans `neoforge.mods.toml`) reste introuvable
-> dans le repo ; à vérifier si `logoFile` doit simplement pointer vers `icon.png`.
+> ⚠️ **`logoFile` toujours cassé après le commit `93975b3`.** `neoforge.mods.toml` pointe vers
+> `logoFile = "icon.png"`, mais le fichier vivait dans `src/main/resources/META-INF/icon.png` —
+> NeoForge résout `logoFile` relativement à la racine du jar (comme `assets/`, `data/`), pas au
+> dossier `META-INF/` qui contient le toml. Le fichier était donc introuvable à l'exécution malgré
+> son existence dans le repo. Corrigé en déplaçant l'image vers `src/main/resources/icon.png`
+> (racine des resources, sibling de `META-INF/`), pour matcher la convention des templates
+> NeoForge/Forge MDK.
+>
+> ✅ **`CNShapelessRecipeGen.java` supprimé** (commit `93975b3`), plutôt que rebranché. Sa
+> registration dans `CreateNuclearDatagen` était déjà commentée et le générateur était mort code
+> depuis le début — pas de recettes shapeless (cloth, etc.) perdues puisqu'elles n'étaient jamais
+> produites. Sorti de cette liste et de l'ordre de travail (§5).
 
 ---
 
@@ -250,14 +257,18 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Rebrancher `CNShapelessRecipeGen` (§2.2)** | 1 ligne | faible | Isolé, sans risque — juste décommenter et tester en jeu |
-| 2 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
-| 3 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
-| 4 | **Fournir `logo.png` ou repointer `logoFile` vers `icon.png` (§2.2)** | 1 ressource/config | faible | Cosmétique mais visible dès l'écran des mods |
-| 5 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Abstraction animaux + vache (§2.1)** | 5 | moy./élevée | Refactor de 3 entités qui marchent |
+| 2 | **Brancher ou supprimer `IrradiatedWoldCollarLayer` (§2.2)** | 1 | faible | Dead code à trancher : finir la feature ou la retirer |
+| 3 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
 > ✅ Namespace `create` des recettes crushing/washing (§3.1) — corrigé, commit `93975b3`, sorti de
 > cette liste.
+>
+> ✅ `CNShapelessRecipeGen` (§2.2) — supprimé plutôt que rebranché (dead code depuis le début),
+> commit `93975b3`, sorti de cette liste.
+>
+> ✅ `logoFile` (§2.2) — image déplacée de `META-INF/icon.png` vers `icon.png` (racine des
+> resources), seul emplacement que NeoForge résout réellement pour cette clé.
 
 Les tests en jeu du §4 passent avant tout ça.
 
