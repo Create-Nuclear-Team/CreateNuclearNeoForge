@@ -305,6 +305,7 @@
   "emi.category.createnuclear.snow_powder": "Cryogenic fan",
   "entity.createnuclear.irradiated_cat": "Irradiated Cat",
   "entity.createnuclear.irradiated_chicken": "Irradiated Chicken",
+  "entity.createnuclear.irradiated_cow": "Irradiated Cow",
   "entity.createnuclear.irradiated_wolf": "Irradiated Wolf",
   "entity.createnuclear.nuclear_explosion": "Nuclear Explosion",
   "fluid.createnuclear.nitrogen": "Liquid Nitrogen",

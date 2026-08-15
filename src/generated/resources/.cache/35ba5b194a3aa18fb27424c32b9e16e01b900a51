@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-14T19:46:09.9053235	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-08-15T11:32:01.8311131	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -48,8 +48,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-33e9dcac40fcb32a46343f546f0aad2e38fe96f0 assets/createnuclear/lang/en_ud.json
-28e64c6658311d18a29cf635ef2821b03e53f8a7 assets/createnuclear/lang/en_us.json
+a4c603389a465f0372bee3cb3810339188d0c078 assets/createnuclear/lang/en_ud.json
+fa8483240efe0a608e5ed5b899a3a7f93afba4f9 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -466,6 +466,7 @@ d485b8cf17eb64e79e7f3391cae375b78f20be77 data/createnuclear/loot_table/blocks/th
 d6135780d6ae9e0c890f6ccf6932250faeea5372 data/createnuclear/loot_table/blocks/uranium_ore.json
 fba1a7bdb0835c034aa5ef52ebf589123d41b33e data/createnuclear/loot_table/entities/irradiated_cat.json
 2d8f5d7d7babd2b02ae836846e62daabf84de427 data/createnuclear/loot_table/entities/irradiated_chicken.json
+900719d49cec9385da31bb392649c65f4297288c data/createnuclear/loot_table/entities/irradiated_cow.json
 f91f43a39c80f583f878ea1a0d944798c05f2388 data/createnuclear/loot_table/entities/irradiated_wolf.json
 ef428465f5d04edfb67c7357bef7936e93800cb0 data/createnuclear/recipe/autunite_from_stone_types_autunite_stonecutting.json
 5988520980fc9ae12384874425e01110816ea779 data/createnuclear/recipe/autunite_pillar_from_stone_types_autunite_stonecutting.json
@@ -611,12 +612,12 @@ bc8701774f57ab000a8f0f1d390702175a6cdbb8 data/createnuclear/tags/block/fan_proce
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/block/lead_ores.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/createnuclear/tags/block/thorium_ores.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/block/uranium_ores.json
-e8b97836e0a934f9023ba18e6ad44e60dca4532d data/createnuclear/tags/entity_type/irradiated_immune.json
+ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_type/irradiated_immune.json
 410aa6d101788f25baa176741887c6f314006f29 data/createnuclear/tags/fluid/nitrogen.json
 dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluid/thorium.json
 bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluid/uranium.json
 bce34f53cb2d00f7dee84683e8fdd429dabbcc1d data/createnuclear/tags/item/anti_radiation_armor.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/item/anti_radiation_helmet_full_dye.json
+b3f8c7d4cc47db1954a7470d37e5e4e6549c9480 data/createnuclear/tags/item/anti_radiation_helmet.json
 2e4d08932c4a84863f0198eb2845f80d8fda1221 data/createnuclear/tags/item/cloth.json
 8e6598f14a72a61cbe1e5ed2aaea229fb2dd74e6 data/createnuclear/tags/item/cooler.json
 d534438c9314e8b014bf1796060dd801f4ef4d4e data/createnuclear/tags/item/fuel.json

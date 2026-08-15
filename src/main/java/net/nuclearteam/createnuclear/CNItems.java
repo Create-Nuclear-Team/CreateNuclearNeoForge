@@ -222,7 +222,8 @@ public class CNItems {
         .properties(p -> p.stacksTo(1))
         .tag(
             CNTags.forgeItemTag("armors/helmets"),
-            CNItemTags.ANTI_RADIATION_ARMOR.tag
+            CNItemTags.ANTI_RADIATION_ARMOR.tag,
+            CNItemTags.ANTI_RADIATION_HELMET.tag
         )
         .transform(setColorComponent(Cloths.DEFAULT))
         .recipe((c, p) -> {

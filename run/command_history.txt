@@ -1,5 +1,3 @@
-/particle create:air_flow
-/particle
 /particle createnuclear:irradiated_particles ~ ~1 ~ 0 0 0 0 104
 /particle minecraft:flame ~ ~1 ~ 0 0 0 0 10
 /give Dev minecraft:command_block
@@ -56,3 +54,5 @@
 /effect give Dev minecraft:regeneration infinite 255 true
 /effect clear Dev createnuclear:radiation
 /effect give Dev createnuclear:radiation infinite 0 true
+/summon createnuclear:irradiated_cow
+/effect clear
