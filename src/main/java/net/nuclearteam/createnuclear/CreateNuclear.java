@@ -3,9 +3,11 @@ package net.nuclearteam.createnuclear;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.CreateBuildInfo;
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
@@ -95,6 +97,8 @@ public class CreateNuclear {
         CNRecipeTypes.register(modEventBus);
         CNAttributes.register(modEventBus);
         CNPlacementModifiers.register(modEventBus);
+
+        GogglesItem.addIsWearingPredicate(AntiRadiationArmorItem.IGoggleHelmet::isGoggleHelmet);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);

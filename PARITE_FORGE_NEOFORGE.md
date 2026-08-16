@@ -10,7 +10,13 @@ est dans les commits.
 des mixins client, de plusieurs refactors (RadiationCapability en attachment, overlay HUD,
 routage des dégâts), du correctif de la fuite de namespace `create` (§3.1), et du commit
 `7d16431` (« add the IrradiatedAnimal abstraction, wire it into the chicken, and align the cat
-with vanilla Cat ») qui livre le dernier chantier de parité listé ici — voir §2.1.
+with vanilla Cat ») qui livre le dernier chantier de *feature manquante* listé ici — voir §2.1.
+**L'audit ligne à ligne du même jour (§3.4) a aussi trouvé 4 divergences comportementales.** Deux
+sont assumées volontairement et closes (`RadiationCapability` persiste deux champs de contagion
+que Forge ne persiste pas ; `CNStandardRecipeGen` génère 6 recettes de décompactage absentes de
+Forge). Les deux autres restent du travail réel non tranché : `CNAdvancement` a 6 advancements
+désactivées côté NeoForge, `IrradiatedWolf` a un but de fuite manquant et un apprivoisement/
+armure implémenté alors que Forge le bloque en WIP — voir §3.4.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
@@ -65,14 +71,32 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 |---|---|---|
 | `foundation/data/recipe/CNProcessingRecipeGen` | `foundation/data/recipe/CNRecipeProvider` | En 1.21 la classe n'hérite plus de `ProcessingRecipeGen` mais de `RecipeProvider`, et agrège les générateurs. Même rôle, nom aligné sur son parent |
 | `foundation/events/overlay/IrradiatedOverlayRendererVision` | `foundation/events/overlay/RadiationOverlay` | Même rôle (overlay HUD de radiation), réécrit pour hériter d'une nouvelle base `EasingHudOverlay`. Porté le 14 août (commit `fa48da6`, « restore the radiation vision overlay ») |
-| `content/multiblock/bluePrintItem/ReactorBluePrintItemPacket` | `ReactorBluePrintData` + `PatternData` | Le paquet réseau Forge (`SimplePacketBase`) est remplacé par deux records à `Codec`/`StreamCodec`, cohérent avec l'architecture data-component déjà validée en §7 pour `controller/` — mais ce sous-dossier `bluePrintItem` lui-même n'a pas été audité ligne à ligne |
+| `content/multiblock/bluePrintItem/ReactorBluePrintItemPacket` | `ReactorBluePrintData` + `PatternData` | Le paquet réseau Forge (`SimplePacketBase`) est remplacé par deux records à `Codec`/`StreamCodec`, cohérent avec l'architecture data-component déjà validée en §7 pour `controller/` |
+
+> ✅ **`bluePrintItem/` déjà audité — dans [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md), pas ici.**
+> Contrairement à ce que disait la version précédente de ce document, ce sous-dossier n'a pas été
+> laissé de côté : le « Lot 2bis » de `PORTAGE_REACTEUR.md` (9 août 2026) couvre la migration
+> complète NBT → Data Components de `bluePrintItem/`, avec deux bugs réels trouvés et corrigés à
+> cette occasion (thorium qui perdait ses barres à la réouverture du menu faute de tag
+> `CNItemTags.FUEL`, et une config `CRods` dupliquée entre `CNCCommon`/`CNCServer` qui pouvait
+> désynchroniser l'affichage du blueprint du calcul de chaleur réel). Vérifié le 16 août : les
+> arborescences correspondent bien à la description de ce lot — Forge a 4 fichiers
+> (`ReactorBluePrintItem`, `ReactorBluePrintItemPacket`, `ReactorBluePrintItemScreen`,
+> `ReactorBluePrintMenu`), NeoForge en a 5 (mêmes moins le paquet réseau, plus
+> `ReactorBluePrintData`/`PatternData`) — cohérent avec la suppression assumée du paquet réseau
+> documentée dans ce lot. Rien à reporter ici.
 
 > ✅ **Résolu depuis le 7 août.** `SnowPowderRecipeGen` n'est plus une divergence de package :
 > le commit `41f6176` (« move EnrichedRecipeGen/SnowPowderRecipeGen from foundation to the api
-> package ») l'a ramené dans `api/data/recipe`, exactement au même chemin que Forge. Le sort
-> exact de l'ancien vestige `api/data/recipe/EnrichedRecipeGen` (mentionné comme mort dans la
-> version précédente de ce doc) n'a **pas été revérifié** dans cet audit — à confirmer avant de
-> le considérer réglé.
+> package ») l'a ramené dans `api/data/recipe`, exactement au même chemin que Forge.
+>
+> ✅ **Sort de l'ancien vestige `api/data/recipe/EnrichedRecipeGen` — revérifié le 16 août, vivant
+> et sain.** Existe des deux côtés au même chemin, avec le même rôle (classe de base des recettes
+> d'enrichissement, lue par `CNRecipeTypes.ENRICHED`). Côté Forge, hérite de `ProcessingRecipeGen`
+> (API 1.20.1) ; côté NeoForge, de `StandardProcessingRecipeGen<EnrichedRecipe>` (API 1.21,
+> conforme au reste du projet). `CNEnrichedRecipeGen` (`foundation/data/recipe/`) l'étend des deux
+> côtés avec les deux mêmes recettes (`ENRICHING_CAMPFIRES`, `ENRICHED_YELLOWCAKE`), et est
+> référencé et enregistré dans `CNRecipeProvider` côté NeoForge — pas de code mort. Rien à faire.
 
 ---
 
@@ -193,18 +217,18 @@ Ces fichiers existent des deux côtés mais divergent fortement. **Un gros diff 
 preuve de feature manquante** : l'API 1.21 en explique une grande part. Aucun n'a été audité
 ligne à ligne, contrairement au domaine réacteur.
 
-| Fichier | Lignes divergentes (7 août) | Lignes divergentes (14 août) | Lignes divergentes (16 août) |
+| Fichier | Lignes divergentes (7 août) | Lignes divergentes (14 août) | Statut au 16 août |
 |---|---|---|---|
-| `CNBlocks` | 701 | 707 | non revérifié |
-| `CNItems` | 457 | 472 | non revérifié |
-| `foundation/advancement/CNAdvancement` | 394 | 416 | non revérifié |
+| `CNBlocks` | 701 | 707 | **audité ligne à ligne, §3.3** — 1 bug réel corrigé |
+| `CNItems` | 457 | 472 | **audité ligne à ligne, §3.3** — parité confirmée |
+| `foundation/advancement/CNAdvancement` | 394 | 416 | **audité ligne à ligne, §3.4** — ⚠️ 6 advancements désactivées, non corrigé |
 | `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 | 40 |
-| `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 | non revérifié |
-| `compat/jei/CreateNuclearJEI` | 344 | 333 | non revérifié |
-| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 | 333 |
+| `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 | **audité ligne à ligne, §3.4** — 6 recettes de décompactage en trop, ✅ acceptées tel quel |
+| `compat/jei/CreateNuclearJEI` | 344 | 333 | **audité ligne à ligne, §3.4** — sain, superset de Forge |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 | **audité ligne à ligne, §3.4** — ⚠️ divergences de gameplay, non corrigé |
 | `content/contraptions/irradiated/chicken/IrradiatedChicken` | — | — | 111 *(nouveau — n'était pas suivi ici avant le portage du 16 août)* |
 | `CNCreativeModeTabs` | 249 | 249 | non revérifié |
-| `content/radiation/capability/RadiationCapability` | 186 | 199 | non revérifié |
+| `content/radiation/capability/RadiationCapability` | 186 | 199 | **audité ligne à ligne, §3.4** — divergence de persistance, ✅ assumée volontairement |
 
 `IrradiatedCat` chute de 380 à 40 lignes divergentes : la réécriture du 16 août aligne l'IA du
 chat sur `Cat` vanilla plutôt que de la dupliquer dans des classes de goal maison (§2.1), donc le
@@ -303,6 +327,174 @@ anormal sur ces minerais.
 trouvé et corrigé.** La ligne « continu » du §5 reste néanmoins en place par nature (voir sa
 justification) — un futur symptôme en jeu peut toujours révéler autre chose, mais aucun résidu
 connu ne traîne sur ces deux fichiers à ce jour.
+
+### 3.4 Audit ligne à ligne — `CNAdvancement`, `CNStandardRecipeGen`, `CreateNuclearJEI`,
+`RadiationCapability`, `IrradiatedWolf` (16 août 2026)
+
+Les cinq fichiers que le tableau du §3 marquait « non revérifié » depuis le 14 août ont été lus
+intégralement des deux côtés et comparés ligne à ligne, comme pour `CNBlocks`/`CNItems` (§3.3).
+**Contrairement à cette dernière passe, celle-ci trouve plusieurs divergences comportementales
+réelles, non corrigées ici** — ce ne sont pas des « faux positifs de diff », le §0 avait raison
+de garder la mise en garde ouverte.
+
+#### 3.4.1 `CNAdvancement` — ⚠️ bug réel, 6 advancements désactivées côté NeoForge
+
+La majorité du diff (~400 lignes) est de l'adaptation d'API 1.21 normale (`Advancement`/
+`AdvancementHolder` + codecs, `RecipeCraftedTrigger` prenant désormais une `List<ItemPredicate
+.Builder>` au lieu d'un `ItemPredicate` construit, dossier `data/<ns>/advancement/` au singulier).
+Mais **6 advancements existent et sont actives côté Forge, et sont commentées en bloc (`/* ... */`)
+côté NeoForge** — donc absentes du datapack généré, sans erreur de compilation puisque la syntaxe
+de champs chaînés reste valide autour du bloc commenté :
+
+| Advancement | Forge | NeoForge |
+|---|---|---|
+| `anti_radiation_armor` | active | commentée |
+| `avoiding_cancer` | active | commentée |
+| `dye_anti_radiation_armor` | active | commentée |
+| `feeding_the_reactor` (`REACTOR_ROD_INPUT`) | active | commentée |
+| `fueling_the_reactor` (`REACTOR_FLUID_INPUT`) | active | commentée |
+| `unlimited_power` (`REACTOR_OUTPUT`) | active | commentée |
+
+Toutes les autres advancements (racine, chaînes uranium/thorium/azote/charbon/plomb, réacteur
+casing/controller/core/cooler/frame, T1-T3, blueprint, `silence_the_core`, `no_time_to_die`,
+`crunchy_uranium`, `cryogenic_baptism`, `reinforced_glass`, `craft_enriching_campfire`)
+correspondent 1:1 (même id, titre, description, icône, parent `after()`, même type de trigger
+une fois l'adaptation d'API prise en compte).
+
+**Non corrigé ici.** À trancher : soit ces 6 blocs ont été désactivés volontairement en attendant
+une autre feature (les 3 dernières dépendent des jauges DisplayLink/blueprint déjà portées, donc
+rien ne semble bloquer techniquement leur réactivation), soit c'est un oubli de nettoyage laissé
+pendant le portage. Dans les deux cas, décommenter et vérifier en jeu est un travail de quelques
+minutes, pas un chantier de portage.
+
+#### 3.4.2 `CNStandardRecipeGen` — recettes de décompactage en trop côté NeoForge
+
+Le diff de ~150 lignes en plus côté NeoForge (548 vs 398) s'explique à ~90% par de la migration
+d'API légitime : le remplacement de `ModdedCookingRecipeResult` (record simple, Forge) par
+`ModdedCookingRecipeOutputShim` (record + `Serializer` + `FakeItemStack`, ~115 lignes, la
+plomberie codec/`RecipeSerializer` qu'exige 1.21 pour ce même mécanisme de compat cuisson
+« moddée »), plus le passage à `RecipeOutput`/conditions (`ICondition`, `withConditions`).
+
+**Divergence réelle trouvée :** `metalCompacting()` (Forge lignes 99-116, NeoForge lignes 177-199)
+ajoute côté NeoForge une recette supplémentaire par itération, absente de Forge :
+
+```java
+result = create(currentEntry).returns(9)
+        .withSuffix("_from_decompacting")
+        .unlockedBy(nextEntry::get)
+        .viaShapeless(b -> b.requires(nextIngredient.get()));
+```
+
+Ça génère 6 recettes de « décompactage » (lingot/bloc → 9 du palier inférieur) pour le plomb,
+l'acier et le thorium, qui n'existent pas côté Forge.
+
+> ✅ **Accepté tel quel pour l'instant, close.** Décision du 16 août : feature de confort ajoutée
+> volontairement pendant le portage NeoForge, pas un bug de portage. Gardée en l'état — elle
+> pourra être retirée plus tard si besoin, mais ce n'est pas un chantier ouvert aujourd'hui.
+> Si elle disparaît un jour, ce sera un choix de design assumé, pas une correction de parité.
+
+Point mineur sans impact : les deux fichiers portent des méthodes utilitaires jamais appelées
+nulle part (`createSpecial`/`blastCrushedMetal`/`recycleGlass`/... côté NeoForge,
+`smokerRecipe`/`furnaceRecipe`/... côté Forge) — du code mort hérité du template `RecipeGen` de
+Create des deux côtés, sans impact en jeu.
+
+#### 3.4.3 `CreateNuclearJEI` — sain, le diff est un superset NeoForge
+
+Les deux catégories JEI (`fan_enriched`, `fan_snow_powder`) sont enregistrées à l'identique des
+deux côtés, mêmes catalyseurs, mêmes icônes, mêmes classes de rendu (`FanEnrichedCategory`,
+`FanSnowPowderCategory`, présentes dans les deux arbres). **La catégorie « Cryogenic fan » (snow
+powder) mentionnée en attente au §4 est confirmée présente et correctement câblée** — pas de
+travail restant sur ce point précis pour JEI.
+
+Le diff de taille (312 Forge vs 249 NeoForge, donc NeoForge plus **court**) vient de la relocation
+du `CategoryBuilder` (Forge en réimplémente ~20 méthodes utilitaires jamais appelées par
+`loadCategories()` ; NeoForge en hérite directement de `CreateRecipeCategory.Builder<T>` côté
+Create 1.21, 12 lignes) et de renommages d'API de recettes (`Recipe<?>` → `RecipeHolder<?>`).
+NeoForge ajoute même 5 enregistrements absents de Forge (subtypes de fluide potion, ingrédients
+extra, gestionnaires d'ingrédients fantômes pour plusieurs écrans, transfer handler universel,
+recettes de coloration toolbox) — vraisemblablement un resynchronisation sur un template Create
+JEI plus récent au moment du portage. **Rien à corriger.**
+
+#### 3.4.4 `RadiationCapability` — divergence de persistance de la contagion
+
+Les seuils, la formule de résistance (`Mth.clamp(attribute.getValue(), 0.0, 1.0)`), le
+recalcul de `radiation` à chaque changement de hash d'inventaire (ni l'un ni l'autre ne fait
+« décroître » la radiation dans le temps — elle est entièrement recalculée depuis les items
+détenus) et la logique de rafraîchissement d'effet (durée 100 ticks, relance sous 40) sont
+identiques des deux côtés, au tick et au chiffre près — y compris un bug latent préexistant
+partagé par les deux versions (la branche `amplifierLevel3` réutilise `amplifierLevel2` au lieu
+d'un palier distinct, Forge L230-233 / NeoForge L209-212 — pas une divergence Forge/NeoForge,
+donc hors périmètre de ce document).
+
+**Divergence trouvée — le jeu de champs persistés diffère :**
+
+| | Forge (`RadiationProvider.serializeNBT`) | NeoForge (`RadiationCapability.CODEC`) |
+|---|---|---|
+| `radiation`, `hash`, `lastBiome` | persistés | persistés |
+| `contagionDose`, `contagionTicks` | **jamais persistés** (purement en mémoire) | **persistés** |
+
+Conséquence en jeu : côté Forge, une contagion active est silencieusement effacée à chaque
+déchargement/rechargement de chunk (reco du joueur, mob qui se recharge) — la contagion ne
+survit jamais à une sauvegarde. Côté NeoForge, elle survit désormais et continue de décroître
+après rechargement.
+
+> ✅ **Divergence assumée volontairement, close.** Décision du 16 août : la persistance
+> `contagionDose`/`contagionTicks` reste telle quelle côté NeoForge. Ce n'est pas un alignement
+> strict sur Forge, mais un comportement jugé correct (voire préférable) — la contagion ne doit
+> pas s'effacer gratuitement par un simple rechargement de chunk. **Ne pas « corriger » ce point
+> lors d'une synchro Forge → NeoForge.**
+
+Persistance à la mort : vérifiée absente des deux côtés (ni `PlayerEvent.Clone` côté Forge, ni
+`.copyOnDeath()` sur `CNAttachmentTypes.RADIATION` côté NeoForge) — la radiation/contagion se
+réinitialise au respawn sur les deux plateformes, comportement cohérent bien que probablement
+non intentionnel à l'origine. Rien à faire sur ce point précis : au moins les deux versions
+s'accordent.
+
+#### 3.4.5 `IrradiatedWolf` — pas de régression `defineSynchedData`, mais plusieurs écarts de gameplay
+
+**Point de vérification prioritaire, confirmé sain :** contrairement à `IrradiatedCat` (§2.1),
+`defineSynchedData` a la bonne signature 1.21 côté NeoForge (lignes 118-124) : `protected void
+defineSynchedData(SynchedEntityData.Builder builder)`, appelle bien `super.defineSynchedData
+(builder)`, et enregistre `DATA_INTERESTED_ID`/`DATA_REMAINING_ANGER_TIME` via `builder.define
+(...)`. Pas de risque de crash au spawn ici.
+
+**Divergences réelles trouvées :**
+
+- **But de panique manquant.** Forge enregistre `new WolfPanicGoal(1.5)` à la priorité 1
+  (`registerGoals()` ligne 84, classe interne `WolfPanicGoal` qui panique si `isFreezing()` ou
+  `isOnFire()`). **Absent des deux côtés du fichier NeoForge** (ni le goal enregistré, ni la
+  classe) — le loup irradié NeoForge ne fuit plus quand il prend feu ou gèle.
+- **Le mécanisme d'apprivoisement diverge complètement, et c'est le point le plus surprenant.**
+  Forge bloque volontairement l'apprivoisement : l'interaction nourriture appelle juste
+  `AnimalUtil.blockTamingWip(player, level())` — la feature est marquée « work in progress » et
+  désactivée côté Forge. **NeoForge implémente un apprivoisement complet à l'os** (`tryToTame`,
+  `EventHooks.onAnimalTame`) **plus tout un sous-système d'armure de loup** absent de Forge
+  (`canUseSlot`, `actuallyHurt`, `canArmorAbsorb`, `hurtArmor`, `hasArmor`,
+  `applyTamingSideEffects`), avec `TAME_HEALTH` passé de 20 à 40 et `ATTACK_DAMAGE` de 2.0 à 4.0
+  pour accompagner. Ressemble à un pull complet de la parité avec le `Wolf` vanilla 1.21 fait
+  pendant le portage, sans revue explicite de la portée — **à confirmer avec l'auteur si c'est
+  voulu** (et si oui, à documenter comme divergence assumée, pas à « corriger » vers le WIP
+  bloqué de Forge).
+- **Source de nourriture changée.** Forge lie l'éligibilité nourriture/apprivoisement à
+  `CNItems.YELLOWCAKE` uniquement (`AnimalUtil.isFood`). NeoForge vérifie
+  `CNTags.CNItemTags.FUEL.tag` (ligne 427) — un ensemble bien plus large basé sur un tag.
+  Divergence fonctionnelle, pas un simple renommage.
+- **`getStandingEyeHeight` absent.** Forge le surcharge (`dimensions.height * 0.8F`), NeoForge
+  ne le fait pas — retombe sur la hauteur d'œil par défaut de l'entité.
+- **`canBeLeashed` perd son appel à `super`.** Forge : `!isAngry() && super.canBeLeashed(player)`
+  (avec paramètre `Player`). NeoForge : `!isAngry()` seul, sans paramètre ni appel à `super` — à
+  vérifier contre `TamableAnimal` vanilla 1.21 que rien d'utile n'est perdu dans ce `super`.
+
+Aucun mécanisme de conversion irradié → loup vanilla n'existe dans ce fichier, ni d'un côté ni de
+l'autre — cohérent avec §2.1 : seul `IrradiatedChicken` implémente `IrradiatedAnimal` des deux
+côtés, le loup ne fait pas partie de ce contrat chez Forge non plus.
+
+**Non corrigé ici.** Le point le plus important à trancher n'est pas un bug de portage au sens
+strict (rien n'a cassé), mais une **question de scope** : l'apprivoisement + armure sont une
+fonctionnalité entière que Forge n'a jamais activée. Les réactiver côté NeoForge sans decision
+explicite serait aller au-delà de la parité Forge, pas la réaliser.
+
+---
 
 ### 3.1 Recettes — diff des JSON générés
 
@@ -444,8 +636,19 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Décommenter les 6 advancements désactivées (§3.4.1)** | `CNAdvancement` | triviale | Bug de contenu, pas de portage — quelques minutes une fois la décision prise |
+| 2 | **Trancher le scope apprivoisement/armure du loup (§3.4.5)** | `IrradiatedWolf` | décision, pas code | Forge bloque volontairement cette feature (WIP) ; NeoForge l'a activée en portant — à valider avant de la garder ou de la retirer |
+| 3 | **Réintroduire le but de fuite du loup (§3.4.5)** | `IrradiatedWolf` | triviale | `WolfPanicGoal` manquant, comportement perdu sans discussion de scope |
+| 4 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
+> ✅ Audit ligne à ligne de `CNAdvancement`, `CNStandardRecipeGen`, `CreateNuclearJEI`,
+> `RadiationCapability`, `IrradiatedWolf` (§3.4) — fait le 16 août : `CreateNuclearJEI` est sain
+> (superset de Forge, catégorie snow-powder confirmée câblée). La divergence de persistance de
+> `RadiationCapability` (§3.4.4) et les 6 recettes de décompactage en trop de
+> `CNStandardRecipeGen` (§3.4.2) sont **assumées volontairement, closes** — pas de travail
+> restant dessus. `CNAdvancement` et `IrradiatedWolf` gardent chacun une divergence réelle non
+> tranchée, documentée en §3.4 — ce sont les chantiers #1 à #3 ci-dessus.
+>
 > ✅ Audit ligne à ligne complet de `CNBlocks`/`CNItems` (§3.3) — fait le 16 août : parité de
 > liste confirmée (27 blocs, 29 items), les 6 `addLayer` « manquants » se sont révélés être un
 > remplacement correct par `render_type` en JSON (pas un bug), et un vrai bug de rendement de

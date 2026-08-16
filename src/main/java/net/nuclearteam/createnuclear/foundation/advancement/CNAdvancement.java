@@ -37,10 +37,17 @@ import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclear
 @SuppressWarnings("unused")
 public class CNAdvancement implements DataProvider {
 
+    public static final EntityEquipmentPredicate FULL_ARMOR = new EntityEquipmentPredicate.Builder()
+        .head(ItemPredicate.Builder.item().of(CNItems.ANTI_RADIATION_HELMETS))
+        .chest(ItemPredicate.Builder.item().of(CNItems.ANTI_RADIATION_CHESTPLATES))
+        .legs(ItemPredicate.Builder.item().of(CNItems.ANTI_RADIATION_LEGGINGS))
+        .feet(ItemPredicate.Builder.item().of(CNItems.ANTI_RADIATION_BOOTS))
+        .build();
+
     private static final List<ItemPredicate.Builder> PREDICATES = List.of(
-            ItemPredicate.Builder.item().of(CNBlocks.ENRICHED_SOUL_SOIL),
-            ItemPredicate.Builder.item().of(ItemTags.LOGS),
-            ItemPredicate.Builder.item().of(Tags.Items.RODS_WOODEN)
+        ItemPredicate.Builder.item().of(CNBlocks.ENRICHED_SOUL_SOIL),
+        ItemPredicate.Builder.item().of(ItemTags.LOGS),
+        ItemPredicate.Builder.item().of(Tags.Items.RODS_WOODEN)
     );
 
     public static final List<CreateNuclearAdvancement> ENTRIES = new ArrayList<>();
@@ -187,7 +194,6 @@ public class CNAdvancement implements DataProvider {
             .special(SECRET)
     ),
 
-
     COAL_DUST = create("coal_dust", b -> b.icon(CNItems.COAL_DUST)
             .title("Coal Dust")
             .description("Crush coal or charcoal to obtain coal dust, a key crafting material")
@@ -237,7 +243,6 @@ public class CNAdvancement implements DataProvider {
             .whenIconCollected()
     ),
 
-    /*
     ANTI_RADIATION_ARMOR = create("anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_HELMETS)
             .title("Anti Radiation Armor")
             .description("Craft your first anti-radiation armor piece to protect yourself from radiation")
@@ -250,7 +255,13 @@ public class CNAdvancement implements DataProvider {
             .description("Equip anti-radiation armor for the first time")
             .after(ANTI_RADIATION_ARMOR)
             .externalTrigger(
-                    InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(CNItems.ANTI_RADIATION_HELMETS).build())
+                CriteriaTriggers.INVENTORY_CHANGED.createCriterion(
+                    new InventoryChangeTrigger.TriggerInstance(
+                        Optional.of(EntityPredicate.wrap(EntityPredicate.Builder.entity().of(EntityType.PLAYER).equipment(FULL_ARMOR).build())),
+                        InventoryChangeTrigger.TriggerInstance.Slots.ANY,
+                        List.of()
+                    )
+                )
             )
     ),
 
@@ -259,7 +270,6 @@ public class CNAdvancement implements DataProvider {
             .description("Dye your anti radiation armor to any color")
             .after(ANTI_RADIATION_ARMOR)
     ),
-    */
 
     REACTOR_CASING = create("reactor_casing", b -> b.icon(CNBlocks.REACTOR_CASING)
             .title("The Power Of The Reactor")
@@ -268,13 +278,11 @@ public class CNAdvancement implements DataProvider {
             .whenIconCollected()
     ),
 
-
     SILENCE_THE_CORE = create("silence_the_core", b -> b.icon(CNBlocks.REACTOR_ALARM.asItem())
             .title("It Makes So Much Noise !")
             .description("sound the alarm for the first time")
             .after(REACTOR_CASING)
     ),
-
 
     REACTOR_CONTROLLER = create("reactor_controller", b -> b.icon(CNBlocks.REACTOR_CONTROLLER)
             .title("Controller Of The Core")
@@ -317,7 +325,6 @@ public class CNAdvancement implements DataProvider {
             .whenIconCollected()
     ),
 
-    /*
     REACTOR_ROD_INPUT = create("feeding_the_reactor", b -> b.icon(CNBlocks.REACTOR_ROD_INPUT)
             .title("Feeding The Reactor")
             .description("Craft a Reactor Rod Input to feed heating and cooling rods into your reactor")
@@ -338,7 +345,6 @@ public class CNAdvancement implements DataProvider {
             .after(REACTOR_FLUID_INPUT)
             .whenIconCollected()
     ),
-    */
 
     REACTOR_CORE = create("reactor_core", b -> b.icon(CNBlocks.REACTOR_CORE)
             .title("Core Of Power")
@@ -360,6 +366,7 @@ public class CNAdvancement implements DataProvider {
             .after(REACTOR_COOLER)
             .whenIconCollected()
     )
+
     ;
 
     private final PackOutput output;
