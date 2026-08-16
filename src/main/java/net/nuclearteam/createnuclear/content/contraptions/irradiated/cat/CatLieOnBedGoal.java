@@ -11,22 +11,22 @@ import java.util.EnumSet;
 
 @ParametersAreNonnullByDefault
 public class CatLieOnBedGoal extends MoveToBlockGoal {
-    private final IrradiatedCat irradiatedCat;
+    private final IrradiatedCat cat;
 
     public CatLieOnBedGoal(IrradiatedCat cat, double speedModifier, int searchRange) {
         super(cat, speedModifier, searchRange, 6);
-        this.irradiatedCat = cat;
+        this.cat = cat;
         this.verticalSearchStart = -2;
         this.setFlags(EnumSet.of(Flag.JUMP, Flag.MOVE));
     }
 
     public boolean canUse() {
-        return this.irradiatedCat.isTame() && !this.irradiatedCat.isOrderedToSit() && !this.irradiatedCat.isLying() && super.canUse();
+        return this.cat.isTame() && !this.cat.isOrderedToSit() && !this.cat.isLying() && super.canUse();
     }
 
     public void start() {
         super.start();
-        this.irradiatedCat.setInSittingPose(false);
+        this.cat.setInSittingPose(false);
     }
 
     protected int nextStartTick(PathfinderMob creature) {
@@ -35,16 +35,16 @@ public class CatLieOnBedGoal extends MoveToBlockGoal {
 
     public void stop() {
         super.stop();
-        this.irradiatedCat.setLying(false);
+        this.cat.setLying(false);
     }
 
     public void tick() {
         super.tick();
-        this.irradiatedCat.setInSittingPose(false);
+        this.cat.setInSittingPose(false);
         if (!this.isReachedTarget()) {
-            this.irradiatedCat.setLying(false);
-        } else if (!this.irradiatedCat.isLying()) {
-            this.irradiatedCat.setLying(true);
+            this.cat.setLying(false);
+        } else if (!this.cat.isLying()) {
+            this.cat.setLying(true);
         }
 
     }
