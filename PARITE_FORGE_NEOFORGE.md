@@ -11,12 +11,13 @@ des mixins client, de plusieurs refactors (RadiationCapability en attachment, ov
 routage des dégâts), du correctif de la fuite de namespace `create` (§3.1), et du commit
 `7d16431` (« add the IrradiatedAnimal abstraction, wire it into the chicken, and align the cat
 with vanilla Cat ») qui livre le dernier chantier de *feature manquante* listé ici — voir §2.1.
-**L'audit ligne à ligne du même jour (§3.4) a aussi trouvé 4 divergences comportementales.** Deux
-sont assumées volontairement et closes (`RadiationCapability` persiste deux champs de contagion
-que Forge ne persiste pas ; `CNStandardRecipeGen` génère 6 recettes de décompactage absentes de
-Forge). Les deux autres restent du travail réel non tranché : `CNAdvancement` a 6 advancements
-désactivées côté NeoForge, `IrradiatedWolf` a un but de fuite manquant et un apprivoisement/
-armure implémenté alors que Forge le bloque en WIP — voir §3.4.
+**L'audit ligne à ligne du même jour (§3.4) a aussi trouvé 4 divergences comportementales.** Trois
+sont réglées : `RadiationCapability` (persistance de contagion) et `CNStandardRecipeGen` (recettes
+de décompactage en trop) sont assumées volontairement et closes ; `CNAdvancement` avait 6
+advancements désactivées côté NeoForge, corrigées (décommentées + un vrai piège 1.21 sur
+`AVOIDING_CANCER` résolu au passage, `CriterionTrigger.getId()` n'existant plus dans cette API).
+Seul `IrradiatedWolf` garde du travail réel non tranché : un but de fuite manquant et un
+apprivoisement/armure implémenté alors que Forge le bloque en WIP — voir §3.4.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
@@ -221,7 +222,7 @@ ligne à ligne, contrairement au domaine réacteur.
 |---|---|---|---|
 | `CNBlocks` | 701 | 707 | **audité ligne à ligne, §3.3** — 1 bug réel corrigé |
 | `CNItems` | 457 | 472 | **audité ligne à ligne, §3.3** — parité confirmée |
-| `foundation/advancement/CNAdvancement` | 394 | 416 | **audité ligne à ligne, §3.4** — ⚠️ 6 advancements désactivées, non corrigé |
+| `foundation/advancement/CNAdvancement` | 394 | 416 | **audité ligne à ligne, §3.4** — ✅ 6 advancements réactivées et corrigées |
 | `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 | 40 |
 | `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 | **audité ligne à ligne, §3.4** — 6 recettes de décompactage en trop, ✅ acceptées tel quel |
 | `compat/jei/CreateNuclearJEI` | 344 | 333 | **audité ligne à ligne, §3.4** — sain, superset de Forge |
@@ -337,16 +338,16 @@ intégralement des deux côtés et comparés ligne à ligne, comme pour `CNBlock
 réelles, non corrigées ici** — ce ne sont pas des « faux positifs de diff », le §0 avait raison
 de garder la mise en garde ouverte.
 
-#### 3.4.1 `CNAdvancement` — ⚠️ bug réel, 6 advancements désactivées côté NeoForge
+#### 3.4.1 `CNAdvancement` — ✅ corrigé, 6 advancements réactivées
 
 La majorité du diff (~400 lignes) est de l'adaptation d'API 1.21 normale (`Advancement`/
 `AdvancementHolder` + codecs, `RecipeCraftedTrigger` prenant désormais une `List<ItemPredicate
 .Builder>` au lieu d'un `ItemPredicate` construit, dossier `data/<ns>/advancement/` au singulier).
-Mais **6 advancements existent et sont actives côté Forge, et sont commentées en bloc (`/* ... */`)
-côté NeoForge** — donc absentes du datapack généré, sans erreur de compilation puisque la syntaxe
-de champs chaînés reste valide autour du bloc commenté :
+Mais **6 advancements existaient et étaient actives côté Forge, et étaient commentées en bloc
+(`/* ... */`) côté NeoForge** — donc absentes du datapack généré, sans erreur de compilation
+puisque la syntaxe de champs chaînés restait valide autour du bloc commenté :
 
-| Advancement | Forge | NeoForge |
+| Advancement | Forge | NeoForge (avant correctif) |
 |---|---|---|
 | `anti_radiation_armor` | active | commentée |
 | `avoiding_cancer` | active | commentée |
@@ -361,11 +362,28 @@ casing/controller/core/cooler/frame, T1-T3, blueprint, `silence_the_core`, `no_t
 correspondent 1:1 (même id, titre, description, icône, parent `after()`, même type de trigger
 une fois l'adaptation d'API prise en compte).
 
-**Non corrigé ici.** À trancher : soit ces 6 blocs ont été désactivés volontairement en attendant
-une autre feature (les 3 dernières dépendent des jauges DisplayLink/blueprint déjà portées, donc
-rien ne semble bloquer techniquement leur réactivation), soit c'est un oubli de nettoyage laissé
-pendant le portage. Dans les deux cas, décommenter et vérifier en jeu est un travail de quelques
-minutes, pas un chantier de portage.
+> ✅ **Corrigé le 16 août.** Les 6 blocs ont été décommentés. `ANTI_RADIATION_ARMOR`,
+> `DYE_ANTI_RADIATION_ARMOR`, `REACTOR_ROD_INPUT`/`feeding_the_reactor`,
+> `REACTOR_FLUID_INPUT`/`fueling_the_reactor` et `REACTOR_OUTPUT`/`unlimited_power` n'avaient
+> besoin d'aucune adaptation — ils compilaient tels quels une fois décommentés.
+>
+> **`AVOIDING_CANCER` avait un vrai piège 1.21 caché dans son trigger, révélé seulement une fois
+> décommenté :** `CriterionTrigger.getId()` n'existe plus en 1.21 — les triggers ne portent plus
+> leur propre id, ils sont identifiés via leur registre (`BuiltInRegistries`/`CriteriaTriggers`).
+> Le code Forge original faisait `new PlayerTrigger.TriggerInstance(CriteriaTriggers
+> .INVENTORY_CHANGED.getId(), EntityPredicate.wrap(...))` — un vieux contournement 1.16-1.20 pour
+> réutiliser l'écoute de l'événement « inventaire modifié » avec un prédicat de joueur personnalisé
+> (ici, `FULL_ARMOR` : les 4 pièces d'armure anti-radiation équipées). Remplacé par le mécanisme
+> 1.21 : construire directement un `InventoryChangeTrigger.TriggerInstance(Optional<player>, Slots
+> .ANY, List.of())` et l'envelopper via `CriteriaTriggers.INVENTORY_CHANGED.createCriterion(...)`
+> — la même méthode déjà utilisée ailleurs dans ce fichier (`InventoryChangeTrigger.TriggerInstance
+> .hasItems(...)`, `builtinTrigger.createCriterion(...)`). Comportement inchangé : toujours
+> déclenché sur `minecraft:inventory_changed` (l'équipement d'armure fait partie de l'inventaire
+> joueur), toujours conditionné à `FULL_ARMOR`.
+>
+> Vérifié : `./gradlew compileJava` passe, `./gradlew runData` régénère les 6 JSON manquants dans
+> `src/generated/resources/data/createnuclear/advancement/`. **Non testé en jeu** (le
+> déclenchement effectif au moment d'équiper l'armure complète) — à ajouter au §4.
 
 #### 3.4.2 `CNStandardRecipeGen` — recettes de décompactage en trop côté NeoForge
 
@@ -624,6 +642,7 @@ les gametests.**
 | `enable_world_gen = true` (défaut) | les cinq features génèrent comme avant | le filtre est désormais `createnuclear:config_filter`, plus celui de Create — non-régression à confirmer |
 | Chaîne de l'azote de bout en bout | nitrate → *(four)* → concentré → *(ventilateur + neige poudreuse)* → concentré refroidi → *(mixeur + glace)* → 100 mB d'azote liquide | §3.1 corrigé sans test en jeu |
 | Minage `uranium_ore`/`deepslate_uranium_ore`/`lead_ore`/`deepslate_lead_ore` | drop 3–4 (uranium) ou 2–4 (plomb) matière brute, plus bonus fortune | §3.3 corrigé sans test en jeu — vérifié uniquement sur le JSON de loot table généré |
+| Les 6 advancements réactivées (`anti_radiation_armor`, `avoiding_cancer`, `dye_anti_radiation_armor`, `feeding_the_reactor`, `fueling_the_reactor`, `unlimited_power`) | se débloquent au bon moment, en particulier `avoiding_cancer` (équiper les 4 pièces d'armure anti-radiation) dont le trigger a été réécrit | §3.4.1 corrigé sans test en jeu — vérifié uniquement par compilation + `runData` |
 
 > **Divergence assumée sur la clé de config.** `CWorldGen` exposait `disableWorldGen` (défaut
 > `false`) — un copier-coller littéral de la classe homonyme de Create, **jamais lu par personne**.
@@ -636,18 +655,23 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Décommenter les 6 advancements désactivées (§3.4.1)** | `CNAdvancement` | triviale | Bug de contenu, pas de portage — quelques minutes une fois la décision prise |
-| 2 | **Trancher le scope apprivoisement/armure du loup (§3.4.5)** | `IrradiatedWolf` | décision, pas code | Forge bloque volontairement cette feature (WIP) ; NeoForge l'a activée en portant — à valider avant de la garder ou de la retirer |
-| 3 | **Réintroduire le but de fuite du loup (§3.4.5)** | `IrradiatedWolf` | triviale | `WolfPanicGoal` manquant, comportement perdu sans discussion de scope |
-| 4 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Trancher le scope apprivoisement/armure du loup (§3.4.5)** | `IrradiatedWolf` | décision, pas code | Forge bloque volontairement cette feature (WIP) ; NeoForge l'a activée en portant — à valider avant de la garder ou de la retirer |
+| 2 | **Réintroduire le but de fuite du loup (§3.4.5)** | `IrradiatedWolf` | triviale | `WolfPanicGoal` manquant, comportement perdu sans discussion de scope |
+| 3 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
 > ✅ Audit ligne à ligne de `CNAdvancement`, `CNStandardRecipeGen`, `CreateNuclearJEI`,
 > `RadiationCapability`, `IrradiatedWolf` (§3.4) — fait le 16 août : `CreateNuclearJEI` est sain
 > (superset de Forge, catégorie snow-powder confirmée câblée). La divergence de persistance de
 > `RadiationCapability` (§3.4.4) et les 6 recettes de décompactage en trop de
 > `CNStandardRecipeGen` (§3.4.2) sont **assumées volontairement, closes** — pas de travail
-> restant dessus. `CNAdvancement` et `IrradiatedWolf` gardent chacun une divergence réelle non
-> tranchée, documentée en §3.4 — ce sont les chantiers #1 à #3 ci-dessus.
+> restant dessus.
+>
+> ✅ **`CNAdvancement` corrigé (§3.4.1)** — les 6 advancements désactivées ont été décommentées et
+> réactivées ; `AVOIDING_CANCER` avait en plus un vrai piège 1.21 (`CriterionTrigger.getId()`
+> disparu de l'API) résolu en reconstruisant le trigger via `CriteriaTriggers.INVENTORY_CHANGED
+> .createCriterion(new InventoryChangeTrigger.TriggerInstance(...))`. Compile et `runData` passent ;
+> non testé en jeu (§4). Seul `IrradiatedWolf` garde une divergence réelle non tranchée — chantiers
+> #1 et #2 ci-dessus.
 >
 > ✅ Audit ligne à ligne complet de `CNBlocks`/`CNItems` (§3.3) — fait le 16 août : parité de
 > liste confirmée (27 blocs, 29 items), les 6 `addLayer` « manquants » se sont révélés être un
