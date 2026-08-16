@@ -11,13 +11,17 @@ des mixins client, de plusieurs refactors (RadiationCapability en attachment, ov
 routage des dégâts), du correctif de la fuite de namespace `create` (§3.1), et du commit
 `7d16431` (« add the IrradiatedAnimal abstraction, wire it into the chicken, and align the cat
 with vanilla Cat ») qui livre le dernier chantier de *feature manquante* listé ici — voir §2.1.
-**L'audit ligne à ligne du même jour (§3.4) a aussi trouvé 4 divergences comportementales.** Trois
-sont réglées : `RadiationCapability` (persistance de contagion) et `CNStandardRecipeGen` (recettes
-de décompactage en trop) sont assumées volontairement et closes ; `CNAdvancement` avait 6
-advancements désactivées côté NeoForge, corrigées (décommentées + un vrai piège 1.21 sur
-`AVOIDING_CANCER` résolu au passage, `CriterionTrigger.getId()` n'existant plus dans cette API).
-Seul `IrradiatedWolf` garde du travail réel non tranché : un but de fuite manquant et un
-apprivoisement/armure implémenté alors que Forge le bloque en WIP — voir §3.4.
+**L'audit ligne à ligne du même jour (§3.4) a aussi trouvé et réglé 4 divergences comportementales.**
+`RadiationCapability` (persistance de contagion) et `CNStandardRecipeGen` (recettes de
+décompactage en trop) sont assumées volontairement et closes. `CNAdvancement` avait 6 advancements
+désactivées côté NeoForge, corrigées (décommentées + un vrai piège 1.21 sur `AVOIDING_CANCER`
+résolu au passage, `CriterionTrigger.getId()` n'existant plus dans cette API). `IrradiatedWolf`
+avait un but de fuite manquant et un apprivoisement/armure complet implémenté alors que Forge le
+bloque en WIP — corrigé en alignant sur Forge (but de fuite restauré, apprivoisement/armure
+retirés). Au passage, ce dernier correctif a mis au jour un piège 1.21 plus large : `getStandingEyeHeight`
+n'est plus jamais appelé par le moteur du jeu (le hook a disparu de l'API), donc tout override de
+cette méthode compile silencieusement sans jamais s'exécuter — `IrradiatedCat` et `IrradiatedCow`
+en ont très probablement un chacun, non corrigés ici, voir §3.4.5.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
@@ -226,7 +230,7 @@ ligne à ligne, contrairement au domaine réacteur.
 | `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 | 40 |
 | `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 | **audité ligne à ligne, §3.4** — 6 recettes de décompactage en trop, ✅ acceptées tel quel |
 | `compat/jei/CreateNuclearJEI` | 344 | 333 | **audité ligne à ligne, §3.4** — sain, superset de Forge |
-| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 | **audité ligne à ligne, §3.4** — ⚠️ divergences de gameplay, non corrigé |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 | **audité ligne à ligne, §3.4** — ✅ aligné sur Forge (apprivoisement bloqué, but de fuite restauré) |
 | `content/contraptions/irradiated/chicken/IrradiatedChicken` | — | — | 111 *(nouveau — n'était pas suivi ici avant le portage du 16 août)* |
 | `CNCreativeModeTabs` | 249 | 249 | non revérifié |
 | `content/radiation/capability/RadiationCapability` | 186 | 199 | **audité ligne à ligne, §3.4** — divergence de persistance, ✅ assumée volontairement |
@@ -468,49 +472,68 @@ réinitialise au respawn sur les deux plateformes, comportement cohérent bien q
 non intentionnel à l'origine. Rien à faire sur ce point précis : au moins les deux versions
 s'accordent.
 
-#### 3.4.5 `IrradiatedWolf` — pas de régression `defineSynchedData`, mais plusieurs écarts de gameplay
+#### 3.4.5 `IrradiatedWolf` — ✅ corrigé, aligné sur Forge (apprivoisement bloqué, but de fuite restauré)
 
-**Point de vérification prioritaire, confirmé sain :** contrairement à `IrradiatedCat` (§2.1),
-`defineSynchedData` a la bonne signature 1.21 côté NeoForge (lignes 118-124) : `protected void
-defineSynchedData(SynchedEntityData.Builder builder)`, appelle bien `super.defineSynchedData
-(builder)`, et enregistre `DATA_INTERESTED_ID`/`DATA_REMAINING_ANGER_TIME` via `builder.define
-(...)`. Pas de risque de crash au spawn ici.
+**Point de vérification prioritaire, confirmé sain dès l'audit :** contrairement à `IrradiatedCat`
+(§2.1), `defineSynchedData` avait la bonne signature 1.21 côté NeoForge (`protected void
+defineSynchedData(SynchedEntityData.Builder builder)`, appelle `super.defineSynchedData(builder)`,
+enregistre `DATA_INTERESTED_ID`/`DATA_REMAINING_ANGER_TIME` via `builder.define(...)`) — aucun
+risque de crash au spawn ici, rien à corriger sur ce point.
 
-**Divergences réelles trouvées :**
+**Divergences trouvées, toutes corrigées le 16 août :**
 
-- **But de panique manquant.** Forge enregistre `new WolfPanicGoal(1.5)` à la priorité 1
-  (`registerGoals()` ligne 84, classe interne `WolfPanicGoal` qui panique si `isFreezing()` ou
-  `isOnFire()`). **Absent des deux côtés du fichier NeoForge** (ni le goal enregistré, ni la
-  classe) — le loup irradié NeoForge ne fuit plus quand il prend feu ou gèle.
-- **Le mécanisme d'apprivoisement diverge complètement, et c'est le point le plus surprenant.**
-  Forge bloque volontairement l'apprivoisement : l'interaction nourriture appelle juste
-  `AnimalUtil.blockTamingWip(player, level())` — la feature est marquée « work in progress » et
-  désactivée côté Forge. **NeoForge implémente un apprivoisement complet à l'os** (`tryToTame`,
-  `EventHooks.onAnimalTame`) **plus tout un sous-système d'armure de loup** absent de Forge
-  (`canUseSlot`, `actuallyHurt`, `canArmorAbsorb`, `hurtArmor`, `hasArmor`,
-  `applyTamingSideEffects`), avec `TAME_HEALTH` passé de 20 à 40 et `ATTACK_DAMAGE` de 2.0 à 4.0
-  pour accompagner. Ressemble à un pull complet de la parité avec le `Wolf` vanilla 1.21 fait
-  pendant le portage, sans revue explicite de la portée — **à confirmer avec l'auteur si c'est
-  voulu** (et si oui, à documenter comme divergence assumée, pas à « corriger » vers le WIP
-  bloqué de Forge).
-- **Source de nourriture changée.** Forge lie l'éligibilité nourriture/apprivoisement à
-  `CNItems.YELLOWCAKE` uniquement (`AnimalUtil.isFood`). NeoForge vérifie
-  `CNTags.CNItemTags.FUEL.tag` (ligne 427) — un ensemble bien plus large basé sur un tag.
-  Divergence fonctionnelle, pas un simple renommage.
-- **`getStandingEyeHeight` absent.** Forge le surcharge (`dimensions.height * 0.8F`), NeoForge
-  ne le fait pas — retombe sur la hauteur d'œil par défaut de l'entité.
-- **`canBeLeashed` perd son appel à `super`.** Forge : `!isAngry() && super.canBeLeashed(player)`
-  (avec paramètre `Player`). NeoForge : `!isAngry()` seul, sans paramètre ni appel à `super` — à
-  vérifier contre `TamableAnimal` vanilla 1.21 que rien d'utile n'est perdu dans ce `super`.
+- **But de panique manquant → réintroduit.** Forge enregistre `new WolfPanicGoal(1.5)` à la
+  priorité 1. Absent côté NeoForge (ni le goal, ni la classe). La classe interne `WolfPanicGoal`
+  (paniquer si `isFreezing()` ou `isOnFire()`) et son enregistrement ont été copiés à l'identique
+  depuis Forge.
+- **Apprivoisement/armure complet → retiré, aligné sur le blocage WIP de Forge.** Forge bloque
+  volontairement l'apprivoisement : l'interaction nourriture appelle
+  `AnimalUtil.blockTamingWip(player, level())`. NeoForge implémentait un apprivoisement complet
+  (`tryToTame`, `EventHooks.onAnimalTame`) plus tout un sous-système d'armure de loup absent de
+  Forge (`canUseSlot`, `actuallyHurt`, `canArmorAbsorb`, `hurtArmor`, `hasArmor`) — vraisemblablement
+  un pull complet de la parité avec le `Wolf` vanilla 1.21 fait pendant le portage, sans revue
+  explicite de la portée. **Décision : aligner sur Forge.** `mobInteract` réécrit sur le modèle
+  Forge (nourrir un loup apprivoisé soigne toujours ; nourrir un loup non apprivoisé appelle
+  `AnimalUtil.blockTamingWip` au lieu de tenter l'apprivoisement à l'os) ; les 6 méthodes d'armure
+  supprimées avec leurs imports devenus morts (`ItemParticleOption`, `DamageTypeTags`,
+  `ItemAbilities`, `EnchantmentHelper`/`EnchantmentEffectComponents`, `Ingredient`, `EventHooks`).
+  `applyTamingSideEffects()` — le hook 1.21 qui remplace le `setTame(boolean)` overridé de Forge —
+  est conservé (c'est la bonne mécanique 1.21, pas l'armure) mais son `TAME_HEALTH` est ramené de
+  `40.0F` à `20.0F` pour matcher exactement la valeur Forge.
+- **Source de nourriture — divergence non touchée, assumée.** Forge lie l'éligibilité nourriture/
+  apprivoisement à `CNItems.YELLOWCAKE` uniquement (`AnimalUtil.isFood`) ; NeoForge vérifie
+  `CNTags.CNItemTags.FUEL.tag`, un ensemble plus large. Comme le loup ne s'apprivoise plus (WIP
+  bloqué des deux côtés), cette différence n'affecte que le prompt « je vais essayer de
+  t'apprivoiser » et le soin d'un loup déjà apprivoisé par commande — jugée mineure, non alignée
+  ici. À revoir si besoin.
+- **`getStandingEyeHeight` — ⚠️ le vrai piège de cette passe, plus profond que prévu.** L'audit
+  initial pensait qu'il suffisait de reporter l'override Forge (`dimensions.height * 0.8F`) tel
+  quel. **Faux : ce hook n'existe plus du tout en 1.21.** `Entity.getEyeHeight(Pose)` est devenu
+  `final` (`return this.getDimensions(pose).eyeHeight();`), donc tout override de
+  `getStandingEyeHeight(Pose, EntityDimensions)` **compile sans erreur mais ne s'exécute jamais** —
+  exactement la même classe de piège que la régression `defineSynchedData` du chat (§2.1),
+  découverte ici en ajoutant `@Override` explicitement et en laissant le compilateur le confirmer
+  (`error: method does not override or implement a method from a supertype`). **`IrradiatedCat` et
+  `IrradiatedCow` ont très probablement le même override mort** (même signature trouvée dans les
+  deux fichiers par `grep`) — **non corrigé dans ces deux fichiers, hors périmètre de cette passe,
+  à traiter séparément.** Le mécanisme 1.21 correct est `EntityType.Builder.eyeHeight(float)` au
+  moment de l'enregistrement du type d'entité. Corrigé pour le loup dans `CNEntityType.java` :
+  `.properties(p -> p.sized(0.6f, 0.85f).eyeHeight(0.68f))` (0.85 × 0.8, le ratio Forge), et
+  l'override mort supprimé de `IrradiatedWolf.java`.
+- **`canBeLeashed` — corrigé, et confirme que la signature 1.21 est bien no-arg.** Forge :
+  `!isAngry() && super.canBeLeashed(player)` (avec paramètre `Player`, API 1.20.1). Testé avec
+  `@Override` : `public boolean canBeLeashed()` **sans paramètre** compile et override bien en
+  1.21 (contrairement à `getStandingEyeHeight` ci-dessus — la suppression du paramètre `Player`
+  est un vrai changement d'API 1.21, pas un override mort). L'appel à `super.canBeLeashed()`
+  manquant a été rajouté : `return !this.isAngry() && super.canBeLeashed();`.
 
 Aucun mécanisme de conversion irradié → loup vanilla n'existe dans ce fichier, ni d'un côté ni de
 l'autre — cohérent avec §2.1 : seul `IrradiatedChicken` implémente `IrradiatedAnimal` des deux
 côtés, le loup ne fait pas partie de ce contrat chez Forge non plus.
 
-**Non corrigé ici.** Le point le plus important à trancher n'est pas un bug de portage au sens
-strict (rien n'a cassé), mais une **question de scope** : l'apprivoisement + armure sont une
-fonctionnalité entière que Forge n'a jamais activée. Les réactiver côté NeoForge sans decision
-explicite serait aller au-delà de la parité Forge, pas la réaliser.
+Vérifié : `./gradlew compileJava` et `./gradlew runData` passent. **Non testé en jeu** (le
+blocage effectif de l'apprivoisement, le but de fuite en situation de feu/gel, la hauteur des
+yeux) — à ajouter au §4.
 
 ---
 
@@ -643,6 +666,7 @@ les gametests.**
 | Chaîne de l'azote de bout en bout | nitrate → *(four)* → concentré → *(ventilateur + neige poudreuse)* → concentré refroidi → *(mixeur + glace)* → 100 mB d'azote liquide | §3.1 corrigé sans test en jeu |
 | Minage `uranium_ore`/`deepslate_uranium_ore`/`lead_ore`/`deepslate_lead_ore` | drop 3–4 (uranium) ou 2–4 (plomb) matière brute, plus bonus fortune | §3.3 corrigé sans test en jeu — vérifié uniquement sur le JSON de loot table généré |
 | Les 6 advancements réactivées (`anti_radiation_armor`, `avoiding_cancer`, `dye_anti_radiation_armor`, `feeding_the_reactor`, `fueling_the_reactor`, `unlimited_power`) | se débloquent au bon moment, en particulier `avoiding_cancer` (équiper les 4 pièces d'armure anti-radiation) dont le trigger a été réécrit | §3.4.1 corrigé sans test en jeu — vérifié uniquement par compilation + `runData` |
+| `IrradiatedWolf` réaligné sur Forge | nourrir un loup non apprivoisé affiche le message WIP au lieu de l'apprivoiser ; le loup fuit quand il prend feu ou gèle (`WolfPanicGoal`) ; hauteur des yeux correcte (`eyeHeight(0.68f)`) | §3.4.5 corrigé sans test en jeu |
 
 > **Divergence assumée sur la clé de config.** `CWorldGen` exposait `disableWorldGen` (défaut
 > `false`) — un copier-coller littéral de la classe homonyme de Create, **jamais lu par personne**.
@@ -655,9 +679,8 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Trancher le scope apprivoisement/armure du loup (§3.4.5)** | `IrradiatedWolf` | décision, pas code | Forge bloque volontairement cette feature (WIP) ; NeoForge l'a activée en portant — à valider avant de la garder ou de la retirer |
-| 2 | **Réintroduire le but de fuite du loup (§3.4.5)** | `IrradiatedWolf` | triviale | `WolfPanicGoal` manquant, comportement perdu sans discussion de scope |
-| 3 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Vérifier/corriger `getStandingEyeHeight` mort côté `IrradiatedCat`/`IrradiatedCow` (§3.4.5)** | `IrradiatedCat`, `IrradiatedCow` | triviale une fois confirmé | Découvert en corrigeant `IrradiatedWolf` : ce hook n'existe plus en 1.21, tout override compile mais ne s'exécute jamais — à vérifier par le même test (`@Override` + compile) puis migrer vers `EntityType.Builder.eyeHeight(...)` si confirmé |
+| 2 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
 > ✅ Audit ligne à ligne de `CNAdvancement`, `CNStandardRecipeGen`, `CreateNuclearJEI`,
 > `RadiationCapability`, `IrradiatedWolf` (§3.4) — fait le 16 août : `CreateNuclearJEI` est sain
@@ -670,8 +693,15 @@ les gametests.**
 > réactivées ; `AVOIDING_CANCER` avait en plus un vrai piège 1.21 (`CriterionTrigger.getId()`
 > disparu de l'API) résolu en reconstruisant le trigger via `CriteriaTriggers.INVENTORY_CHANGED
 > .createCriterion(new InventoryChangeTrigger.TriggerInstance(...))`. Compile et `runData` passent ;
-> non testé en jeu (§4). Seul `IrradiatedWolf` garde une divergence réelle non tranchée — chantiers
-> #1 et #2 ci-dessus.
+> non testé en jeu (§4).
+>
+> ✅ **`IrradiatedWolf` corrigé (§3.4.5)** — `WolfPanicGoal` réintroduite, apprivoisement/armure
+> complet retiré et remplacé par le blocage WIP de Forge (`AnimalUtil.blockTamingWip`),
+> `TAME_HEALTH` réaligné à `20.0F`, `canBeLeashed` réparé (appel à `super` manquant). Piège 1.21
+> trouvé au passage sur `getStandingEyeHeight` (override mort, hook disparu de l'API) — corrigé
+> pour le loup via `EntityType.Builder.eyeHeight(...)`, mais probablement présent aussi côté
+> `IrradiatedCat`/`IrradiatedCow` (chantier #1 ci-dessus). Compile et `runData` passent ; non
+> testé en jeu (§4).
 >
 > ✅ Audit ligne à ligne complet de `CNBlocks`/`CNItems` (§3.3) — fait le 16 août : parité de
 > liste confirmée (27 blocs, 29 items), les 6 `addLayer` « manquants » se sont révélés être un

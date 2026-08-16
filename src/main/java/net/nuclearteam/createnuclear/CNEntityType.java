@@ -55,7 +55,7 @@ public class CNEntityType {
         .entity("irradiated_wolf", IrradiatedWolf::new, MobCategory.CREATURE)
         .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
         .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
-        .properties(p -> p.sized(0.6f, 0.85f))
+        .properties(p -> p.sized(0.6f, 0.85f).eyeHeight(0.68f))
         .lang("Irradiated Wolf")
         .renderer(() -> IrradiatedWolfRenderer::new)
         .attributes(IrradiatedWolf::createAttributes)
