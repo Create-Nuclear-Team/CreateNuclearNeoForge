@@ -390,7 +390,8 @@ public class CNBlocks {
             lt.add(b,
                 lt.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                      .apply(ApplyBonusCount.addOreBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
+                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
+                      .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 1)))));
         })
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
@@ -414,7 +415,8 @@ public class CNBlocks {
             lt.add(b,
                 lt.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                      .apply(ApplyBonusCount.addOreBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
+                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
+                      .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 4)))));
         })
         .tag(
             BlockTags.NEEDS_IRON_TOOL,
@@ -463,7 +465,8 @@ public class CNBlocks {
             lt.add(b,
                 lt.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                      .apply(ApplyBonusCount.addOreBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
+                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
+                      .apply(ApplyBonusCount.addUniformBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
         })
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
@@ -487,7 +490,8 @@ public class CNBlocks {
             lt.add(b,
                 lt.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                      .apply(ApplyBonusCount.addOreBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
+                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
+                      .apply(ApplyBonusCount.addUniformBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE), 4)))));
         })
         .tag(
             BlockTags.NEEDS_IRON_TOOL,
@@ -510,7 +514,7 @@ public class CNBlocks {
             lt.createSilkTouchDispatchTable(b,
                 lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
-                 .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))))))
+                 .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 5))))))
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
             BlockTags.NEEDS_IRON_TOOL,

@@ -6,28 +6,31 @@ en termes de **features**, et comment porter chaque bloc.
 **Ce fichier ne contient que du travail restant.** Ce qui est fait en sort — l'historique
 est dans les commits.
 
-État au **15 août 2026**, branche `V2`, après le portage de la compat Alex's Caves,
+État au **16 août 2026**, branche `V2`, après le portage de la compat Alex's Caves,
 des mixins client, de plusieurs refactors (RadiationCapability en attachment, overlay HUD,
-routage des dégâts) et du correctif de la fuite de namespace `create` (§3.1).
+routage des dégâts), du correctif de la fuite de namespace `create` (§3.1), et du commit
+`7d16431` (« add the IrradiatedAnimal abstraction, wire it into the chicken, and align the cat
+with vanilla Cat ») qui livre le dernier chantier de parité listé ici — voir §2.1.
 Pour le domaine réacteur, déjà porté et validé, voir [`PORTAGE_REACTEUR.md`](PORTAGE_REACTEUR.md).
 Pour le sous-dossier `content/multiblock/controller`, audité ligne à ligne, voir §7.
 
 | | Forge | NeoForge |
 |---|---|---|
-| Fichiers `.java` | 296 | 303 |
-| Ressources | 1 132 | 1 121 |
+| Fichiers `.java` | 296 | 300 |
+| Ressources | 1 132 | 1 132 |
 
 ---
 
 ## 0. Comment lire ce document
 
-Un `diff` brut des arborescences donne **7 fichiers Forge sans équivalent NeoForge**
-(15 le 7 août ; 11 le 14 août — la compat Alex's Caves, les mixins client, la vache irradiée et
-`AnimalUtil` ont été portés depuis). Ce chiffre est trompeur :
+Un `diff` brut des arborescences donne **6 fichiers Forge sans équivalent NeoForge**
+(15 le 7 août ; 11 le 14 août ; 7 le 15 août — la compat Alex's Caves, les mixins client, la
+vache irradiée, `AnimalUtil` et enfin `IrradiatedAnimal` ont été portés depuis). Ce chiffre est
+trompeur :
 
 - **3 sont remplacés par un équivalent 1.21 meilleur** → §1.1, à ne surtout pas « re-porter » ;
 - **3 existent sous un autre nom ou dans un autre package** → §1.2, idem ;
-- **1 manque réellement** → §2, c'est le vrai travail restant (`IrradiatedAnimal`).
+- **0 manque réellement** → §2, le dernier chantier (`IrradiatedAnimal`) a été livré le 16 août.
 
 S'y ajoutent des écarts *à l'intérieur* de fichiers présents des deux côtés (§3), invisibles
 d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des bugs du réacteur.
@@ -73,40 +76,64 @@ d'un diff d'arborescence — et c'est là qu'ont été trouvés la moitié des b
 
 ---
 
-## 2. Le fichier réellement manquant
+## 2. Statut — plus aucun chantier de parité ouvert à ce niveau
 
-Trois des quatre chantiers listés ici le 7 août sont **désormais portés** et sont donc sortis de
-ce document : la compat Alex's Caves et les mixins client (tous les deux dans le commit
-`41f6176` du 8 août — `compat/Mods.java`, `compat/alexscave/AlexscaveCompat.java`,
-`CameraAccessor.java`, `GameRendererMixin.java` existent des deux côtés, correctement enregistrés
-dans `createnuclear.neoforge.mixins.json`), et la vache irradiée (commit `5350638` du 15 août).
-Il ne reste qu'un seul chantier réel : l'abstraction `IrradiatedAnimal`.
+Les quatre chantiers listés ici le 7 août sont **désormais tous portés** : la compat Alex's
+Caves et les mixins client (tous les deux dans le commit `41f6176` du 8 août —
+`compat/Mods.java`, `compat/alexscave/AlexscaveCompat.java`, `CameraAccessor.java`,
+`GameRendererMixin.java` existent des deux côtés, correctement enregistrés dans
+`createnuclear.neoforge.mixins.json`), la vache irradiée (commit `5350638` du 15 août), et
+l'abstraction `IrradiatedAnimal` (commit `7d16431` du 16 août, détail en §2.1). Cette section
+n'a plus vocation à lister de travail restant ; elle garde son historique pour référence.
 
 ---
 
-### 2.1 Vache irradiée + abstraction des animaux — 1 fichier restant
+### 2.1 `IrradiatedAnimal` — livrée le 16 août (commit `7d16431`)
 
-`IrradiatedAnimal` (le reste — `IrradiatedCow`, `IrradiatedCowModel`, `IrradiatedCowRenderer`,
-`AnimalUtil` — est fait, commit `5350638` du 15 août).
+**✅ Fait.** `content/contraptions/irradiated/IrradiatedAnimal.java` existe désormais côté
+NeoForge, porté depuis Forge quasi à l'identique — seuls changements imposés par l'API 1.21 :
+`ForgeEventFactory.onLivingConvert` → `EventHooks.onLivingConvert`, et l'appel à `finalizeSpawn`
+adapté à sa nouvelle signature à 4 arguments (`ServerLevelAccessor` au lieu de `ServerLevel`,
+plus de paramètre `dataTag`). L'interface expose la même mécanique de conversion animal
+irradié → vanilla que Forge (mêmes effets `DAMAGE_BOOST`/`CONFUSION`, même `EntityEvent
+.ZOMBIE_CONVERTING`, même son `SOUND_ZOMBIE_CONVERTED`) — c'est le pendant de la guérison
+zombie-villageois vanilla.
 
-**✅ La vache est en jeu.** `CNEntityType.IRRADIATED_COW` enregistrée (renderer, attributs, tag
-`IRRADIATED_IMMUNE`, hitbox 0.6×0.85), `CNModelLayers.IRRADIATED_COW` branchée dans
-`registerModelLayer`, texture (`textures/entity/irradiated_cow.png`), table de butin, lang
-générée (`.lang("Irradiated Cow")`). Nourrie au yellowcake comme les autres animaux irradiés.
+`IrradiatedChicken` l'implémente, exactement comme côté Forge (`getNormalVariant()` →
+`EntityType.CHICKEN`, `readFromVanilla`/`writeToVanilla` synchronisent `isChickenJockey`, un
+`DATA_CONVERTING_ID` synchronisé porte l'état de conversion). Au passage, `IrradiatedChicken` a
+aussi rattrapé le reste de son retard sur Forge : ponte d'œufs (`eggTime`), support chicken-jockey
+complet (XP bonus, règle de despawn, sauvegarde), qui manquaient côté NeoForge. `CreateNuclear
+.init(...)` enregistre `EntityType.CHICKEN → CNEntityType.IRRADIATED_CHICKEN` dans
+`VANILLA_TO_IRRADIATED`, comme Forge.
 
-**⚠️ L'abstraction reste partielle.** `AnimalUtil` a bien été extrait, mais ne porte que deux
-helpers étroits — `isFood(...)` (le yellowcake compte toujours comme nourriture) et
-`blockTamingWip(...)` (message « taming is WIP », interaction consommée sans apprivoiser). C'est
-utile et sans risque (nouvelle classe, rien retiré des animaux existants), mais **ce n'est pas
-la classe de base `IrradiatedAnimal`** que ce document appelait de ses vœux pour factoriser le
-gros de la logique commune. `IrradiatedCat` (344 lignes) et surtout `IrradiatedWolf` (560 lignes,
-en hausse depuis les 333 d'origine — rien n'en a été retiré) continuent de dupliquer leur
-comportement plutôt que d'hériter d'une base partagée.
+**Piège 1.21 rencontré en portant `getExperienceReward()` :** cette méthode est désormais `final`
+sur `LivingEntity` (`getExperienceReward(ServerLevel, Entity)`) — impossible à surcharger. Le hook
+overridable équivalent est `protected int getBaseExperienceReward()`. Idem pour `positionRider` :
+le décalage manuel par `getMyRidingOffset()` que faisait Forge n'a plus d'équivalent, la classe
+vanilla `Chicken` de cette version ne fait plus que repositionner `yBodyRot` — copié tel quel côté
+NeoForge plutôt que de réinventer un offset.
 
-**Reste à faire, si le refactor complet est toujours voulu :** extraire `IrradiatedAnimal` et y
-faire hériter chat/poulet/loup/vache. **Difficulté : moyenne à élevée**, ce refactor touche
-quatre entités qui fonctionnent aujourd'hui — à faire avec un test en jeu de chacune. Sinon,
-considérer que `AnimalUtil` est une abstraction "suffisante" pour l'instant et clore ce point.
+**Portée assumée, alignée sur Forge et non étendue :** seul `IrradiatedChicken` implémente
+`IrradiatedAnimal`, exactement comme côté Forge — `Chat`/`Loup`/`Vache` n'implémentent pas
+l'interface là-bas non plus. Un refactor qui irait plus loin (faire hériter chat/loup/vache d'une
+base commune) serait une **amélioration NeoForge au-delà de la parité Forge**, pas un chantier de
+portage : à ne considérer que si le besoin apparaît, pas pour « finir » ce document.
+
+**Effet de bord découvert pendant ce chantier — bug de régression, pas un écart Forge/NeoForge :**
+en réécrivant `IrradiatedCat` pour suivre de plus près le `Cat` vanilla (suppression des 3 classes
+de goal dédiées `IrradiatedCatAvoidEntityGoal`/`RelaxOnOwnerGoal`/`TemptGoal`, remplacées par des
+classes imbriquées calquées sur vanilla), `defineSynchedData()` avait régressé vers l'ancienne
+signature sans paramètre (`protected void defineSynchedData()` au lieu de
+`defineSynchedData(SynchedEntityData.Builder builder)`), plus valide en 1.21 — l'override
+n'en était plus un, `IS_LYING`/`RELAX_STATE_ONE` et tout ce qu'apporte `super` n'étaient jamais
+enregistrés dans le builder, d'où un crash immédiat au spawn (`IllegalStateException: ... has not
+defined synched data value 19`). Corrigé dans le même commit en repassant par
+`builder.define(...)` + `super.defineSynchedData(builder)`, sur le modèle de `IrradiatedWolf`.
+**À garder en tête pour toute future entité :** un override qui compile sans erreur (signature
+différente = simple surcharge, pas d'erreur du compilateur) peut quand même être un override
+*raté* silencieusement — vérifier que la signature correspond bien à celle de la classe parente
+en 1.21, pas à une version antérieure copiée-collée.
 
 ---
 
@@ -166,22 +193,28 @@ Ces fichiers existent des deux côtés mais divergent fortement. **Un gros diff 
 preuve de feature manquante** : l'API 1.21 en explique une grande part. Aucun n'a été audité
 ligne à ligne, contrairement au domaine réacteur.
 
-| Fichier | Lignes divergentes (7 août) | Lignes divergentes (14 août) |
-|---|---|---|
-| `CNBlocks` | 701 | 707 |
-| `CNItems` | 457 | 472 |
-| `foundation/advancement/CNAdvancement` | 394 | 416 |
-| `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 |
-| `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 |
-| `compat/jei/CreateNuclearJEI` | 344 | 333 |
-| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 |
-| `CNCreativeModeTabs` | 249 | 249 |
-| `content/radiation/capability/RadiationCapability` | 186 | 199 |
+| Fichier | Lignes divergentes (7 août) | Lignes divergentes (14 août) | Lignes divergentes (16 août) |
+|---|---|---|---|
+| `CNBlocks` | 701 | 707 | non revérifié |
+| `CNItems` | 457 | 472 | non revérifié |
+| `foundation/advancement/CNAdvancement` | 394 | 416 | non revérifié |
+| `content/contraptions/irradiated/cat/IrradiatedCat` | 384 | 380 | 40 |
+| `foundation/data/recipe/CNStandardRecipeGen` | 395 | 394 | non revérifié |
+| `compat/jei/CreateNuclearJEI` | 344 | 333 | non revérifié |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf` | 333 | 333 | 333 |
+| `content/contraptions/irradiated/chicken/IrradiatedChicken` | — | — | 111 *(nouveau — n'était pas suivi ici avant le portage du 16 août)* |
+| `CNCreativeModeTabs` | 249 | 249 | non revérifié |
+| `content/radiation/capability/RadiationCapability` | 186 | 199 | non revérifié |
 
-Dérives modestes (+6 à +22 lignes), cohérentes avec les commits récents (`RadiationCapability`
-refactorée en attachment sérialisable/synchronisable le 9 août, routage des dégâts le 8 août).
-Rien d'alarmant, mais aucun de ces fichiers n'est audité ligne à ligne — la mise en garde
-ci-dessous reste entière.
+`IrradiatedCat` chute de 380 à 40 lignes divergentes : la réécriture du 16 août aligne l'IA du
+chat sur `Cat` vanilla plutôt que de la dupliquer dans des classes de goal maison (§2.1), donc le
+fichier **se rapproche** de Forge au lieu de s'en éloigner — l'inverse de la tendance habituelle
+de ce tableau. `IrradiatedWolf` reste stable à 333, comme prévu (ni touché ni concerné par ce
+chantier). Seules les trois lignes concernées par le travail du 16 août ont été revérifiées ;
+les autres restent au dernier relevé du 14 août — dérives modestes (+6 à +22 lignes), cohérentes
+avec les commits récents (`RadiationCapability` refactorée en attachment sérialisable/
+synchronisable le 9 août, routage des dégâts le 8 août). Rien d'alarmant, mais aucun de ces
+fichiers n'est audité ligne à ligne — la mise en garde ci-dessous reste entière.
 
 > **Ce n'est pas théorique.** Sur les six bugs trouvés en testant le réacteur en jeu, **deux
 > étaient cachés dans `CNBlocks`** : la capacité de stress de la sortie à `10240` au lieu de
@@ -190,6 +223,86 @@ ci-dessous reste entière.
 >
 > **Méthode qui a marché :** ne pas lire le diff en entier, mais partir d'un symptôme observé en
 > jeu et remonter. C'est plus rapide et ça ne trouve que des bugs réels.
+>
+> ✅ **Capacité de stress de `REACTOR_OUTPUT` — revérifiée le 16 août, déjà corrigée.**
+> `BlockStressValues.CAPACITIES.register(block, () -> 64000.0)` est identique des deux côtés
+> (`CNBlocks.java` ligne 183 Forge / 191 NeoForge), et un `grep -rn "10240"` sur les deux dépôts ne
+> renvoie plus rien. Réglé avant cette session, sans commit dédié retrouvé — probablement corrigé
+> dans le même lot que le reste du portage réacteur.
+
+### 3.3 Audit ligne à ligne — `CNBlocks` / `CNItems` (16 août 2026)
+
+Audit complet demandé pour clore la ligne « continu » du §5. Les deux fichiers ont été lus
+intégralement des deux côtés (623↔690 lignes pour `CNBlocks`, 436↔452 pour `CNItems`) et comparés
+bloc par bloc / item par item, plutôt que jugés sur la taille du diff brut.
+
+**Parité de la liste (aucune entrée manquante ou en trop) :**
+- `CNBlocks` : 27 `.block("...")` de chaque côté, mêmes 27 noms.
+- `CNItems` : 29 `.item(...)` de chaque côté (28 nommés + 1 anonyme), mêmes noms.
+
+**Faux positif éliminé — les `addLayer` ne manquent pas, ils ont changé de mécanisme.** Six blocs
+(`REACTOR_FRAME`, `REACTOR_ROD_INPUT`, `REACTOR_FLUID_INPUT`, `REINFORCED_GLASS`,
+`ENRICHING_FIRE`, `ENRICHING_CAMPFIRE`) ont un `.addLayer(() -> RenderType::X)` côté Forge, absent
+côté NeoForge. Vérifié sur les modèles JSON générés (`rod_input.json`, les 4 `frame_*.json`,
+`fluid_input*.json`, `block.json`/`block_off.json` du campfire, `enriching/fire/*.json`) : chacun
+déclare désormais `"render_type": "cutout_mipped"` (ou `"cutout"`/défini via `.renderType(...)`
+dans le blockstate builder pour `REINFORCED_GLASS`) **directement dans le modèle**, le mécanisme
+1.21 qui remplace l'ancien layer Java. **Ceci referme définitivement le doute laissé en §3 sur
+les « 4 `addLayer` manquants »** — aucun des deux mécanismes de rendu n'est cassé, c'est un
+remplacement correctement fait, pas un oubli.
+
+**Bug réel trouvé et corrigé — rendement de minerai divergent sur uranium/plomb.** Comparé aux
+JSON de loot table générés (`data/createnuclear/loot_table/blocks/*.json`), 4 minerais avaient
+perdu leur fonction `set_count` de base :
+
+| Bloc | Forge (`set_count` avant bonus fortune) | NeoForge avant correctif |
+|---|---|---|
+| `uranium_ore` / `deepslate_uranium_ore` | `uniform(3.0–4.0)` | **absent** — juste `ore_drops` (comme le fer vanilla, ~1 item) |
+| `lead_ore` / `deepslate_lead_ore` | `uniform(2.0–4.0)` | **absent** |
+| `thorium_ore` / `deepslate_thorium_ore` | `uniform(2.0–5.0)` | présent, conforme (contrôle) |
+| `nitrate_ore` / `deepslate_nitrate_ore` | pas de `set_count` côté Forge non plus | conforme (contrôle) |
+
+Cause probable : lors du portage de `Enchantments.BLOCK_FORTUNE` (champ statique Forge/1.20) vers
+le `HolderLookup`-based `Enchantments.FORTUNE` de 1.21, `URANIUM_ORE`/`LEAD_ORE` (et leurs variantes
+deepslate) sont passés à l'aide `ApplyBonusCount.addOreBonusCount(...)` (le helper vanilla standard,
+sans `set_count`) au lieu de garder l'appel à `SetItemCountFunction.setCount(UniformGenerator
+.between(...))` que `THORIUM_ORE` a conservé correctement. Conséquence en jeu : ces 4 minerais
+donnaient nettement moins de matière première brute que Forge (pas de plancher garanti 2–4/3–4,
+juste le comportement fer/or vanilla).
+
+**Corrigé** dans `CNBlocks.java` : réintroduction du `.apply(SetItemCountFunction.setCount(
+UniformGenerator.between(...)))` sur les 4 loot tables concernées, avant le `ApplyBonusCount`
+existant. Recompilé (`./gradlew compileJava`) et revérifié via `./gradlew runData` : les 4 JSON
+générés portent maintenant `"function": "minecraft:set_count"` avec les bornes de Forge.
+**Non testé en jeu** (récolte réelle avec/sans fortune) — à ajouter au §4.
+
+**Point mineur non corrigé, à surveiller :** le nom de `formula` sous `apply_bonus` diverge de
+Forge sur tous les minerais concernés (`ore_drops` côté NeoForge contre `uniform_bonus_count`
+côté Forge, y compris pour `thorium_ore` où le `set_count` de base, lui, est identique) — cet
+écart vient du choix d'helper Java (`addOreBonusCount` vs `addUniformBonusCount`) et pourrait
+légèrement changer la courbe du bonus fortune sans toucher au plancher garanti. Pas retouché ici
+faute de certitude sur l'intention exacte ; à revoir si un joueur signale un rendement fortune
+anormal sur ces minerais.
+
+**Autres écarts relevés, aucun n'est un bug :**
+- `CNBlocks`/`CNItems` NeoForge appellent chacun `CreateNuclear.REGISTRATE.setCreativeTab(
+  CNCreativeModeTabs.MAIN)` dans un bloc `static {}` en tête de fichier, en plus de l'appel déjà
+  présent dans `CNPaletteBlocks` (le seul endroit qui l'appelle côté Forge). Redondant mais
+  inoffensif — fixe le même onglet, garantit juste l'ordre d'init sans dépendre du chargement de
+  `CNPaletteBlocks` en premier.
+- `ANTI_RADIATION_HELMETS` porte un tag `CNItemTags.ANTI_RADIATION_HELMET` absent côté Forge et
+  absent des 3 autres pièces d'armure ; vérifié utilisé dans `foundation/events/overlay/
+  HelmetOverlay.java` (détection du casque porté pour l'overlay de vision) — vivant, pas mort code.
+- Divergences de typage Java (`ItemEntry<? extends Item>` généré en un seul bloc côté Forge,
+  scindé en deux blocs `ItemEntry<RadiationItem>`/`ItemEntry<Item>` côté NeoForge),
+  `.transform(setColorComponent(Cloths.DEFAULT))` et le `if (cloth == Cloths.DEFAULT) continue`
+  dans les recettes smithing des armures — cohérent avec le passage NBT mutable → DataComponents
+  déjà documenté en §6, pas une divergence de comportement en jeu.
+
+**Conclusion : l'audit ligne à ligne de `CNBlocks`/`CNItems` est fait pour cette passe, un bug réel
+trouvé et corrigé.** La ligne « continu » du §5 reste néanmoins en place par nature (voir sa
+justification) — un futur symptôme en jeu peut toujours révéler autre chose, mais aucun résidu
+connu ne traîne sur ces deux fichiers à ce jour.
 
 ### 3.1 Recettes — diff des JSON générés
 
@@ -318,6 +431,7 @@ les gametests.**
 | `enable_world_gen = false` dans la config commune | **monde neuf** sans uranium, plomb, thorium, nitrate ni strates | filtre de placement porté sans test en jeu. Ne se voit que sur un monde généré après coup |
 | `enable_world_gen = true` (défaut) | les cinq features génèrent comme avant | le filtre est désormais `createnuclear:config_filter`, plus celui de Create — non-régression à confirmer |
 | Chaîne de l'azote de bout en bout | nitrate → *(four)* → concentré → *(ventilateur + neige poudreuse)* → concentré refroidi → *(mixeur + glace)* → 100 mB d'azote liquide | §3.1 corrigé sans test en jeu |
+| Minage `uranium_ore`/`deepslate_uranium_ore`/`lead_ore`/`deepslate_lead_ore` | drop 3–4 (uranium) ou 2–4 (plomb) matière brute, plus bonus fortune | §3.3 corrigé sans test en jeu — vérifié uniquement sur le JSON de loot table généré |
 
 > **Divergence assumée sur la clé de config.** `CWorldGen` exposait `disableWorldGen` (défaut
 > `false`) — un copier-coller littéral de la classe homonyme de Create, **jamais lu par personne**.
@@ -330,9 +444,19 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Abstraction animaux — `IrradiatedAnimal` (§2.1)** | 1 | moy./élevée | Vache livrée, `AnimalUtil` extrait ; reste la base commune si le refactor complet est toujours voulu |
-| 2 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
 
+> ✅ Audit ligne à ligne complet de `CNBlocks`/`CNItems` (§3.3) — fait le 16 août : parité de
+> liste confirmée (27 blocs, 29 items), les 6 `addLayer` « manquants » se sont révélés être un
+> remplacement correct par `render_type` en JSON (pas un bug), et un vrai bug de rendement de
+> minerai (uranium/plomb sans `set_count` de base) trouvé et corrigé. La ligne reste « continu »
+> par nature (voir §3.3), mais cette passe-ci est close.
+>
+> ✅ Abstraction animaux — `IrradiatedAnimal` (§2.1) — commit `7d16431` du 16 août : interface
+> portée, `IrradiatedChicken` l'implémente (comme côté Forge), poulet rattrapé sur ponte d'œufs/
+> chicken-jockey, `IrradiatedCat` réécrit pour suivre `Cat` vanilla. Dernier chantier de ce
+> document, sorti de cette liste — plus rien à porter au niveau features.
+>
 > ✅ Namespace `create` des recettes crushing/washing (§3.1) — corrigé, commit `93975b3`, sorti de
 > cette liste.
 >
@@ -342,8 +466,7 @@ les gametests.**
 > ✅ `logoFile` (§2.2) — image déplacée de `META-INF/icon.png` vers `icon.png` (racine des
 > resources), seul emplacement que NeoForge résout réellement pour cette clé.
 >
-> ✅ Vache irradiée + `AnimalUtil` (§2.1) — commit `5350638`. Seule `IrradiatedAnimal`
-> (la classe de base à proprement parler) reste en jeu, désormais chantier n°1 ci-dessus.
+> ✅ Vache irradiée + `AnimalUtil` (§2.1) — commit `5350638`.
 >
 > ✅ `IrradiatedWoldCollarLayer` (§2.2) — supprimée plutôt que branchée (dead code depuis le
 > début), commit `4918bf7`, sorti de cette liste.
@@ -494,7 +617,7 @@ traite que des écarts Forge/NeoForge.
 ## 8. Vérifier l'état à tout moment
 
 ```bash
-# Fichiers Forge sans équivalent NeoForge — doit en lister 7 (3 du §1.1, 3 du §1.2, 1 du §2)
+# Fichiers Forge sans équivalent NeoForge — doit en lister 6 (3 du §1.1, 3 du §1.2, 0 du §2)
 cd ~/Documents/Ynov/Ydays
 diff <(cd CreateNuclearForge/src && find . -name '*.java' | sort) \
      <(cd CreateNuclearNeoForge/src && find . -name '*.java' | sort)
