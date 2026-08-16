@@ -513,13 +513,20 @@ risque de crash au spawn ici, rien à corriger sur ce point.
   `getStandingEyeHeight(Pose, EntityDimensions)` **compile sans erreur mais ne s'exécute jamais** —
   exactement la même classe de piège que la régression `defineSynchedData` du chat (§2.1),
   découverte ici en ajoutant `@Override` explicitement et en laissant le compilateur le confirmer
-  (`error: method does not override or implement a method from a supertype`). **`IrradiatedCat` et
-  `IrradiatedCow` ont très probablement le même override mort** (même signature trouvée dans les
-  deux fichiers par `grep`) — **non corrigé dans ces deux fichiers, hors périmètre de cette passe,
-  à traiter séparément.** Le mécanisme 1.21 correct est `EntityType.Builder.eyeHeight(float)` au
-  moment de l'enregistrement du type d'entité. Corrigé pour le loup dans `CNEntityType.java` :
+  (`error: method does not override or implement a method from a supertype`). Le mécanisme 1.21
+  correct est `EntityType.Builder.eyeHeight(float)` au moment de l'enregistrement du type
+  d'entité. Corrigé pour le loup dans `CNEntityType.java` :
   `.properties(p -> p.sized(0.6f, 0.85f).eyeHeight(0.68f))` (0.85 × 0.8, le ratio Forge), et
   l'override mort supprimé de `IrradiatedWolf.java`.
+  > ✅ **`IrradiatedCat`/`IrradiatedCow` — confirmés porteurs du même override mort (ligne 339 du
+  > chat, ligne ~97 de la vache, vérifié par lecture directe), mais volontairement non corrigés
+  > ici et sortis de ce document.** Décision du 16 août : une vraie passe d'intégration est prévue
+  > sur ces deux entités, qui ira au-delà d'un simple correctif ponctuel — but explicite de
+  > supprimer autant que possible les « copies » de mobs vanilla (le même travail qui a déjà réduit
+  > `IrradiatedCat` de 380 à 40 lignes divergentes en §2.1, à poursuivre/étendre). Corriger
+  > `getStandingEyeHeight` isolément ici serait du travail jeté à la prochaine passe. **Ne pas
+  > traiter comme un chantier de parité Forge/NeoForge** — c'est un refactor NeoForge au-delà de la
+  > parité, à faire dans ce cadre-là, pas ici.
 - **`canBeLeashed` — corrigé, et confirme que la signature 1.21 est bien no-arg.** Forge :
   `!isAngry() && super.canBeLeashed(player)` (avec paramètre `Player`, API 1.20.1). Testé avec
   `@Override` : `public boolean canBeLeashed()` **sans paramètre** compile et override bien en
@@ -679,8 +686,14 @@ les gametests.**
 
 | # | Chantier | Fichiers | Difficulté | Pourquoi ce rang |
 |---|---|---|---|---|
-| 1 | **Vérifier/corriger `getStandingEyeHeight` mort côté `IrradiatedCat`/`IrradiatedCow` (§3.4.5)** | `IrradiatedCat`, `IrradiatedCow` | triviale une fois confirmé | Découvert en corrigeant `IrradiatedWolf` : ce hook n'existe plus en 1.21, tout override compile mais ne s'exécute jamais — à vérifier par le même test (`@Override` + compile) puis migrer vers `EntityType.Builder.eyeHeight(...)` si confirmé |
-| 2 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+| 1 | **Audit `CNBlocks` / `CNItems` (§3)** | — | continu | À faire au fil des symptômes, pas d'un bloc |
+
+> ✅ **`getStandingEyeHeight` mort côté `IrradiatedCat`/`IrradiatedCow` (§3.4.5) — confirmé, mais
+> volontairement sorti de cette liste.** Présent dans les deux fichiers (même override mort que
+> celui trouvé et corrigé sur `IrradiatedWolf`). Une vraie passe d'intégration est prévue sur ces
+> deux entités, avec pour but explicite de réduire au maximum les « copies » de mobs vanilla —
+> corriger ce point isolément ici serait jeté à cette prochaine passe. **Ce n'est plus un chantier
+> de parité Forge/NeoForge**, à traiter dans le cadre de ce futur refactor.
 
 > ✅ Audit ligne à ligne de `CNAdvancement`, `CNStandardRecipeGen`, `CreateNuclearJEI`,
 > `RadiationCapability`, `IrradiatedWolf` (§3.4) — fait le 16 août : `CreateNuclearJEI` est sain
