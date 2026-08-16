@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.nuclearteam.createnuclear.CNClientProxy;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
-// import net.nuclearteam.createnuclear.foundation.mixin.client.CameraAccessor;
+import net.nuclearteam.createnuclear.foundation.mixin.client.CameraAccessor;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID, value = Dist.CLIENT)
@@ -72,13 +72,12 @@ public class ClientEvents {
                 double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
 
                 // Physically offset the camera
-                /*
                 ((CameraAccessor) event.getCamera()).callMove(
-                        CNClientProxy.randomTremorOffsets[0] * 0.2F * intensity,
-                        CNClientProxy.randomTremorOffsets[1] * 0.2F * intensity,
-                        CNClientProxy.randomTremorOffsets[2] * 0.5F * intensity
+                    (float) (CNClientProxy.randomTremorOffsets[0] * 0.2F * intensity),
+                    (float) (CNClientProxy.randomTremorOffsets[1] * 0.2F * intensity),
+                    (float) (CNClientProxy.randomTremorOffsets[2] * 0.5F * intensity)
                 );
-                */
+
             }
         }
     }

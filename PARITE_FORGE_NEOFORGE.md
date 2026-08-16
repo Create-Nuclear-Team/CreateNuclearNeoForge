@@ -664,17 +664,55 @@ les gametests.**
 | À vérifier | Attendu | Pourquoi c'est en attente |
 |---|---|---|
 | Comportement de la radiation | seuils, décroissance, persistance à la mort identiques à Forge | `RadiationCapability` diverge de 186 lignes. Le mécanisme (data attachments) est correct, mais rien ne dit que le comportement l'est |
-| Tooltip d'une barre d'uranium/graphite | cinq lignes de stats, type en vert (FUEL) ou cyan | livré sans test en jeu |
-| `raw_uranium_block` en inventaire | la radiation monte de 27 par item | livré sans test en jeu |
-| Tuyau ouvert Create crachant de l'uranium | irradie les entités de la zone | livré sans test en jeu ; la feature était morte avant, donc jamais observée |
-| Ventilateur derrière de la neige poudreuse | le concentré d'azote devient du concentré d'azote refroidi ; particules flocon/éternuement ; entités ralenties | §2.1 porté sans test en jeu. Vérifier aussi la catégorie JEI « Cryogenic fan » |
-| `enable_world_gen = false` dans la config commune | **monde neuf** sans uranium, plomb, thorium, nitrate ni strates | filtre de placement porté sans test en jeu. Ne se voit que sur un monde généré après coup |
-| `enable_world_gen = true` (défaut) | les cinq features génèrent comme avant | le filtre est désormais `createnuclear:config_filter`, plus celui de Create — non-régression à confirmer |
-| Chaîne de l'azote de bout en bout | nitrate → *(four)* → concentré → *(ventilateur + neige poudreuse)* → concentré refroidi → *(mixeur + glace)* → 100 mB d'azote liquide | §3.1 corrigé sans test en jeu |
-| Minage `uranium_ore`/`deepslate_uranium_ore`/`lead_ore`/`deepslate_lead_ore` | drop 3–4 (uranium) ou 2–4 (plomb) matière brute, plus bonus fortune | §3.3 corrigé sans test en jeu — vérifié uniquement sur le JSON de loot table généré |
+| Tuyau ouvert Create crachant de l'uranium | irradie les entités de la zone | **testé, non concluant — reporté.** Aucune irradiation observée. Isolé en testant aussi lave (pose juste un bloc, jugé correct, pas de handler attendu) et thé (rien, non isolé). `CNOpenPipeEffectHandlers`/`RadiationEffectHandler` vérifiés identiques au bit près entre Forge et NeoForge — donc pas une divergence de portage si bug il y a. Piste non creusée : `RadiationCapability.canBeIrradiated()`, appelé par le handler, dépend de `CNConfigs.server().radiation.enabledItemRadiation`, un flag pensé pour la radiation passive par items et potentiellement mal réutilisé ici |
 | Les 6 advancements réactivées (`anti_radiation_armor`, `avoiding_cancer`, `dye_anti_radiation_armor`, `feeding_the_reactor`, `fueling_the_reactor`, `unlimited_power`) | se débloquent au bon moment, en particulier `avoiding_cancer` (équiper les 4 pièces d'armure anti-radiation) dont le trigger a été réécrit | §3.4.1 corrigé sans test en jeu — vérifié uniquement par compilation + `runData` |
-| `IrradiatedWolf` réaligné sur Forge | nourrir un loup non apprivoisé affiche le message WIP au lieu de l'apprivoiser ; le loup fuit quand il prend feu ou gèle (`WolfPanicGoal`) ; hauteur des yeux correcte (`eyeHeight(0.68f)`) | §3.4.5 corrigé sans test en jeu |
 
+> ✅ **Tooltip d'une barre d'uranium/graphite — testé en jeu, confirmé.** Cinq lignes de stats,
+> type en vert (FUEL) ou cyan. Sorti de la liste des points en attente.
+>
+> ✅ **`raw_uranium_block` en inventaire — testé en jeu, confirmé.** La radiation monte bien de 27
+> par item. Sorti de la liste des points en attente.
+>
+> ✅ **Ventilateur derrière de la neige poudreuse — testé en jeu, confirmé.** Le concentré d'azote
+> devient concentré refroidi, particules flocon/éternuement présentes, entités ralenties ; la
+> catégorie JEI « Cryogenic fan » (§2.1/§3.4.3) est bien câblée. Sorti de la liste des points en
+> attente.
+>
+> ✅ **`IrradiatedWolf` réaligné sur Forge — testé en jeu, confirmé.** Nourrir un loup non
+> apprivoisé (yellowcake) affiche le message WIP au lieu de l'apprivoiser (§3.4.5). Sorti de la
+> liste des points en attente.
+>
+> ✅ **Minage `uranium_ore`/`deepslate_uranium_ore`/`lead_ore`/`deepslate_lead_ore` — testé en jeu,
+> confirmé.** Drop 3–4 (uranium) / 2–4 (plomb) de matière brute plus bonus fortune, conforme au
+> correctif du §3.3. Sorti de la liste des points en attente.
+>
+> ✅ **`enable_world_gen` (false et true) — testé en jeu, les deux cas confirmés, mais un vrai bug
+> trouvé et corrigé au passage.** `enable_world_gen = false` sur un monde neuf : aucun
+> uranium/plomb/thorium/nitrate ni strate n'apparaît, le filtre `createnuclear:config_filter`
+> fonctionne. `enable_world_gen = true` : les cinq features génèrent, mais **les valeurs de
+> génération ne matchaient pas Forge** — corrigé côté joueur dans `CNConfiguredFeatures.java`/
+> `CNPlacedFeatures.java` :
+>
+> | Minerai | Avant (divergent) | Après (= Forge) |
+> |---|---|---|
+> | `URANIUM_ORE` count/hauteur | 7 / -63→16 | **4** / -63→16 |
+> | `LEAD_ORE` taille de veine / count / hauteur | 10 / 10 / -16→112 | **12** / 10 / -16→**60** |
+> | `THORIUM_ORE` taille de veine / count / hauteur | 16 / 16 / -16→112 | **12** / **6** / -16→**55** |
+> | `STRIATED_ORES_OVERWORLD` rareté / hauteur | 1/18 / -30→70 | **1/64** / **-63→16** |
+>
+> `NITRATE_ORE` était déjà conforme (6 / -63→64), pas touché. Sorti de la liste des points en
+> attente.
+>
+> ✅ **Chaîne complète de l'azote — testée en jeu, confirmé de bout en bout.** Nitrate → (four) →
+> concentré → (ventilateur + neige poudreuse) → concentré refroidi → (mixeur + glace) → 100 mB
+> d'azote liquide (§3.1). Sortie de la liste des points en attente.
+>
+> ✅ **`WolfPanicGoal` et `eyeHeight(0.68f)` — sortis de cette liste de vérifications, pas fermés
+> par un test manuel isolé.** Décision du 16 août : une future passe couvrira le comportement de
+> **toutes les living entities du mod** (pas seulement le chat comme en §2.1/§3.4.5) — `WolfPanicGoal`
+> et la hauteur des yeux du loup seront revérifiés à cette occasion, avec le reste (goals IA,
+> réductions de « copies » de mobs vanilla). Inutile de les tester isolément avant cette passe.
+>
 > **Divergence assumée sur la clé de config.** `CWorldGen` exposait `disableWorldGen` (défaut
 > `false`) — un copier-coller littéral de la classe homonyme de Create, **jamais lu par personne**.
 > Il est remplacé par `enable_world_gen` (défaut `true`), la clé de Forge. Un `createnuclear-common.toml`

@@ -19,6 +19,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 
 import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 
 
 @SuppressWarnings("unused")
@@ -47,8 +48,8 @@ public class AntiRadiationArmorItem extends ArmorItem {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
         if (level.isClientSide || !(entity instanceof Player player)) return;
         if (!stack.has(CNDataComponents.CLOTH_COLOR)) return;
-//        if (CNAdvancement.DYE_ANTI_RADIATION_ARMOR.isAlreadyAwardedTo(player)) return;
-//        CNAdvancement.DYE_ANTI_RADIATION_ARMOR.awardTo(player);
+        if (CNAdvancement.DYE_ANTI_RADIATION_ARMOR.isAlreadyAwardedTo(player)) return;
+        CNAdvancement.DYE_ANTI_RADIATION_ARMOR.awardTo(player);
     }
 
     public static <T extends Item, P>NonNullUnaryOperator<ItemBuilder<T, P>> setColorComponent(Cloths cloths) {
