@@ -546,7 +546,7 @@ Ce sont les plus coûteux : le code compile, ne lève rien, et se comporte mal.
 ### Noms qui masquent une classe vanilla
 
 Trois classes du mod portent volontairement le nom d'une classe vanilla, pour rester alignées
-sur Forge : `ArmorMaterials` (`net.minecraft.world.item.ArmorMaterials`), `CatLieOnBedGoal` et
+sur Forge : `CNArmorMaterials` (`net.minecraft.world.item.ArmorMaterials`), `CatLieOnBedGoal` et
 `CatSitOnBlockGoal` (`net.minecraft.world.entity.ai.goal.*`). Les fichiers concernés importent
 le package vanilla en wildcard — **sans danger**, parce qu'en Java une classe du même package
 l'emporte sur un import à la demande, et qu'aucun de ces fichiers n'utilise la classe vanilla

@@ -89,6 +89,7 @@ Ces trois cas ont une logique entièrement commentée ou un comportement neutral
 |---|---|---|
 | `content/multiblock/output/ReactorOutput.java:45,54,111` | `SPEED` (IntegerProperty) déclarée mais son ajout au state-builder est commenté à 3 endroits. | 🟢 |
 | `content/multiblock/fluid/CNReactorFluidTypes.java:45-50` | Enregistrement du fluide `nitrogen` entièrement commenté. | 🟢 |
+| `foundation/utility/RenderHelper.java:27-62` | `renderOverlay(...)` dessine un masque plein écran opaque (alpha=1, `blit` sur toute la fenêtre) sans jamais toucher au depth test/depth mask autour du `blit`. Sous l'ancien pipeline GUI Forge (avant la réécriture du système de layers en 1.20.2+), le rendu 2D du HUD ne s'appuyait pas sur un vrai depth buffer : l'ordre de dessin (painter's algorithm) suffisait à déterminer la superposition visuelle, donc l'absence de gestion explicite du depth state n'avait aucune conséquence. Sous NeoForge, `GuiLayerManager` (qui gère désormais les layers, y compris ceux enregistrés via `RegisterGuiLayersEvent`) sépare chaque layer en Z de +200 et garde le depth test **actif** pendant toute la durée de `layerManager.render()` — y compris pendant `RenderGuiEvent.Post`, l'event utilisé par des mods tiers comme Jade pour dessiner leur propre HUD après tous les layers vanilla/mod. Un blit plein écran qui n'annule pas `depthMask`/`disableDepthTest` peut donc occulter par test de profondeur — et pas seulement par transparence — tout ce qui est dessiné après lui dans la même frame. Constaté concrètement avec `HelmetOverlay` (casque anti-radiation) masquant presque entièrement le HUD de Jade. Correctif : encadrer le `blit` de `RenderSystem.depthMask(false)`/`disableDepthTest()` puis restaurer l'état (`enableDepthTest()`/`depthMask(true)`) juste après. **✅ Corrigé et testé en jeu** (`RenderHelper.java:45-46,63-65`). | 🟠 |
 | `net/nuclearteam/createnuclear/infrastructure/config/CNCServer.java:17` | `Comments.explode` défini mais jamais utilisé côté serveur. | 🟢 |
 
 ### 1.5 Imports inutiles
@@ -305,6 +306,7 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 - Duplication `FindController` (5 classes), `AntiRadiationArmorItem.isArmored/isArmored2`, `RadiationCapability.computeItemRadiation`.
 - Commentaires français impactant l'expérience joueur ou masquant un bug : `CNCCommon.explode`, `ReactorAlarmManager`, `ReactorFluidInputEntity`, `BigFluidStack`.
 - `RodType`/`ReactorFluidType` : intention de lecture config jamais implémentée (code mort + doc trompeuse).
+- ~~`RenderHelper.renderOverlay` : absence de gestion du depth state autour du `blit` plein écran, sans conséquence sous l'ancien pipeline GUI Forge mais provoquant sous NeoForge une occlusion par depth test des HUD de mods tiers dessinés en `RenderGuiEvent.Post` (ex. Jade masqué par le casque anti-radiation).~~ **✅ Corrigé et testé en jeu.**
 
 ### 🟡 Moyen
 

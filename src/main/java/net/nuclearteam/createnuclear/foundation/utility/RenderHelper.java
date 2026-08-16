@@ -42,6 +42,8 @@ public class RenderHelper {
 
         graphics.setColor(1f, 1f, 1f, alpha);
         RenderSystem.enableBlend();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
 
         if (coverage != 1f) {
             // Center + scale
@@ -58,6 +60,8 @@ public class RenderHelper {
             graphics.blit(texture, 0, 0, -90, 0, 0, width, height, width, height);
         }
 
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
     }
 

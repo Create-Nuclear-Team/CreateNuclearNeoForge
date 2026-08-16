@@ -56,6 +56,7 @@ public class HelmetOverlay  implements HudOverlay {
         // Calculate durability ratio
         float durabilityRatio = (helmet.getMaxDamage() - helmet.getDamageValue())
                 / (float) helmet.getMaxDamage();
+
         // Determine texture index based on thresholds
         int index = durabilityRatio >= 0.95f ? 0
                 : durabilityRatio >= 0.80f ? 1

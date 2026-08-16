@@ -1,12 +1,17 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
+import com.tterrag.registrate.builders.ItemBuilder;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.ArmorMaterial;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.bus.api.IEventBus;
 import net.nuclearteam.createnuclear.CNItems;
@@ -18,7 +23,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class ArmorMaterials {
+public class CNArmorMaterials {
     private static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, CreateNuclear.MOD_ID);
 
     public static final Holder<ArmorMaterial>  ANTI_RADIATION_SUIT = register(
@@ -48,8 +53,8 @@ public class ArmorMaterials {
                                                   float knockbackResistance,
                                                   Supplier<Ingredient> repairIngredient,
                                                   List<ArmorMaterial.Layer> layers) {
-        EnumMap<ArmorItem.Type, Integer> enumMap = new EnumMap<>(ArmorItem.Type.class);
-        for (ArmorItem.Type armorItem : ArmorItem.Type.values()) {
+        EnumMap<Type, Integer> enumMap = new EnumMap<>(Type.class);
+        for (Type armorItem : Type.values()) {
             enumMap.put(armorItem, defense[armorItem.ordinal()]);
         }
 
@@ -63,9 +68,18 @@ public class ArmorMaterials {
         ARMOR_MATERIALS.register(eventBus);
     }
 
-    public static int durabilityForType(ArmorItem.Type type) {
+    public static int durabilityForType(Type type) {
         int[] BASE_DURABILITY = {11, 16, 15, 13};
         int durabilityMultiplier = 15;
         return BASE_DURABILITY[type.ordinal()] * durabilityMultiplier;
     }
+
+    public static <T extends Item, P> NonNullUnaryOperator<ItemBuilder<T, P>> setArmorDurability(Type type, int factor) {
+        return b -> b.properties(p -> p.durability(type.getDurability(factor)));
+    }
+
+    public static <T extends Item, P> NonNullUnaryOperator<ItemBuilder<T, P>> setArmorDurability(Type type) {
+        return setArmorDurability(type, 15);
+    }
+
 }

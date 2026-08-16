@@ -132,13 +132,14 @@ repositories {
     //maven { url = "https://maven.tterrag.com" } // Registrate
     maven { url = "https://mvn.devos.one/snapshots" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+    maven { url = "https://api.modrinth.com/maven" } // JADE
 }
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     // autres dépendances Minecraft
-    implementation "curse.maven:jade-324717:6291517"
+    implementation "maven.modrinth:jade:${jade_version}"
     //compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     //compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
     implementation("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")

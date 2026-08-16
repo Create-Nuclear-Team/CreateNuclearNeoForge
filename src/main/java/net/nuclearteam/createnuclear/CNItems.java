@@ -22,6 +22,7 @@ import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
+import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
@@ -228,6 +229,7 @@ public class CNItems {
             CNItemTags.ANTI_RADIATION_HELMET.tag
         )
         .transform(setColorComponent(Cloths.DEFAULT))
+        .transform(CNArmorMaterials.setArmorDurability(Type.HELMET))
         .recipe((c, p) -> {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -266,6 +268,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
+            .transform(CNArmorMaterials.setArmorDurability(Type.CHESTPLATE))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -305,6 +308,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
+            .transform(CNArmorMaterials.setArmorDurability(Type.LEGGINGS))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -344,6 +348,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
+            .transform(CNArmorMaterials.setArmorDurability(Type.BOOTS))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
