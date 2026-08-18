@@ -1402,3 +1402,118 @@ Idée jugée intéressante par l'utilisateur, **pas implémentée, pas définiti
 retenir comme angle par défaut si/quand ce pan du prototype est repris, mais rien dans le code des
 addendums précédents ne dépend de ce choix narratif précis (il ne change que le texte de flavor,
 pas `BehaviorSynthesizer`/`CombatLog`).
+
+---
+
+# Addendum 4 — Idées de modélisation : tortue irradiée, item bloqué par le souffle du réacteur
+
+> Liste d'idées notées lors d'une session de suite, à garder sous la main **au moment de modéliser
+> la tortue irradiée dans Blockbench**, pas un système générique comme les tiers 1/2/3 plus haut.
+> Spécifique à ce seul mob, déclenché par un seul event précis (explosion du réacteur), pas par
+> kill ni par palier de contamination. Rien d'implémenté, rien vérifié à la compilation.
+
+## Le principe
+
+Si un item se trouve physiquement entre le point d'origine de l'explosion du réacteur et la
+tortue irradiée au moment du souffle, cet item reste visible, planté/posé sur la carapace, une fois
+la mutation terminée — comme si le souffle l'avait plaqué là.
+
+## Idées à garder pour la modélisation Blockbench
+
+- **Cube-locator dédié dans le modèle custom de la tortue** (`"item_anchor"` ou similaire), pas un
+  cube vanilla réutilisé : contourne directement la limite posée plus haut sur `TurtleModel#"shell"`
+  (cube non extractible car fondu dans `"body"`) puisque c'est un `PartDefinition` nommé qu'on
+  contrôle nous-mêmes → accessible après `bake()` via `ModelPart.getChild(...)`, et son
+  positionnement Blockbench se retranscrit tel quel au rendu via `ModelPart#translateAndRotate`.
+- Le locator porte transform (position + rotation) réglée à l'œil dans Blockbench, pas en Java —
+  un seul point à recaler si le modèle de la carapace change.
+
+## Idées de détection (au moment du blast)
+
+- Segment/raycast entre le point d'origine de l'explosion et la position de la tortue ; tester les
+  `ItemEntity` dont la bounding box intersecte ce segment, garder le plus proche de la source du
+  souffle si plusieurs candidats.
+- Stocker, en plus de l'`ItemStack` capturé, la **direction du souffle** (origine → tortue,
+  convertie en repère local à la tortue) pour pouvoir orienter certains items en fonction de cette
+  direction plutôt que d'une pose fixe.
+
+## Idées de pose par catégorie d'item (pas par item précis)
+
+Classification par `instanceof`/tag d'objet (`SwordItem`, `PickaxeItem`, ...), pas par item nommé —
+même logique générique que le reste du document, alphabet fini de poses :
+
+- **Épée** : verticale, plantée comme Excalibur bloquée — rotation fixe + léger enfoncement dans la
+  carapace pour donner l'impression qu'elle est coincée, pas juste posée à plat.
+- **Pioche** : inclinée, comme figée en plein geste de minage — rotation fixe différente de l'épée,
+  pas de logique de swing réelle, juste une pose statique évocatrice.
+- **Bâton (et candidats similaires, ex. hache)** : orienté selon la direction du souffle capturée à
+  la détection, via une rotation qui aligne l'axe de l'item sur ce vecteur plutôt qu'une pose fixe.
+- **Défaut (tout le reste)** : pose brute du locator Blockbench, sans rotation additionnelle.
+
+## Rappel : pourquoi c'est plus simple que le Tier 3 générique plus haut
+
+Pas besoin d'extraire une sous-partie d'un modèle vanilla ni de gérer une texture d'origine
+étrangère (`PartGraftExtractor`) : l'item se rend via l'API standard `ItemRenderer#renderStatic`
+(même mécanisme que les items tenus en main ou posés sur la tête d'un Piglin/Enderman vanilla), pas
+via un graft de géométrie. Le seul travail manuel réel est le réglage du locator dans Blockbench et
+l'écriture des 3-4 poses par catégorie — pas un problème d'API bloquant comme pour `"shell"`.
+
+## Non tranché / à décider plus tard
+
+- Le nombre exact de catégories d'items gérées au-delà de épée/pioche/bâton (armures ? blocs ?).
+- Si l'item doit rester définitivement sur la carapace ou disparaître après un certain temps/dégât.
+- Si ce mécanisme est propre à la tortue irradiée seule, ou pourrait être généralisé à d'autres
+  mobs irradiés plus tard (pas demandé pour l'instant — portée volontairement limitée à la tortue).
+
+## Prompt de vérification (spécifique à cet addendum)
+
+À utiliser (par moi plus tard, par un autre agent, ou par un dev qui relit) pour confirmer la
+faisabilité réelle de ce mécanisme et lister les classes/méthodes exactes à utiliser, **avant toute
+implémentation** :
+
+```
+Contexte : CreateNuclearNeoForge, mod NeoForge pour Minecraft 1.21.1 (neo_version=21.1.247,
+mappings officiels + Parchment 2024.11.17), package racine net.nuclearteam.createnuclear.
+
+L'Addendum 4 de PROTOTYPE_EVOLUTION_MOBS_IRRADIES.md propose un mécanisme spécifique à la tortue
+irradiée : au moment de l'explosion du réacteur, si un ItemEntity se trouve sur le segment entre
+l'origine du souffle et la tortue, l'item capturé reste visible sur la carapace (posé/planté selon
+sa catégorie : épée verticale façon Excalibur bloquée, pioche inclinée façon posture de minage,
+bâton/hache orienté selon la direction du souffle) une fois la mutation terminée.
+
+Vérifie et réponds point par point, CONFIRMÉ / INFIRMÉ / À REVÉRIFIER, avec la source
+(fichier + ligne, ou nom de classe/méthode exact) à l'appui pour chaque point :
+
+1. Faisabilité globale : ce mécanisme est-il réalisable avec des API publiques NeoForge/vanilla
+   côté client ET serveur, sans bytecode généré à la volée, sans dépendance externe (pas de
+   GeckoLib dans ce mod) ?
+2. Détection au moment du blast :
+   - Quelle classe/méthode représente le mieux "l'explosion du réacteur" dans le mod actuel (event
+     custom existant ? ExplosionEvent de NeoForge ? à créer) ?
+   - Level#getEntitiesOfClass(ItemEntity.class, AABB) existe-t-il toujours avec cette signature ?
+   - Quelle est la méthode publique la plus fiable pour tester l'intersection segment/AABB
+     (Clip/ClipContext, AABB#clip(Vec3, Vec3), ou une méthode maison à écrire) ?
+3. Modèle Blockbench / locator :
+   - Un cube nommé ajouté dans un modèle custom (LayerDefinition/PartDefinition écrit à la main,
+     pas TurtleModel vanilla) est-il bien accessible après bake() via ModelPart#getChild(String),
+     et ModelPart#translateAndRotate(PoseStack) est-elle toujours publique avec cette signature ?
+   - Existe-t-il une meilleure primitive vanilla récente pour ce cas (ex. EntityAttachment /
+     système d'ancrage introduit pour Warden$SONIC_BOOM cité dans le corps du document) ?
+4. Rendu de l'item :
+   - ItemRenderer#renderStatic(...) existe-t-il toujours avec une signature proche de celle
+     utilisée plus haut dans ce document, accessible depuis un RenderLayer<T, M> ?
+   - Quel ItemDisplayContext est le plus adapté (FIXED, GROUND, ou autre) pour un item statique
+     posé sur une entité, par opposition à un item tenu en main ?
+5. Persistance/synchro : le patron AttachmentType (RecordCodecBuilder + StreamCodec.composite),
+   déjà utilisé pour RadiationCapability/AcquiredTraits/MutationCapability dans ce document, est-il
+   le bon véhicule pour synchroniser un ItemStack + une direction (2 float ou Vec3) au client, ou
+   existe-t-il un helper vanilla/NeoForge plus direct pour un ItemStack seul (ItemStack.CODEC vs
+   ItemStack.OPTIONAL_CODEC, StreamCodec correspondant) ?
+6. Classification par catégorie d'item : confirmer que SwordItem, PickaxeItem, AxeItem sont
+   toujours les bons types (ou si la hiérarchie DiggerItem/Tiers a changé dans cette version), et
+   si un ItemTags existe déjà (vanilla ou Create) qui couvrirait un de ces cas plus proprement
+   qu'un instanceof.
+7. Le code des exemples proposés dans l'Addendum 4 compile-t-il tel quel une fois copié dans le
+   projet (imports, noms de packages, méthodes réellement publiques) ? Signale toute erreur de
+   compilation probable et la correction attendue.
+```
