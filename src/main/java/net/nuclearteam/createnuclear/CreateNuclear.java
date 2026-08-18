@@ -2,19 +2,20 @@ package net.nuclearteam.createnuclear;
 
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.CreateBuildInfo;
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
-import com.simibubi.create.infrastructure.data.CreateDatagen;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -23,13 +24,17 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.content.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule.BiomeTagRule;
 import org.slf4j.Logger;
 
 import com.simibubi.create.api.registrate.CreateRegistrateRegistrationCallback;
@@ -50,6 +55,7 @@ public class CreateNuclear {
             .setTooltipModifierFactory(item ->
                     new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
                             .andThen(TooltipModifier.mapNull(KineticStats.create(item)))
+                            .andThen(RodsStats.create(item))
             );
 
     public CreateNuclear(IEventBus eventBus, ModContainer modContainer) {
@@ -65,7 +71,8 @@ public class CreateNuclear {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-
+        CNSoundEvents.prepare();
+        CNDisplaySources.register();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -78,13 +85,20 @@ public class CreateNuclear {
 
         CNArmorMaterials.register(modEventBus);
         CNDataComponents.register(modEventBus);
+        CNAttachmentTypes.register(modEventBus);
 
         CNConfigs.register(modLoadingContext, modContainer);
 
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
+        CNParticleTypes.register(modEventBus);
+        CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
+        CNAttributes.register(modEventBus);
+        CNPlacementModifiers.register(modEventBus);
+
+        GogglesItem.addIsWearingPredicate(AntiRadiationArmorItem.IGoggleHelmet::isGoggleHelmet);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
@@ -98,10 +112,16 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
+        CNRadiationValues.register();
+
+        event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
+        event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
     }
 
     public static void onRegister(final RegisterEvent event) {
+        CNSoundEvents.register(event);
         CNFanProcessingTypes.register();
+        BiomeTagRule.register(event);
 
         if (event.getRegistry() == BuiltInRegistries.TRIGGER_TYPES) {
             CNAdvancement.register();

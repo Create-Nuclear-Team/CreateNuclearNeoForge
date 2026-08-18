@@ -16,6 +16,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe;
+import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,8 @@ import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "unchecked"})
 public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
-        ENRICHED(EnrichedRecipe::new)
+        ENRICHED(EnrichedRecipe::new),
+        SNOW_POWDER(SnowPowderRecipe::new)
     ;
 
     public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id()

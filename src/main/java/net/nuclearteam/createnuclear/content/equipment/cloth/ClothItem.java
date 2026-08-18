@@ -1,18 +1,22 @@
 package net.nuclearteam.createnuclear.content.equipment.cloth;
 
-import com.simibubi.create.api.data.recipe.BaseRecipeProvider.GeneratedRecipe;
+import com.mojang.serialization.Codec;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNItems;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import java.util.*;
-import java.util.function.Function;
+
+import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class ClothItem extends Item {
-
     private final DyeColor color;
 
     public ClothItem(Item.Properties properties, DyeColor color) {
@@ -20,112 +24,32 @@ public class ClothItem extends Item {
         this.color = color;
     }
 
-    public static class DyeRecipeList implements Iterable<GeneratedRecipe> {
-
-        private static final int COLOR_AMOUNT = DyeColor.values().length;
-        protected final GeneratedRecipe[] recipes = new GeneratedRecipe[getColorCount()];
-
-        public DyeRecipeList(Function<@NotNull DyeColor, GeneratedRecipe> filler) {
-            for (DyeColor color : DyeColor.values()) {
-                recipes[color.ordinal()] = filler.apply(color);
-            }
-        }
-
-        protected int getColorCount() {
-            return COLOR_AMOUNT;
-        }
-
-        public GeneratedRecipe get(@Nullable DyeColor color) {
-            return recipes[color.ordinal()];
-        }
-
-        public GeneratedRecipe[] toArrays() {
-            return Arrays.copyOf(recipes, recipes.length);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<GeneratedRecipe> iterator() {
-            return new Iterator<>() {
-                private int index = 0;
-                @Override
-                public boolean hasNext() {
-                    return index < recipes.length;
-                }
-                @Override
-                public GeneratedRecipe next() {
-                    if (!hasNext()) throw new NoSuchElementException();
-                    return recipes[index++];
-                }
-            };
-        }
-
-        public static class NullableDyedRecipeList extends DyeRecipeList {
-            public NullableDyedRecipeList(Function<@Nullable DyeColor, GeneratedRecipe> filter) {
-                super(filter);
-                recipes[recipes.length - 1] = filter.apply(null);
-            }
-            @Override
-            protected int getColorCount() {
-                return COLOR_AMOUNT + 1;
-            }
-            @Override
-            public GeneratedRecipe get(@Nullable DyeColor color) {
-                return color == null ? recipes[recipes.length - 1] : super.get(color);
-            }
-        }
-
+    public DyeColor getColor() {
+        return color;
     }
 
-    public static class DyeItemList<T extends Item> implements Iterable<ItemEntry<T>> {
+    /**
+     * Wraps an ItemStack with content-based equals/hashCode, since ItemStack itself only offers
+     * identity equality and NeoForge requires data component values to implement both properly.
+     */
+    public record ClothItemStack(ItemStack stack) {
+        public static final Codec<ClothItemStack> CODEC = ItemStack.CODEC.xmap(ClothItemStack::new, ClothItemStack::stack);
+        public static final StreamCodec<RegistryFriendlyByteBuf, ClothItemStack> STREAM_CODEC = ItemStack.STREAM_CODEC.map(ClothItemStack::new, ClothItemStack::stack);
 
-        private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-        private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
-
-        public DyeItemList(Function<DyeColor, ItemEntry<? extends T>> filler) {
-            for (DyeColor color : DyeColor.values()) {
-                entry[color.ordinal()] = filler.apply(color);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public ItemEntry<T> get(DyeColor color) {
-            return (ItemEntry<T>) entry[color.ordinal()];
-        }
-
-        public boolean contains(Item block) {
-            for (ItemEntry<?> entry : entry) {
-                if (entry.is(block)) return true;
-            }
-            return false;
-        }
-
-        @SuppressWarnings("unchecked")
-        public ItemEntry<T>[] toArray() {
-            return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof ClothItemStack(ItemStack stack1)
+                && ItemStack.isSameItemSameComponents(this.stack, stack1);
         }
 
         @Override
-        public Iterator<ItemEntry<T>> iterator() {
-            return new Iterator<>() {
-                private int index = 0;
-                @Override
-                public boolean hasNext() {
-                    return index < entry.length;
-                }
-                @SuppressWarnings("unchecked")
-                @Override
-                public ItemEntry<T> next() {
-                    if (!hasNext()) throw new NoSuchElementException();
-                    return (ItemEntry<T>) entry[index++];
-                }
-            };
+        public int hashCode() {
+            return ItemStack.hashItemAndComponents(this.stack);
         }
-
     }
 
-    public enum Cloths {
+    @MethodsReturnNonnullByDefault
+    public enum Cloths implements StringRepresentable {
         WHITE_CLOTH(DyeColor.WHITE),
         YELLOW_CLOTH(DyeColor.YELLOW),
         RED_CLOTH(DyeColor.RED),
@@ -141,29 +65,59 @@ public class ClothItem extends Item {
         GRAY_CLOTH(DyeColor.GRAY),
         LIGHT_BLUE_CLOTH(DyeColor.LIGHT_BLUE),
         LIME_CLOTH(DyeColor.LIME),
-        MAGENTA_CLOTH(DyeColor.MAGENTA);
+        MAGENTA_CLOTH(DyeColor.MAGENTA),
+        DEFAULT(null, "default");
 
-        private static final Map<DyeColor, ItemEntry<ClothItem>> clothMap = new EnumMap<>(DyeColor.class);
+        private static Map<DyeColor, ItemEntry<ClothItem>> clothMap;
 
-        static {
-            for (DyeColor color : DyeColor.values()) {
-                clothMap.put(color, CNItems.CLOTHS.get(color));
+        private static Map<DyeColor, ItemEntry<ClothItem>> clothMap() {
+            if (clothMap == null) {
+                clothMap = new EnumMap<>(DyeColor.class);
+                for (DyeColor color : DyeColor.values()) {
+                    clothMap.put(color, CNItems.CLOTHS.get(color));
+                }
             }
+            return clothMap;
         }
 
+        @Nullable
         private final DyeColor color;
+        private final String serializedName;
 
         Cloths(DyeColor color) {
-            this.color = color;
+            this(color, color.getSerializedName());
         }
 
+        Cloths(@Nullable DyeColor color, String serializedName) {
+            this.color = color;
+            this.serializedName = serializedName;
+        }
+
+        @Nullable
         public ItemEntry<ClothItem> getItem() {
-            return clothMap.get(this.color);
+            return color != null ? clothMap().get(color) : null;
         }
 
         public static ItemEntry<ClothItem> getByColor(DyeColor color) {
-            return clothMap.get(color);
+            return clothMap().get(color);
         }
 
+        public static Cloths of(@Nullable DyeColor color) {
+            if (color == null) return DEFAULT;
+            for (Cloths c : values()) {
+                if (c.color == color) return c;
+            }
+            return DEFAULT;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return serializedName;
+        }
+
+        @Nullable
+        public DyeColor getDyeColor() {
+            return color;
+        }
     }
 }

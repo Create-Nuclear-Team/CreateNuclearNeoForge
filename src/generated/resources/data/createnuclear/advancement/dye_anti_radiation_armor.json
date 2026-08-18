@@ -2,34 +2,7 @@
   "parent": "createnuclear:anti_radiation_armor",
   "criteria": {
     "0": {
-      "conditions": {
-        "items": [
-          {
-            "items": "#createnuclear:anti_radiation_helmet_dye"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "1": {
-      "conditions": {
-        "items": [
-          {
-            "items": "#createnuclear:anti_radiation_chestplate_dye"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "2": {
-      "conditions": {
-        "items": [
-          {
-            "items": "#createnuclear:anti_radiation_leggings_dye"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
+      "trigger": "createnuclear:dye_anti_radiation_armor_builtin"
     }
   },
   "display": {
@@ -40,7 +13,7 @@
     },
     "icon": {
       "count": 1,
-      "id": "createnuclear:red_anti_radiation_helmet"
+      "id": "createnuclear:default_anti_radiation_helmet"
     },
     "title": {
       "translate": "advancement.createnuclear.dye_anti_radiation_armor"
@@ -49,12 +22,6 @@
   "requirements": [
     [
       "0"
-    ],
-    [
-      "1"
-    ],
-    [
-      "2"
     ]
   ],
   "sends_telemetry_event": true

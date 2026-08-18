@@ -2,8 +2,6 @@ package net.nuclearteam.createnuclear.infrastructure.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.simibubi.create.foundation.data.recipe.CreateMechanicalCraftingRecipeGen;
-import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider;
 import com.simibubi.create.foundation.utility.FilesHelper;
 import com.tterrag.registrate.providers.ProviderType;
 import net.createmod.ponder.foundation.PonderIndex;
@@ -12,11 +10,11 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNMechanicalCraftingRecipeGen;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNRecipeProvider;
-import net.nuclearteam.createnuclear.foundation.data.recipe.CNShapelessRecipeGen;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNStandardRecipeGen;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 
@@ -47,10 +45,11 @@ public class CreateNuclearDatagen {
 
         generator.addProvider(event.includeClient(), new CNStandardRecipeGen(output, lookupProvider));
         generator.addProvider(event.includeServer(), new CNMechanicalCraftingRecipeGen(output, lookupProvider));
-//        generator.addProvider(event.includeServer(), new CNShapelessRecipeGen(output, lookupProvider));
 
 
-        generator.addProvider(event.includeClient(), new CNAdvancement(output, lookupProvider));
+        generator.addProvider(event.includeServer(), new CNAdvancement(output, lookupProvider));
+        generator.addProvider(event.includeClient(), CNSoundEvents.provider(generator));
+        generator.addProvider(event.includeServer(), new CNDamageTypeTagsProvider(output, lookupProvider, existingFileHelper));
 
         if (event.includeServer()) {
             CNRecipeProvider.registerAllProcessing(generator, output, lookupProvider);
@@ -67,7 +66,9 @@ public class CreateNuclearDatagen {
             provideDefaultLang("potion", langConsumer);
             provideDefaultLang("tooltips", langConsumer);
             provideDefaultLang("reactor", langConsumer);
+            provideDefaultLang("irradiated", langConsumer);
             CNAdvancement.provideLang(langConsumer);
+            CNSoundEvents.provideLang(langConsumer);
             providePonderLang(langConsumer);
         });
     }

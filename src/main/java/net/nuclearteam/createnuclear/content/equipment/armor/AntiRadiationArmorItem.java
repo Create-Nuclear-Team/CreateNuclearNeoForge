@@ -1,179 +1,92 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
-import com.simibubi.create.content.equipment.armor.BaseArmorItem;
-import com.tterrag.registrate.util.entry.ItemEntry;
+import com.tterrag.registrate.builders.ItemBuilder;
+import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
-import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.nuclearteam.createnuclear.CNAttributes;
+import net.nuclearteam.createnuclear.CNDataComponents;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 
-import java.util.EnumMap;
-import java.util.Locale;
-import java.util.Map;
+import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+
 
 @SuppressWarnings("unused")
-public class AntiRadiationArmorItem {
+@MethodsReturnNonnullByDefault
+public class AntiRadiationArmorItem extends ArmorItem {
+    public static final double RADIATION_VALUE = 0.25;
 
-    public static final ArmorItem.Type HELMET = ArmorItem.Type.HELMET;
-    public static final ArmorItem.Type CHESTPLATE = ArmorItem.Type.CHESTPLATE;
-    public static final ArmorItem.Type LEGGINGS = ArmorItem.Type.LEGGINGS;
-    public static final ArmorItem.Type BOOTS = ArmorItem.Type.BOOTS;
-    public static final Holder<ArmorMaterial> ARMOR_MATERIAL = CNArmorMaterials.ANTI_RADIATION_SUIT;
+    public AntiRadiationArmorItem(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
+        super(material, type, properties);
+    }
+
+    @Override
+    public ItemAttributeModifiers getDefaultAttributeModifiers() {
+        return super.getDefaultAttributeModifiers().withModifierAdded(
+            CNAttributes.IRRADIATED_RESISTANCE,
+            // The id must be unique per slot: modifiers are keyed by ResourceLocation, so sharing one id
+            // between the 4 pieces would make them overwrite each other instead of stacking to 1.0.
+            new AttributeModifier(CreateNuclear.asResource("armor_resistance_irradiation_" + this.getType().getName()), RADIATION_VALUE, AttributeModifier.Operation.ADD_VALUE),
+            EquipmentSlotGroup.bySlot(this.getType().getSlot())
+        );
+    }
 
 
-    public static class Helmet extends BaseArmorItem {
-        protected final DyeColor color;
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (level.isClientSide || !(entity instanceof Player player)) return;
+        if (!stack.has(CNDataComponents.CLOTH_COLOR)) return;
+        if (CNAdvancement.DYE_ANTI_RADIATION_ARMOR.isAlreadyAwardedTo(player)) return;
+        CNAdvancement.DYE_ANTI_RADIATION_ARMOR.awardTo(player);
+    }
 
-        public Helmet(Properties properties, DyeColor color) {
-            super(
-                    CNArmorMaterials.ANTI_RADIATION_SUIT,
-                    HELMET,
-                    properties,
-                    CreateNuclear.asResource(String.format(Locale.ROOT, "%s_anti_radiation_suit", color.getName()))
+    public static <T extends Item, P>NonNullUnaryOperator<ItemBuilder<T, P>> setColorComponent(Cloths cloths) {
+        return b -> b
+            .properties(p -> p
+                .component(CNDataComponents.CLOTH_COLOR, Cloths.DEFAULT)
             );
-            this.color = color;
-        }
+    }
 
-        public static TagKey<Item> getHelmetTag(String key) {
-            return key.equals("white")
-                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNItemTags.ANTI_RADIATION_HELMET_DYE.tag;
+    public static class Helmet extends AntiRadiationArmorItem implements IGoggleHelmet {
+        public Helmet(Properties p) {
+            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.HELMET, p);
         }
     }
 
-
-    public static class Chestplate extends BaseArmorItem {
-        protected final DyeColor color;
-
-        public Chestplate(Properties properties, DyeColor color) {
-            super(
-                    CNArmorMaterials.ANTI_RADIATION_SUIT,
-                    CHESTPLATE,
-                    properties,
-                    CreateNuclear.asResource(String.format(Locale.ROOT, "%s_anti_radiation_suit", color.getName()))
-            );
-            this.color = color;
-
-        }
-
-        public static TagKey<Item> getChestplateTag(String key) {
-            return key.equals("white")
-                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNItemTags.ANTI_RADIATION_CHESTPLATE_DYE.tag;
+    public static class Chestplate extends AntiRadiationArmorItem {
+        public Chestplate(Properties p) {
+            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.CHESTPLATE, p);
         }
     }
 
-    public static class Leggings extends BaseArmorItem {
-        protected final DyeColor color;
-
-        public Leggings(Properties properties, DyeColor color) {
-            super(
-                    CNArmorMaterials.ANTI_RADIATION_SUIT,
-                    LEGGINGS,
-                    properties,
-                    CreateNuclear.asResource(String.format(Locale.ROOT, "%s_anti_radiation_suit", color.getName()))
-            );
-            this.color = color;
-
-        }
-
-
-        public static TagKey<Item> getLeggingsTag(String key) {
-            return key.equals("white")
-                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNItemTags.ANTI_RADIATION_LEGGINGS_DYE.tag;
+    public static class Leggings extends AntiRadiationArmorItem {
+        public Leggings(Properties p) {
+            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.LEGGINGS, p);
         }
     }
 
-    public static class Boot extends BaseArmorItem {
-        public Boot(Properties properties) {
-            super(
-                    CNArmorMaterials.ANTI_RADIATION_SUIT,
-                    BOOTS,
-                    properties,
-                    CreateNuclear.asResource(String.format(Locale.ROOT, "%s_anti_radiation_suit", DyeColor.WHITE.getName()))
-            );
+    public static class Boot extends AntiRadiationArmorItem {
+        public Boot(Properties p) {
+            super(CNArmorMaterials.ANTI_RADIATION_SUIT, Type.BOOTS, p);
         }
     }
 
-
-    public enum Armor {
-        WHITE_ARMOR(DyeColor.WHITE),
-        YELLOW_ARMOR(DyeColor.YELLOW),
-        RED_ARMOR(DyeColor.RED),
-        BLUE_ARMOR(DyeColor.BLUE),
-        GREEN_ARMOR(DyeColor.GREEN),
-        BLACK_ARMOR(DyeColor.BLACK),
-        ORANGE_ARMOR(DyeColor.ORANGE),
-        PURPLE_ARMOR(DyeColor.PURPLE),
-        BROWN_ARMOR(DyeColor.BROWN),
-        PINK_ARMOR(DyeColor.PINK),
-        CYAN_ARMOR(DyeColor.CYAN),
-        LIGHT_GRAY_ARMOR(DyeColor.LIGHT_GRAY),
-        GRAY_ARMOR(DyeColor.GRAY),
-        LIGHT_BLUE_ARMOR(DyeColor.LIGHT_BLUE),
-        LIME_ARMOR(DyeColor.LIME),
-        MAGENTA_ARMOR(DyeColor.MAGENTA);
-
-        private static final Map<DyeColor, ItemEntry<Helmet>> helmetMap = new EnumMap<>(DyeColor.class);
-        private static final Map<DyeColor, ItemEntry<Chestplate>> chestplateMap = new EnumMap<>(DyeColor.class);
-        private static final Map<DyeColor, ItemEntry<Leggings>> leggingsMap = new EnumMap<>(DyeColor.class);
-
-        static {
-            for (DyeColor color : DyeColor.values()) {
-                helmetMap.put(color, CNItems.ANTI_RADIATION_HELMETS.get(color));
-                chestplateMap.put(color, CNItems.ANTI_RADIATION_CHESTPLATES.get(color));
-                leggingsMap.put(color, CNItems.ANTI_RADIATION_LEGGINGS.get(color));
-            }
-        }
-
-        private final DyeColor color;
-
-        Armor(DyeColor dyeColor) {
-            this.color = dyeColor;
-        }
-
-        public ItemEntry<Helmet> getHelmetItem() {
-            return helmetMap.get(this.color);
-        }
-
-        public static ItemEntry<Helmet> getHelmetByColor(DyeColor color) {
-            return helmetMap.get(color);
-        }
-
-        public ItemEntry<Chestplate> getChestplateItem() {
-            return chestplateMap.get(this.color);
-        }
-
-        public static ItemEntry<Chestplate> getChestplateByColor(DyeColor color) {
-            return chestplateMap.get(color);
-        }
-
-        public ItemEntry<Leggings> getLeggingsItem() {
-            return leggingsMap.get(this.color);
-        }
-
-        public static ItemEntry<Leggings> getLeggingsByColor(DyeColor color) {
-            return leggingsMap.get(color);
-        }
-
-        public static boolean isArmored(ItemStack item) {
-            return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
-                    ;
-        }
-
-        public static boolean isArmored2(ItemStack item) {
-            return CNItems.ANTI_RADIATION_HELMETS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_CHESTPLATES.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_LEGGINGS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
-                    ;
+    public interface IGoggleHelmet {
+        static boolean isGoggleHelmet(LivingEntity entity) {
+            ItemStack headSlot = entity.getItemBySlot(EquipmentSlot.HEAD);
+            return CNItems.ANTI_RADIATION_HELMETS.isIn(headSlot);
         }
     }
-
 }

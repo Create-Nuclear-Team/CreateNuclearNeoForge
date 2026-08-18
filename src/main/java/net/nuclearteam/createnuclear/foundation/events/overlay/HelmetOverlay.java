@@ -42,7 +42,7 @@ public class HelmetOverlay  implements HudOverlay {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return false;
         ItemStack helmet = player.getInventory().getArmor(EquipmentSlot.HEAD.getIndex());
-        return !helmet.isEmpty() && helmet.is(CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag);
+        return !helmet.isEmpty() && helmet.is(CNItemTags.ANTI_RADIATION_HELMET.tag);
     }
 
     @Override
@@ -56,6 +56,7 @@ public class HelmetOverlay  implements HudOverlay {
         // Calculate durability ratio
         float durabilityRatio = (helmet.getMaxDamage() - helmet.getDamageValue())
                 / (float) helmet.getMaxDamage();
+
         // Determine texture index based on thresholds
         int index = durabilityRatio >= 0.95f ? 0
                 : durabilityRatio >= 0.80f ? 1

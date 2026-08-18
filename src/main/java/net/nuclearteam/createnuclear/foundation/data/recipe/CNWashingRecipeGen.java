@@ -2,6 +2,8 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.WashingRecipeGen;
+import com.simibubi.create.content.kinetics.fan.processing.SplashingRecipe;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -12,6 +14,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public class CNWashingRecipeGen extends WashingRecipeGen {
 
@@ -28,5 +31,11 @@ public class CNWashingRecipeGen extends WashingRecipeGen {
 
     public CNWashingRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, CreateNuclear.MOD_ID);
+    }
+
+    @Override
+    protected GeneratedRecipe create(Supplier<ItemLike> singleIngredient,
+                                      UnaryOperator<StandardProcessingRecipe.Builder<SplashingRecipe>> transform) {
+        return create(CreateNuclear.MOD_ID, singleIngredient, transform);
     }
 }
