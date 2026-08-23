@@ -109,30 +109,61 @@ neoForge {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files before January 2023
-        name = "Progwml6's maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-    maven {
-        url "https://cursemaven.com"
+    // Modrinth heberge JADE (groupe "maven.modrinth"). On le declare en exclusiveContent
+    // pour que Gradle n'aille JAMAIS chercher ce groupe ailleurs : sinon une panne d'un
+    // autre depot (ex. HTTP 523 chez progwml6) fait echouer toute la resolution.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter { includeGroup "maven.modrinth" }
     }
 
-    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
-    //maven { url = "https://maven.tterrag.com" } // Registrate
-    maven { url = "https://mvn.devos.one/snapshots" } // Registrate
-    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
-    maven { url = "https://api.modrinth.com/maven" } // JADE
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "CurseMaven"
+                url = "https://cursemaven.com"
+            }
+        }
+        filter { includeGroup "curse.maven" }
+    }
+
+    maven {
+        // JEI depuis janvier 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+        content { includeGroup "mezz.jei" }
+    }
+    maven {
+        // Miroir de secours pour JEI
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+        content { includeGroup "mezz.jei" }
+    }
+
+    maven {
+        name = "CreateMod"
+        url = "https://maven.createmod.net" // Create, Ponder, Flywheel
+        content {
+            includeGroup "com.simibubi.create"
+            includeGroup "net.createmod.ponder"
+            includeGroupAndSubgroups "dev.engine-room"
+        }
+    }
+    maven {
+        name = "DevOS"
+        url = "https://mvn.devos.one/snapshots" // Registrate
+        content { includeGroup "com.tterrag.registrate" }
+    }
+    maven {
+        name = "Fuzs mod resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" // ForgeConfigAPIPort
+        content { includeGroupAndSubgroups "fuzs" }
+    }
 }
 
 dependencies {
