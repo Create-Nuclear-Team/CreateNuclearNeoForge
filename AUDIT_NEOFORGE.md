@@ -1,7 +1,7 @@
 # Audit de code — Migration Forge → NeoForge (CreateNuclearNeoForge)
 
 Document de suivi vivant. **Ne contient que les points encore ouverts.**
-Dernière re-vérification intégrale contre le code : **23/08/2026** (branche `V2`).
+Dernière re-vérification intégrale contre le code : **23/08/2026** (branche `V2-Audit`, commit `d2c7078`).
 Tout point corrigé depuis l'audit initial a été retiré du fichier — l'historique complet reste disponible dans `git log`.
 
 Périmètre : `src/main/java` (292 fichiers), à l'exclusion des ressources/datagen JSON.
@@ -29,10 +29,23 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | # | Fichier:ligne | Problème | Priorité |
 |---|---|---|---|
 | B2 | `content/radiation/capability/RadiationCapability.java:210-212` | Dans `applyEffects`, la branche `< radiationLevel3` et la branche `else` renvoient toutes deux `amplifierLevel2.get()`. Conséquence : le seuil de config `radiation_level_3` n'a **aucun effet** (les deux dernières tranches sont identiques) et l'amplificateur plafonne au niveau 2. À trancher : soit ajouter un `amplifierLevel3` dans `CRadiation.java` (qui n'expose aujourd'hui que `amplifierLevel0/1/2`), soit supprimer `radiationLevel3` devenu inutile. | 🟠 |
+| B3 | `content/enriching/campfire/EnrichingCampfireBlock.java:118-120` | `protected MapCodec<? extends BaseEntityBlock> codec()` renvoie `return null;` au lieu du `CODEC` construit juste au-dessus (l.30-35) via `RecordCodecBuilder`. Le codec du bloc est donc systématiquement `null` en jeu — vérifié directement dans le fichier, ce n'est pas un doute. | 🔴 |
+| B4 | `foundation/data/recipe/CNStandardRecipeGen.java:305-315` | Dans `viaShapeless(...)`, `RecipeOutput conditionalOutput = recipeOutput.withConditions(...)` (l.313) est calculé puis **jamais utilisé** : l'appel `b.save(...)` juste en dessous (l.315) sauvegarde via `recipeOutput` et non `conditionalOutput`. Toute recette générée par cette voie avec des `recipeConditions` (`whenModLoaded`/`whenModMissing`, etc.) voit ses conditions **ignorées**. À noter : le même motif existe correctement à `CNStandardRecipeGen.java:417-420` (`conditionalOutput` y est bien utilisé) — seule la variante `viaShapeless` est buguée. | 🔴 |
+| B5 | `content/contraptions/irradiated/wolf/IrradiatedWolfModel.java:138-145` | `headParts()` et `bodyParts()` renvoient `null` au lieu d'une `Iterable<ModelPart>` vide. Ces hooks d'`AgeableListModel`/`ColorableAgeableListModel` sont normalement itérés par le moteur de rendu vanilla (mise à l'échelle des bébés) : risque de `NullPointerException` si le chemin de code correspondant est atteint. | 🟠 |
+| B6 | `foundation/ponder/CNPonderIndex.java:18,21` (et 24,27) | `addStoryBoard("reactor/reactor_t1_ponder", CNPonderReactorScenes::t1)` puis `addStoryBoard("reactor/reactor_t1_ponder", CNPonderReactorScenes::ioPlacement)` utilisent **le même identifiant** `reactor/reactor_t1_ponder` pour deux storyboards différents (`t1` et `ioPlacement`) — le second écrase probablement le premier dans le registre Ponder. `ioPlacement` devrait très probablement avoir son propre id (ex. `reactor/reactor_io_ponder`). | 🟡 |
 
 ---
 
 ## 1. Dead Code
+
+### 1.1 Classes inutilisées / entièrement mortes
+
+| Fichier | Détail | Priorité |
+|---|---|---|
+| `foundation/utility/Maths.java` | Fichier entier marqué en en-tête *« Source code recreated from a .class file by IntelliJ IDEA (FernFlower decompiler) »* : le source original est perdu. Sur l'ensemble des méthodes/champs statiques, seuls `smin` et `sampleNoise3D(float,float,float,float)` ont un appelant réel (`NuclearExplosionEntity.java:157-158`, `NuclearMushroomCloudParticle.java:115` — vérifié). Tout le reste (`sampleNoise2D`, `buildShape`, `walkValue`, `approachRotation`, `getGroundBelowPosition`, `readVec3`, `writeVec3`, `approachDegreesNoWrap`, `canyonStep`, `getBiomesWithinAtY`, `sampleNoise3D(int,int,int,float)`, `HORIZONTAL_DIRECTIONS`, `NOT_UP_DIRECTIONS`, `HALF_SQRT_3`, `QUARTER_PI`) est du code mort décompilé sans source récupérable. | 🟠 |
+| `content/multiblock/controller/consumable/FluidConsumable.java` | Jamais instanciée ailleurs que dans le `switch` de `IConsumable.deserializeNBT` (cas `"fluid"`) ; `consume()` retourne toujours `false`. Aucun code du dépôt n'écrit de tag `"type":"fluid"` en NBT (la consommation de fluide passe en réalité par `FluidConsumptionRateCalculator`) : chemin mort de bout en bout. | 🟠 |
+| `net/nuclearteam/createnuclear/CNPackets.java` | Enum sans aucune constante (corps vide) ; aucune classe du projet n'implémente `BasePacketPayload`. `register()` et la boucle `for (CNPackets packet : CNPackets.values())` sont donc des no-op complets — soit y migrer les payloads réseau existants s'il devait les centraliser, soit le supprimer. | 🟡 |
+| `content/explosion/CNBasicModelPart.java` | Toute la machinerie de construction de cube (classes internes `ModelBox`, `PositionTextureVertex`, `TexturedQuad`, 7 surcharges `addBox`) n'a aucun appelant dans le dépôt : `CNAdvancedModelBox` utilise les classes équivalentes de `CNTabulaModelRenderUtils` à la place. Voir aussi §3 (duplication avec `CNTabulaModelRenderUtils`). | 🟠 |
 
 ### 1.2 Méthodes inutilisées
 
@@ -42,6 +55,10 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | `content/multiblock/alarm/ReactorAlarmEntity.java:98-100` | `setController(...)` jamais appelée (les seuls `setController` appelés en jeu sont ceux de `ReactorCasingEntity`/`ReactorFrameEntity`, qui prennent un `BlockPos`). | 🟢 |
 | `foundation/utility/CreateNuclearLang.java:68-70` | `temporaryText(String)`, `@Deprecated`, aucun appelant. | 🟢 |
 | `foundation/utility/TextUtils.java:45-75,77,116-119` | `renderMultilineDebugText`, `renderDebugText`, `translateWithFormatting`, `leftPad` : aucun appelant dans le code (`renderDebugText` n'est appelée que par `renderMultilineDebugText`, elle-même morte). | 🟢 |
+| `foundation/advancement/CNAdvancementBehaviour.java:108-112` | `tryAward(BlockGetter, BlockPos, CreateAdvancement)` sans appelant ; délègue en plus vers `AdvancementBehaviour.TYPE` de Create au lieu de `CNAdvancementBehaviour.TYPE` — code copié depuis Create et jamais adapté ni retiré. | 🟡 |
+| `lib/multiblock/impl/IMultiBlockPattern.java:34-36` | Méthode par défaut `contruct(Level, BlockPos)` (faute de frappe pour `construct`) jamais appelée, fait doublon avec `construct(level, pos, (a,b) -> true)`. | 🟡 |
+| `lib/multiblock/SimpleMultiBlockAislePatternBuilder.java:83-87` | `getDistanceController(char)` sans appelant ; réutilise en plus `Util.parseBlockPattern`, qui mute la liste `aisles` passée en paramètre via `Collections.reverse` (`Util.java:20`) — si réactivée telle quelle, elle inverserait une seconde fois une liste déjà consommée. | 🟡 |
+| `content/multiblock/core/ReactorCoreEntity.java:11-23` | `tick()` ne fait qu'un early-return conditionnel ; `countdownTicks`/`hasExploded` ne sont jamais réellement pilotés : la logique d'explosion du cœur semble inachevée plutôt que fonctionnelle. | 🟡 |
 
 ### 1.3 Champs inutilisés
 
@@ -54,12 +71,25 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | `content/multiblock/alarm/ReactorAlarmEntity.java:21` | Champ public `controller` jamais lu (hors `setController` lui-même mort). | 🟢 |
 | `foundation/advancement/CNAdvancement.java:54` | `public static final CreateNuclearAdvancement START = null,` — première entrée nulle de la déclaration groupée, jamais référencée. | 🟢 |
 | `content/contraptions/irradiated/cat/IrradiatedCat.java:525-526` | Dans `CatAvoidEntityGoal` : `Predicate<Entity> var10006 = EntitySelector.NO_CREATIVE_OR_SPECTATOR; Objects.requireNonNull(var10006);` — variable locale décompilée, jamais utilisée ensuite (le prédicat n'est transmis à aucun `super(...)`). | 🟢 |
+| `content/multiblock/controller/snapshot/ReactorInputSnapshotBuilder.java:41` | `VirtualReactorInputsItem virtualItems = inputManager.getInventory(level);` calculée puis jamais utilisée. | 🟡 |
+
+| `content/multiblock/controller/ReactorControllerBlockEntity.java:69` | `private final ReactorPattern pattern = new ReactorPattern();` instancié à chaque bloc-entité mais jamais lu ni utilisé ailleurs dans la classe. | 🟠 |
+| `content/multiblock/controller/ReactorControllerBlockEntity.java:83` | `private double liquidLife;` ni lu ni écrit nulle part dans le fichier. | 🟠 |
+| `content/multiblock/controller/ReactorControllerBlockEntity.java:72,384` | `countCoolerRod` est assigné en `tick()` mais jamais relu ensuite (champ « write-only »). | 🟡 |
+| `content/multiblock/output/ReactorOutputEntity.java:67,77-79,90-92` | `outputPos` n'est jamais assigné ailleurs que dans `read()` (pas de setter, pas d'autre usage) : toujours `null` en pratique bien que lu/écrit en NBT. | 🟡 |
+| `net/nuclearteam/createnuclear/api/multiblock/MultiBlockManagerBeta.java:16` | Constructeur vide `public MultiBlockManagerBeta() {}` redondant (le constructeur par défaut suffirait). | 🟢 |
 
 ### 1.5 Imports inutiles
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
 | `content/uraniumOre/UraniumOreBlock.java:18-19` | `EnchantmentHelper`, `Enchantments` ne servent qu'au bloc XP commenté (l.93-96). | 🟢 |
+| `content/multiblock/controller/ReactorControllerBlockEntity.java:8-14` | `import net.minecraft.core.*;` rend redondants les imports explicites `BlockPos`, `Direction`, `HolderLookup` ; imports totalement inutilisés en plus : `SimpleMultiBlockAislePatternBuilder`, `CatnipServices`, `ChatFormatting`. | 🟢 |
+| `lib/multiblock/SimpleMultiBlockAislePatternBuilder.java:5-7` | `import lib.multiblock.impl.IMultiBlockPatternBuilder;` importé deux fois (lignes 5 et 7). | 🟢 |
+| `api/ItemRodTypesValue.java:5,10`, `api/ReactorFluidTypesValue.java:5,10` | Imports inutilisés `HolderSet`, `Collections`. | 🟢 |
+| `net/nuclearteam/createnuclear/CNSoundEvents.java:5` | Import `com.simibubi.create.AllSoundEvents` inutile (seuls les types imbriqués, importés séparément, sont utilisés). | 🟢 |
+| `net/nuclearteam/createnuclear/CNParticleRegistry.java:4-5` | Imports `BlockParticleOption`/`ItemParticleOption` inutilisés. | 🟢 |
+| `content/multiblock/bluePrintItem/ReactorBluePrintMenu.java:16`, `content/multiblock/output/ReactorOutput.java:35` | Imports wildcard `net.nuclearteam.createnuclear.*` masquant les dépendances réelles de la classe. | 🟢 |
 
 ### 1.6 Code commenté pouvant être supprimé
 
@@ -70,6 +100,13 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | `net/nuclearteam/createnuclear/CNFluids.java:114` | Ligne d'enregistrement `//.onRegister(ReactorFluidTypesValue.setReactorFluidTypeInfos(8196, 100))` commentée sur `LIQUID_NITROGEN`. | 🟢 |
 | `content/uraniumOre/UraniumOreBlock.java:93-96` | Bloc XP entièrement commenté dans `spawnAfterBreak`. | 🟢 |
 | `foundation/utility/RenderHelper.java:52` | `//graphics.pose().scale(coverage, coverage, 1f);` commenté : la branche `coverage != 1f` (l.48-57) devient strictement équivalente à la branche `coverage == 1f` (l.59-61), au `pushPose`/`translate` inutile près. | 🟢 |
+| `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:54-58` | Bloc commenté mort laissé dans le code actif (`//if (!fluidInItem.isEmpty()...)`). | 🟡 |
+| `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:66-68` | Bloc conditionnel `if (player.isCreative() && !onClient) { }` entièrement vide, sans effet. | 🟡 |
+| `content/multiblock/controller/ReactorControllerBlock.java:105-107` | `if (!state.getValue(ASSEMBLED)) { }` : premier branchement vide sans effet (condition à inverser pour ne garder que le `else`). | 🟡 |
+| `content/multiblock/controller/ReactorControllerBlock.java:134` | `//be.clearTimers(); // uncomment if the timer should reset when the reactor stops`. | 🟢 |
+| `content/multiblock/controller/ReactorControllerBlock.java:191` | `//entity.removeIOAll();`. | 🟢 |
+| `content/particles/NuclearMushroomCloudParticle.java:62,70` | `LOGGER.info("EXPLOSIOOOOOON")` (log de debug oublié) et ligne commentée `// playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE...)`. | 🟡 / 🟢 |
+| `foundation/events/overlay/HelmetOverlay.java:73` | `//Minecraft.getInstance().gui.renderItemHotbar(12f, graphics);`. | 🟢 |
 
 ---
 
@@ -108,12 +145,17 @@ Le style du projet est très majoritairement en anglais.
 | `content/multiblock/MultiblockHelpers.java:42-45` | Javadoc placée **à l'intérieur** du corps de `getControllerForPart` (l.41) au lieu d'être au-dessus de la signature. | 🟢 |
 | `content/multiblock/rod/CNRodTypes.java:12-33` | Javadoc utile mais mal placée : elle documente la classe et `RodType.Builder` en général, alors qu'elle est apposée sur la méthode `bootstrap()`. | 🟢 |
 | `content/radiation/RadiationEffect.java:26,34,42` | Commentaires inline répétant littéralement le code (`// Reduces movement speed by 20%` juste au-dessus de la ligne qui applique `-0.2D`). | 🟢 |
+| `content/multiblock/controller/manager/ReactorFrameDisplayManager.java:28-30` | Javadoc tronqué : *« On the client this reads the synced ; on the server it reads the aggregated. »* — les mots attendus après « synced » et « aggregated » manquent. | 🟡 |
 
 ### 2.4 Commentaires devenus obsolètes
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
 | `net/nuclearteam/createnuclear/CNTags.java:32-46,52` | Méthodes `forgeTag`/`forgeBlockTag`/`forgeItemTag`/`forgeFluidTag` : nommage hérité de l'ère Forge alors qu'elles pointent en réalité vers `NEO_FORGE`, lui-même aliasé sur le namespace commun `"c"`. `FORGE("forge")` (l.52) est **confirmée inutilisée** : plus aucune référence dans le projet. | 🟠 |
+| `content/multiblock/controller/ReactorControllerBlockEntity.java:195-197,233-237` | Le Javadoc *« Main constructor allowing dependency injection for testability and DIP compliance. »* est dupliqué : il documente en réalité `getMultiblockPos()` (l.195), alors que le vrai constructeur porte le même texte plus bas (l.233) — reliquat de copier-coller après refactorisation. | 🟠 |
+| `content/multiblock/controller/snapshot/ReactorInputSnapshot.java:13-16` | Javadoc obsolète : décrit des champs `bigFuelItem`/`bigCoolerItem` qui n'existent plus dans le record actuel (`items`, `fluids`, `maxFluidCapacity`). | 🟠 |
+| `api/ItemRodTypesValue.java:51-53` | Javadoc affirmant l'existence d'une valeur `MIXTE` dans `RodType.TypeRod` (« For MIXTE we keep the builder default... »), alors que cet enum ne définit que `FUEL`, `COOLER`, `NONE` (`api/multiblock/rods/RodType.java:312-324`) et que le `switch` associé lève une exception pour toute autre valeur. | 🟠 |
+| `api/data/recipe/EnrichedRecipeGen.java:18` | Javadoc copié de Create : *« The base class for **Haunting** recipe generation »*, alors que la classe concerne les recettes « Enriched » (four à vent enrichissant), pas le système « Haunting » de Create. | 🟡 |
 
 ---
 
@@ -130,6 +172,27 @@ Le style du projet est très majoritairement en anglais.
 | `api/multiblock/rods/RodType.java` (Builder, l.293-306) vs `api/multiblock/fluid/ReactorFluidType.java` (Builder, l.168-177) | Même squelette de validation (liste `missing` + `IllegalStateException` nommant les champs manquants), avec deux mécanismes de détection différents (`== null` côté rods, drapeaux `xxxSet` côté fluides). | 🟢 |
 | `content/contraptions/irradiated/chicken/IrradiatedChicken.java:139-141` vs `wolf/IrradiatedWolf.java:350-352` | `isFood(ItemStack)` strictement identique (`stack.is(CNTags.CNItemTags.FUEL.tag)`) alors qu'`AnimalUtil.isFood(...)` existe déjà et est utilisé par `IrradiatedCow`. | 🟢 |
 | `content/contraptions/irradiated/wolf/IrradiatedWolfRenderer.java:16-17` | `WOLF_LOCATION` et `WOLF_TAME_LOCATION` pointent vers exactement la même texture (`textures/entity/irradiated_wolf.png`) — le branchement l.43-45 est donc sans effet visuel. | 🟢 |
+| `content/explosion/CNBasicModelPart.java` vs `content/explosion/CNTabulaModelRenderUtils.java` | Duplication quasi intégrale de toute la logique de construction de cube de modèle Tabula (mêmes calculs de quads/UV, mêmes classes `ModelBox`/`PositionTextureVertex`/`TexturedQuad`). `CNBasicModelPart` est un reliquat sans appelant (cf. §1.1). | 🟠 |
+| `content/particles/SmallNuclearExplosionParticle.java:73-279` | 13 classes internes `*Factory` (`NukeFactory`, `MineFactory`, `UnderzealotFactory`, `RaygunFactory`, `BlueRaygunFactory`, `TremorzillaFactory`, `TremorzillaRetroFactory`, `TremorzillaTectonicFactory`, `AmberFactory`, `TotemFactory`, `PurpleWitchFactory`, `ConversionCrucibleFactory`, `FrostmintFactory`) structurellement identiques (même champ `spriteSet`, même constructeur, même corps de `createParticle`), ne différant que par des constantes passées en paramètre. | 🟠 |
+| `content/multiblock/input/fluid/ReactorFluidInputEntity.java:168-227` | `fill()`, `drain(FluidStack,...)`, `drain(int,...)` de `FilteredFluidHandler` répètent 3× le même bloc « résoudre le contrôleur → si `ServerLevel` : `PersistentFluidLocks`, sinon : `FluidLockManager` ». | 🟠 |
+| `content/multiblock/pattern/ReactorPattern.java:57-108` | `findController`, `findControllerPos(pos, level, first)` et `findControllerPos(pos, level)` dupliquent presque intégralement le même corps ; la seconde variante appelle même `isInReactorRange` deux fois de suite (l.75 et 84) sur le même résultat. | 🟠 |
+| `content/multiblock/casing/ReactorCasing.java`, `content/multiblock/cooler/ReactorCooler.java`, `content/multiblock/frame/ReactorFrame.java`, `content/multiblock/output/ReactorOutput.java` | Les méthodes `onPlace`/`setPlacedBy`/`onRemove` reproduisent presque littéralement le même triptyque `super.xxx(...)` + résolution de pattern/contrôleur dans les 4 classes de blocs du multiblock. | 🟡 |
+| `content/multiblock/input/item/ReactorRodInputGenerator.java`, `content/multiblock/input/fluid/ReactorFluidInputGenerator.java`, `content/multiblock/output/ReactorOutputGenerator.java` | Trois `SpecialBlockStateGen` quasi identiques (mêmes calculs `getXRotation`/`getYRotation`, même schéma de nom de modèle `..._vertical`), ne différant que par le bloc/modèle ciblé. | 🟡 |
+| `content/redstone/displayLink/source/CoolerDisplaySource.java` et `FuelDisplaySource.java` | Même structure (`getLabelKey`, `getMax`, `getColor`, boucle de comptage sur `getDisplayState().items()`), ne différant que par le prédicat `RodType.TypeRodPredicate` et la couleur. La même boucle de comptage est dupliquée une 3ᵉ fois dans `ReactorSummaryDisplaySource.getReactorSummary` (l.164-172). | 🟡 |
+| `content/kinetics/fan/processing/EnrichedRecipe.java` et `SnowPowderRecipe.java` | Classes quasi identiques (`matches`, `getMaxInputCount`, `getMaxOutputCount`), ne différant que par le `RecipeType` passé au constructeur parent. | 🟡 |
+| `compat/jei/category/FanEnrichedCategory.java` et `FanSnowPowderCategory.java` | Même structure (`getBlockShadow`, `renderAttachedBlock`, `getTitle`), ne différant que par le bloc rendu et le titre. | 🟡 |
+| `content/kinetics/fan/processing/CNFanProcessingTypes.java` | `EnrichedType` et `SnowPowderType` dupliquent presque intégralement `canProcess`/`process`/`spawnProcessingParticles`. | 🟡 |
+| `infrastructure/worldgen/biome/CNDensityFunctions.java:22-31` | `Irradiated.EROSION` et `Irradiated.FINAL_DENSITY` enregistrées avec exactement la même expression `DensityFunctions.add(DensityFunctions.yClampedGradient(0, 90, 1, -1), BlendedNoise.createUnseeded(0.25, 0.375, 80.0, 160.0, 8.0))` dupliquée littéralement. | 🟡 |
+| `net/nuclearteam/createnuclear/CNTags.java:72-300` | Les 5 enums imbriquées (`CNBlockTags`, `CNItemTags`, `CNFluidTags`, `CNEntityTags`, `CNRecipeSerializerTags`) dupliquent exactement la même mécanique de constructeurs en cascade et une méthode `init()` vide (~230 lignes de duplication structurelle, indépendante de Forge/NeoForge). | 🟡 |
+| `net/nuclearteam/createnuclear/CNBlocks.java:383-569` | Les blocs de minerai (uranium, lead, thorium, nitrate, variantes deepslate) répètent un schéma quasi identique (`initialProperties`, `loot` avec `createSilkTouchDispatchTable`/`applyExplosionDecay`, mêmes tags). | 🟡 |
+| `net/nuclearteam/createnuclear/CNItems.java:222-379` | Les 4 entrées d'armure anti-radiation (casque/plastron/jambières/bottes) répètent presque à l'identique le bloc de recette + boucle `for (Cloths cloth : Cloths.values())` générant les recettes de smithing par teinte (~150 lignes). | 🟡 |
+| `lib/multiblock/SimpleMultiBlockPattern.java:31-40,42-53` | `matches(...)` et `matchesWithResult(...)` dupliquent presque intégralement la même boucle de résolution ; `matches` pourrait être réécrit comme `matchesWithResult(...) != null`. | 🟡 |
+| `content/multiblock/bluePrintItem/ReactorBluePrintMenu.java:166-175` et `content/multiblock/input/item/ReactorRodInputMenu.java:113-125` | Deux implémentations différentes du même besoin (rediriger `ClickType.THROW` vers `PICKUP` pour certains slots), l'une par plage d'index, l'autre par tableau codé en dur. | 🟢 |
+| `foundation/data/recipe/CNCrushingRecipeGen.java:84-88` et `CNWashingRecipeGen.java:36-40` | Même motif de surcharge `create(Supplier<ItemLike>, UnaryOperator<...>)` redirigeant vers `create(CreateNuclear.MOD_ID, ...)`, répété à l'identique dans deux générateurs distincts. | 🟢 |
+| `net/nuclearteam/createnuclear/CNItems.java:61-219` | Le trio « ingot/nugget cru → recette de décompactage depuis storage block » répète le même schéma `ShapelessRecipeBuilder...requires(...).save(...)` pour 8 items. | 🟢 |
+| `api/multiblock/fluid/ReactorFluidType.java:80-92` et `api/multiblock/rods/RodType.java:93-105` | `resolveReactorFluidType`/`resolveRodType` suivent le même patron à 3 étapes (lookup registre → fallback `*Value` → fallback registre `FALLBACK_*`), dupliqué terme à terme. | 🟢 |
+| `content/multiblock/controller/manager/ReactorOutputManager.java:102-111` | Dans `rotateOutputs`, les branches `if`/`else` dupliquent `entity.updateSpeed = true; entity.updateGeneratedRotation();`. | 🟢 |
+| `content/contraptions/irradiated/{cat,chicken,cow,wolf}/*` | Duplication de structure attendue pour un portage vanilla, mais incohérence notable : seul `IrradiatedChicken` implémente `IrradiatedAnimal` (conversion), alors qu'`AnimalUtil.blockTamingWip` est utilisé par Cat et Wolf, suggérant une fonctionnalité de conversion partiellement portée sur un seul des 4 animaux — à vérifier si voulu. | 🟡 |
 
 ---
 
@@ -149,6 +212,8 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 | `content/kinetics/fan/processing/CNFanProcessingTypes.java:36-65` | `LEGACY_NAME_MAP`/`ofLegacyName`/`parseLegacy` : shim de compatibilité de noms lié à d'anciennes sauvegardes/NBT pré-migration. **Vérification faite : aucun appelant** — soit le câbler là où les NBT legacy sont lus, soit le supprimer. | 🟡 |
 | `content/contraptions/irradiated/cat/IrradiatedCatRenderer.java:5`, `wolf/IrradiatedWolf.java:3`, `foundation/block/HorizontalDirectionalReactorBlock.java:3`, `MultiDirectionalReactorBlock.java:3` | Import `com.mojang.math.MethodsReturnNonnullByDefault` au lieu de `net.minecraft.MethodsReturnNonnullByDefault` (utilisé partout ailleurs) — incohérence probablement issue d'un auto-import IDE pendant le portage. | 🟡 |
 | `foundation/data/recipe/CNCrushingRecipeGen.java:42-56` | Différences de contenu de recette apparues pendant le portage, à trancher (voulu ou régression) : (1) nouvelle recette `RAW_URANIUM_BLOCK` absente côté Forge ; (2) `RAW_THORIUM_BLOCK` : la sortie secondaire `0.75f ×AllItems.EXP_NUGGET` (Forge) a été remplacée par `0.5f ×CNItems.THORIUM_DUST×72` ; (3) `RAW_THORIUM_ITEM` : même changement, `0.75f×EXP_NUGGET` → `0.5f×THORIUM_DUST×8`. Les recettes de fer/or (l.61,68) ont bien gardé leur `EXP_NUGGET`, ce qui rend l'écart d'autant plus visible. | 🟡 |
+| `content/compat/alexscave/AlexscaveCompat.java:14-66` | Compat entièrement gelée en code Forge commenté (`MobSpawn`, `NukeParam`, `UpdateACProxy`, plus les méthodes entièrement commentées `isRaycat`, `isTremorzilla`, `ACResConfig`, `ACDestroyable`, `GetACSounds`, `GetACConfig`) ; le commentaire de classe indique explicitement que le mod tiers n'a pas encore de version 1.21.1. Coquille vide en attente côté NeoForge. | 🟠 |
+| `content/multiblock/frame/ReactorFrameRenderer.java:74-77` | `CatnipServices.FLUID_RENDERER` est déclaré `FluidRenderHelper<?>`, obligeant un cast non vérifié (`@SuppressWarnings("unchecked")`) vers `FluidRenderHelper<FluidStack>` de NeoForge : shim multiplateforme (Catnip/Create, Forge vs NeoForge) laissé tel quel. | 🟡 |
 
 ---
 
@@ -166,6 +231,14 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 - Retirer `IHeat.intColor` et son constructeur `HeatLevel(int, int)`, `CNRecipeTypes.isProcessingRecipe`, `CNAdvancement.START`, le paramètre `Consumer<Integer> timer` de `VicinityEffect`.
 - Retirer la variable locale décompilée `var10006` dans `IrradiatedCat.CatAvoidEntityGoal` (l.525-526).
 - Nettoyer les imports/blocs commentés listés en §1.5/§1.6 (`UraniumOreBlock`, `CreateNuclearJEI`, `CNFluids`).
+- **Corriger en priorité** (bugs actifs, pas des soucis de fin de migration — voir §0 B3/B4) : `EnrichingCampfireBlock.codec()` qui retourne `null` au lieu du `CODEC`, et `CNStandardRecipeGen.viaShapeless` où `conditionalOutput` est calculé puis jamais appliqué.
+- Supprimer `content/compat/alexscave/AlexscaveCompat.java` (ou le réécrire proprement) une fois qu'Alex's Caves publie une version 1.21.1 compatible et qu'une vraie intégration est décidée.
+- Supprimer les classes internes mortes de `content/explosion/CNBasicModelPart.java` une fois confirmé qu'aucun code externe n'en dépend (déjà vérifié).
+- Supprimer ou réécrire `content/multiblock/controller/consumable/FluidConsumable.java` et le cas `"fluid"` dans `IConsumable.deserializeNBT` si ce mécanisme reste définitivement hors d'usage.
+- Retirer les champs morts `pattern`/`liquidLife`/`countCoolerRod` de `ReactorControllerBlockEntity` et `outputPos` de `ReactorOutputEntity` (ou les implémenter réellement) — attention : `@SuppressWarnings({"unused"})` sur `ReactorControllerBlockEntity` (l.60) masque ce type de code mort, à retirer une fois le nettoyage fait pour que l'IDE le détecte à nouveau.
+- Décider du sort de `Maths.java` (fichier décompilé, en grande partie mort) : soit ne garder que `smin`/`sampleNoise3D(float×4)` dans une classe utilitaire réécrite proprement, soit documenter pourquoi le reste doit être conservé.
+- Corriger l'incohérence de paquet `foundation/damageTypes/CNDamageSources.java` : le dossier est `damageTypes` mais le fichier déclare `package ...foundation.damagesTypes;` (avec un « s » superflu). Compile aujourd'hui car les deux importeurs (`RadiationEffect.java`, `CNFanProcessingTypes.java`) utilisent la même faute, mais cassera tout futur refactor IDE automatique.
+- Vérifier le double enregistrement Ponder sous le même id `reactor/reactor_t1_ponder` (`CNPonderIndex.java:18,21,24,27` — voir §0 B6) et corriger l'id de `ioPlacement` si c'est bien un bug.
 
 ---
 
@@ -183,6 +256,16 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 - **`CNRecipeProvider`** : unifier les deux mécanismes d'enregistrement de générateurs de recettes qui coexistent (liste interne `GENERATORS` dans `CNRecipeProvider.java:18-37` vs `addProvider` directs dans `CreateNuclearDatagen.java:46-52`).
 - **Animaux irradiés** : faire passer `IrradiatedChicken.isFood`/`IrradiatedWolf.isFood` par `AnimalUtil.isFood`, comme `IrradiatedCow`.
 - **`CNArmorMaterials.durabilityForType`** : extraire le tableau `BASE_DURABILITY` (l.72) recréé à chaque appel en constante statique.
+- **`SmallNuclearExplosionParticle`** : factoriser les 13 classes `*Factory` en une seule fabrique paramétrée par couleur/lifetime/scale/fadeColor.
+- **`ReactorPattern`** : réduire les 3 méthodes de scan (`findController`, `findControllerPos` ×2) à une seule méthode paramétrée par un visiteur.
+- **Blocs multiblock (`ReactorCasing`/`ReactorCooler`/`ReactorFrame`/`ReactorOutput`)** : extraire un comportement par défaut commun pour `onPlace`/`setPlacedBy`/`onRemove`.
+- **`CNTags`** : factoriser les 5 enums de tags autour d'une classe/interface générique commune (registre + construction de `ResourceLocation` + `alwaysDatagen`).
+- **`CNBlocks`** : extraire une méthode factory générique `registerOre(name, rawItemEntry, dropRange, fortuneBonus, deepslate?)` pour les 8 blocs de minerai.
+- **`CNItems`** : extraire une méthode commune pour la génération des 4 pièces d'armure anti-radiation (recette de craft + boucle de recettes de smithing par teinte).
+- **`CoolerDisplaySource`/`FuelDisplaySource`** (+ boucle équivalente dans `ReactorSummaryDisplaySource`) : factoriser autour d'un comptage générique paramétré par le prédicat `TypeRodPredicate`.
+- **`EnrichedRecipe`/`SnowPowderRecipe`** et **`FanEnrichedCategory`/`FanSnowPowderCategory`** : factoriser autour d'une base commune paramétrée par `RecipeType`/bloc affiché/titre.
+- **`lib/multiblock`** : fusionner `matches`/`matchesWithResult` dans `SimpleMultiBlockPattern`, retirer `IMultiBlockPattern.contruct` (faute de frappe morte), et simplifier/retirer l'abstraction `IPatternBuilder` jamais exploitée pour son but (seul `SimpleMultiBlockPattern::new` est jamais fourni comme builder).
+- **`CNDensityFunctions`** : factoriser la fonction de densité dupliquée entre `EROSION` et `FINAL_DENSITY`, après confirmation que ce n'était pas un placeholder intentionnel pour deux fonctions distinctes à terme.
 
 ---
 
@@ -190,33 +273,104 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 ### 🔴 Critique
 
-*Aucun point critique restant.*
+- **`EnrichingCampfireBlock.codec()`** (B3) — renvoie `null` au lieu du `CODEC` construit : sérialisation du bloc cassée. **Bug actif, pas une question de fin de migration.**
+- **`CNStandardRecipeGen.viaShapeless`** (B4) — `conditionalOutput` calculé puis jamais appliqué : les conditions de recette (`whenModLoaded`/`whenModMissing`) sont silencieusement ignorées pour toutes les recettes générées par cette voie. **Bug actif.**
+- **`foundation/utility/Maths.java`** — fichier presque entièrement composé de code mort issu d'une décompilation (source originale perdue) ; seules 2 méthodes sur ~14 sont réellement utilisées : risque significatif pour toute future modification de ce fichier.
 
 ### 🟠 Important
 
 - Bug de logique : `RadiationCapability.applyEffects` (B2) — `radiation_level_3` sans effet, amplificateur plafonné au niveau 2.
-- Débris de migration à finaliser : `CreateNuclear.forgeEventBus` + ligne `DistExecutor` commentée, `CNTags.forgeXxxTag`/`FORGE`, capacités Forge commentées dans `ReactorRodInputEntity`, notes d'incertitude non tranchées dans `ReactorFluidInputEntity`.
+- Bug de rendu potentiel : `IrradiatedWolfModel.headParts()`/`bodyParts()` (B5) renvoient `null` au lieu d'une liste vide — risque de NPE.
+- Bug Ponder à vérifier : `CNPonderIndex` (B6) enregistre `t1` et `ioPlacement` sous le même id `reactor/reactor_t1_ponder`.
+- Débris de migration à finaliser : `CreateNuclear.forgeEventBus` + ligne `DistExecutor` commentée, `CNTags.forgeXxxTag`/`FORGE`, capacités Forge commentées dans `ReactorRodInputEntity`, notes d'incertitude non tranchées dans `ReactorFluidInputEntity`, compat `AlexscaveCompat` entièrement gelée en code Forge commenté.
 - Commentaires français masquant une incertitude technique : `ReactorFluidInputEntity`.
+- Incohérence de paquet `foundation/damageTypes` (dossier) vs `foundation.damagesTypes` (package déclaré) dans `CNDamageSources.java`.
+- Code mort à risque si réactivé tel quel : `SimpleMultiBlockAislePatternBuilder.getDistanceController` (mutation de liste en place), `IMultiBlockPattern.contruct` (doublon mal orthographié).
+- Champs totalement inutilisés dans `ReactorControllerBlockEntity` (`pattern`, `liquidLife`, masqués par `@SuppressWarnings("unused")`) et classe morte de bout en bout `FluidConsumable`.
+- Logique inachevée : `ReactorCoreEntity.tick()` (explosion du cœur non pilotée).
+- `RenderHelper.renderOverlay` : mise à l'échelle `coverage` désactivée par une ligne commentée, effet visuel perdu silencieusement.
+- `foundation/advancement/CNAdvancementBehaviour.tryAward` : mort et référence le mauvais `TYPE` (copié de Create).
+- Duplications significatives : `getBlocksPosition(Level)` ×4 managers (+ shadowing), `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`, `CNBasicModelPart` vs `CNTabulaModelRenderUtils`, 13 classes `*Factory` de `SmallNuclearExplosionParticle`, triple duplication de verrou fluide dans `ReactorFluidInputEntity`, triple duplication de scan dans `ReactorPattern`.
+- Javadoc trompeur/obsolète : copier-coller mal placé dans `ReactorControllerBlockEntity` (constructeur), champs disparus documentés dans `ReactorInputSnapshot`, valeur d'enum `MIXTE` inexistante dans `ItemRodTypesValue`.
 
 ### 🟡 Moyen
 
-- Duplications : `getBlocksPosition(Level)` ×4 managers (+ shadowing), `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`.
-- Dead code : shim legacy `CNFanProcessingTypes` sans appelant, champs de cache inertes de `RenderHelper`, `CNRecipeTypes.isProcessingRecipe`, `VicinityEffect.timer`.
-- Javadoc mal placée après `@Override` dans `ReactorInputFluidManager` (6 méthodes) ; Javadoc française mal formée `ReactorAlarmManagerI`.
-- Blocs commentés secondaires : `CreateNuclearJEI` (`BottleType`).
-- Imports `com.mojang.math.MethodsReturnNonnullByDefault` (4 fichiers) ; `CreateNuclearClient.neoEventBus` ; incertitude `ReactorFluidInput.java:91`.
+- Duplications : `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock` (déjà listé ci-dessus), blocs multiblock `onPlace`/`onRemove`, générateurs `SpecialBlockStateGen` ×3, `CoolerDisplaySource`/`FuelDisplaySource`/`ReactorSummaryDisplaySource`, `EnrichedRecipe`/`SnowPowderRecipe` + catégories JEI, `CNTags` (5 enums ~230 lignes), `CNBlocks` (blocs de minerai), `CNItems` (armures anti-radiation), `CNDensityFunctions` (expression dupliquée), `matches`/`matchesWithResult` dans `SimpleMultiBlockPattern`.
+- Dead code : shim legacy `CNFanProcessingTypes` sans appelant, champs de cache inertes de `RenderHelper`, `CNRecipeTypes.isProcessingRecipe`, `VicinityEffect.timer`, `CNPackets` (enum vide, mécanisme no-op), `countCoolerRod`/`outputPos` write-only, abstraction `IPatternBuilder` jamais exploitée.
+- Javadoc mal placée après `@Override` dans `ReactorInputFluidManager` (6 méthodes) ; Javadoc française mal formée `ReactorAlarmManagerI` ; Javadoc tronqué `ReactorFrameDisplayManager`; Javadoc copié de Create dans `EnrichedRecipeGen`.
+- Blocs commentés secondaires : `CreateNuclearJEI` (`BottleType`), `PlayerInteractReactorFluidInput` (×2), `ReactorControllerBlock` (branche vide + 2 lignes commentées).
+- Imports `com.mojang.math.MethodsReturnNonnullByDefault` (4 fichiers) ; `CreateNuclearClient.neoEventBus` ; incertitude `ReactorFluidInput.java:91` ; shim `FluidRenderHelper<?>` cast non vérifié dans `ReactorFrameRenderer`.
 - Divergences de recettes `CNCrushingRecipeGen` à trancher.
+- Incohérence de portage entre les 4 animaux irradiés (seul `IrradiatedChicken` implémente `IrradiatedAnimal`).
+- Log de debug oublié `"EXPLOSIOOOOOON"` dans `NuclearMushroomCloudParticle`.
 
 ### 🟢 Faible
 
-- Champs/méthodes isolés sans impact (`IHeat.intColor`, `ReactorAlarmEntity.controller`/`setController`, `CNAdvancement.START`, méthodes mortes de `TextUtils`/`CreateNuclearLang`, `var10006` dans `IrradiatedCat`).
-- Imports et blocs commentés isolés (`UraniumOreBlock`, `CNFluids`, `RenderHelper`).
-- Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`) et chemins de sons `"reacteur/..."`.
+- Champs/méthodes isolés sans impact (`IHeat.intColor`, `ReactorAlarmEntity.controller`/`setController`, `CNAdvancement.START`, méthodes mortes de `TextUtils`/`CreateNuclearLang`, `var10006` dans `IrradiatedCat`, constructeur vide `MultiBlockManagerBeta`).
+- Imports et blocs commentés isolés (`UraniumOreBlock`, `CNFluids`, `RenderHelper`, imports dupliqués/inutilisés dans `lib/multiblock`, `ItemRodTypesValue`/`ReactorFluidTypesValue`, `CNSoundEvents`, `CNParticleRegistry`, imports wildcard).
+- Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`, `RadiationCapability.radiation_desactive`) et chemins de sons `"reacteur/..."`.
 - Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`), commentaires paraphrasant le code (`RadiationEffect`), note `@goshante` dans `CreateNuclearJEI`.
-- Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`.
+- Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, générateurs de recettes `create(...)` (Crushing/Washing), trio ingot/nugget `CNItems`, `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput).
 
 ---
+## Prompt d'origin
+```md
+Réalise un audit complet du code de la version NeoForge et consigne le résultat dans un fichier Markdown directement dans le projet.
+Contexte :
+* Le projet est actuellement en cours de migration de la V2 Forge vers NeoForge.
+* Cette migration n'est pas terminée.
+* L'objectif est d'identifier les points restant à traiter avant d'entamer une véritable modernisation vers les fonctionnalités propres à NeoForge 1.21.1.
+Le rapport doit au minimum contenir les sections suivantes :
+## 1. Dead Code
+* Classes inutilisées.
+* Méthodes inutilisées.
+* Champs inutilisés.
+* Constantes inutilisées.
+* Imports inutiles.
+* Code commenté pouvant être supprimé.
+* Code devenu inaccessible ou obsolète à la suite de la migration.
+## 2. Commentaires et Javadocs
+* Tous les commentaires et Javadocs rédigés en français.
+* Les commentaires peu explicites ou ambiguës.
+* Les Javadocs incomplètes ou ne respectant pas les standards Java.
+* Les commentaires devenus obsolètes.
+## 3. Duplications
+* Logique dupliquée.
+* Méthodes très similaires.
+* Blocs de code répétitifs.
+* Possibilités de mutualisation.
+* Duplication entre Forge et NeoForge.
+## 4. Migration Forge → NeoForge
+Identifier tout le code correspondant uniquement à une migration technique de Forge vers NeoForge, notamment :
+* API encore héritées de Forge.
+* Adaptations temporaires.
+* Compatibilités provisoires.
+* TODO liés à la migration.
+* Parties restant à migrer.
+* Code pouvant être simplifié une fois la migration terminée.
+Cette section ne doit pas prendre en compte les nouvelles fonctionnalités spécifiques à NeoForge 1.21.1.
+## 5. Nettoyage
+Lister tout ce qui pourra être supprimé une fois la migration complètement terminée.
+## 6. Refactorisations
+Identifier les refactorisations pertinentes uniquement après la fin de la migration.
+## 7. Priorités
+Classer chaque élément selon son niveau de priorité :
+* 🔴 Critique
+* 🟠 Important
+* 🟡 Moyen
+* 🟢 Faible
+Contraintes :
+* Analyse l'intégralité du code NeoForge.
+* Ignore les nouvelles fonctionnalités propres à NeoForge 1.21.1.
+* Ne considère pas comme problème le fait qu'une fonctionnalité Forge n'ait pas encore été remplacée par son équivalent NeoForge moderne si elle fonctionne correctement pendant la migration.
+* Base toutes les conclusions uniquement sur le code réellement présent.
+* N'invente aucun problème.
+* Crée directement le fichier Markdown dans le projet.
+* Utilise une structure claire, cohérente et facilement maintenable afin qu'il puisse servir de document de suivi pendant toute la migration.
+```
 
 ## Notes de méthode
 
-Chaque point ci-dessus a été **re-vérifié ligne à ligne** contre l'état actuel de la branche `V2` le 23/08/2026 : existence du fichier, présence effective du code incriminé, et recherche d'appelants pour tout ce qui est annoncé comme mort. Les points de l'audit initial dont le code a disparu ou été corrigé ont été retirés du document. Aucun point n'est extrapolé au-delà du code effectivement lu ; les usages Forge fonctionnels et non signalés comme temporaires ne sont pas remontés comme des problèmes.
+Chaque point ci-dessus a été **re-vérifié ligne à ligne** contre l'état actuel de la branche `V2-Audit` (commit `d2c7078`) le 23/08/2026 : existence du fichier, présence effective du code incriminé, et recherche d'appelants pour tout ce qui est annoncé comme mort. Les points de l'audit initial dont le code a disparu ou été corrigé ont été retirés du document. Aucun point n'est extrapolé au-delà du code effectivement lu ; les usages Forge fonctionnels et non signalés comme temporaires ne sont pas remontés comme des problèmes.
+
+La passe du 23/08/2026 (après-midi) a complété le document par une seconde lecture intégrale des 300 fichiers de `src/main/java` (répartie par sous-système : Multiblock/Réacteur, Contenu hors multiblock, Fondations/Infrastructure/API, Registres racine), avec vérification directe (lecture de fichier + recherche d'appelants) de chaque nouveau point avant intégration, en particulier les points 🔴/🟠 nouvellement ajoutés (B3 à B6, `Maths.java`, `FluidConsumable`, champs morts de `ReactorControllerBlockEntity`, incohérence de paquet `damageTypes`/`damagesTypes`).
