@@ -28,7 +28,6 @@ public class ReactorFrameEntity extends SmartBlockEntity {
     private BlockPos controller;
 
     public ReactorFrameEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-
         super(type, pos, state);
         setController(pos);
     }

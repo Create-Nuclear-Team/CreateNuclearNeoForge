@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.kinetics.fan.processing;
 
-import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.api.registry.CreateBuiltInRegistries;
 import com.simibubi.create.content.kinetics.fan.processing.FanProcessingType;
 import com.simibubi.create.foundation.recipe.RecipeApplier;

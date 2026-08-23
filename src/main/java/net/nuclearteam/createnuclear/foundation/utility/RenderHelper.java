@@ -10,9 +10,6 @@ import net.nuclearteam.createnuclear.CreateNuclear;
  * Helper class for rendering full-screen overlays with optional scaling and caching.
  */
 public class RenderHelper {
-    private static float lastAlpha = Float.NaN;
-    private static float lastCoverage = Float.NaN;
-    private static boolean lastFirstPerson = false;
 
     /**
      * Renders a full-screen texture with given transparency and coverage scale.
@@ -30,12 +27,6 @@ public class RenderHelper {
 
         // If rendering is restricted to first-person and we're not in it, skip
         if (onlyFirstPerson && !isFirstPerson) return;
-
-        // Skip rendering if parameters unchanged
-        
-        lastAlpha = alpha;
-        lastCoverage = coverage;
-        lastFirstPerson = isFirstPerson;
 
         int width = graphics.guiWidth();
         int height = graphics.guiHeight();
