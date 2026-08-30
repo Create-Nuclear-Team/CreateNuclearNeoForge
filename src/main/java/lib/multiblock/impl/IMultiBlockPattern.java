@@ -30,8 +30,4 @@ public interface IMultiBlockPattern {
     default MultiblockMatchResult matchesWithResult(Level level, BlockPos pos) {
         return matchesWithResult(level, pos, Rotation.NONE);
     }
-
-    default void contruct(Level level, BlockPos pos) {
-        construct(level, pos, (a,b) -> true);
-    }
 }

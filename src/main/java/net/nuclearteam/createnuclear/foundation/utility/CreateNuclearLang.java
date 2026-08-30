@@ -31,8 +31,6 @@ public class CreateNuclearLang extends Lang {
         return result;
     }
 
-    //
-
     public static LangBuilder builder() {
         return new LangBuilder(CreateNuclear.MOD_ID);
     }
@@ -63,5 +61,4 @@ public class CreateNuclearLang extends Lang {
     public static LangBuilder text(String text) {
         return builder().text(text);
     }
-
 }

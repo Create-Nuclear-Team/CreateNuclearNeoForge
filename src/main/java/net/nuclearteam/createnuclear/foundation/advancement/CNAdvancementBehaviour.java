@@ -105,12 +105,6 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
             playerId = nbt.getUUID("Owner");
     }
 
-    public static void tryAward(BlockGetter reader, BlockPos pos, CreateAdvancement advancement) {
-        AdvancementBehaviour behaviour = BlockEntityBehaviour.get(reader, pos, AdvancementBehaviour.TYPE);
-        if (behaviour != null)
-            behaviour.awardPlayer(advancement);
-    }
-
     @Override
     public BehaviourType<?> getType() {
         return TYPE;
