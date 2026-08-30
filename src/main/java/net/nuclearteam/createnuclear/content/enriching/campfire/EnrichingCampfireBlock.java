@@ -117,7 +117,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
-        return null;
+        return CODEC;
     }
 
     @Override

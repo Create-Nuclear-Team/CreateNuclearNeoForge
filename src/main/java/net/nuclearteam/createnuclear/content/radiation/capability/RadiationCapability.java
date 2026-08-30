@@ -209,7 +209,7 @@ public class RadiationCapability {
         if (radiation < CNConfigs.server().radiation.radiationLevel1.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel2.get()) amp = CNConfigs.server().radiation.amplifierLevel1.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel3.get()) amp = CNConfigs.server().radiation.amplifierLevel2.get();
-        else amp = CNConfigs.server().radiation.amplifierLevel2.get();
+        else amp = CNConfigs.server().radiation.amplifierLevel3.get();
 
         MobEffectInstance current = entity.getEffect(CNEffects.RADIATION);
 
