@@ -16,7 +16,7 @@ public interface IConsumable {
     static IConsumable deserializeNBT(CompoundTag tag) {
         return switch (tag.getString("type")) {
             case "item" -> ItemConsumable.deserializeNBT(tag);
-            case "fluid" -> FluidConsumable.deserializeNBT(tag);
+//            case "fluid" -> FluidConsumable.deserializeNBT(tag); // It has been removed; we will need to discuss it again later.
             default -> throw new IllegalArgumentException(
                     "Unknown consumable type: " + tag.getString("type"));
         };
