@@ -65,7 +65,7 @@ public class CNFluids {
                     .source(BaseFlowingFluid.Source::new)
                     .bucket((s, p) -> new RadiationBucketItem(s instanceof Fluid ? (Fluid) s : ((Supplier<? extends Fluid>) s).get(), p, 20))
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
-                    .tag(CNTags.forgeItemTag("buckets/uranium"))
+                    .tag(CNTags.neoForgeItemTag("buckets/uranium"))
                     .lang("Uranium Bucket")
                     .build()
                     .register();
@@ -89,7 +89,7 @@ public class CNFluids {
                     .source(BaseFlowingFluid.Source::new)
                     .bucket()
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
-                    .tag(CNTags.forgeItemTag("buckets/thorium"))
+                    .tag(CNTags.neoForgeItemTag("buckets/thorium"))
                     .lang("Thorium Bucket")
                     .build()
                     .register();
@@ -115,7 +115,7 @@ public class CNFluids {
                     .bucket()
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
                     .lang("Nitrogen Bucket")
-                    .tag(CNTags.forgeItemTag("buckets/nitrogen"))
+                    .tag(CNTags.neoForgeItemTag("buckets/nitrogen"))
                     .build()
                     .register();
 

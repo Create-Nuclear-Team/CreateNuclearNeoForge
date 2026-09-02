@@ -235,7 +235,7 @@ public class CNBlocks {
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
             .unlockedBy("has_reactor_casing", RegistrateRecipeProvider.has(CNBlocks.REACTOR_CASING.get()))
             .define('G', Tags.Items.GLASS_BLOCKS)
-            .define('S', CNTags.forgeItemTag("ingots/lead"))
+            .define('S', CNTags.neoForgeItemTag("ingots/lead"))
             .pattern("SGS")
             .pattern("GSG")
             .pattern("SGS")
@@ -398,10 +398,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNTags.forgeBlockTag("ores/uranium")
+            CNTags.neoForgeBlockTag("ores/uranium")
         )
         .item((b, p) -> new UraniumOreItem(b, p, 3))
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/uranium"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/uranium"))
         .build()
         .register();
 
@@ -422,10 +422,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNTags.forgeBlockTag("ores/lead")
+            CNTags.neoForgeBlockTag("ores/lead")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/lead"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/lead"))
         .build()
         .register();
 
@@ -447,10 +447,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNTags.forgeBlockTag("ores/thorium")
+            CNTags.neoForgeBlockTag("ores/thorium")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/thorium"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/thorium"))
         .build()
         .register();
 
@@ -473,10 +473,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNTags.forgeBlockTag("ores/uranium")
+            CNTags.neoForgeBlockTag("ores/uranium")
         )
         .item((b, p) -> new UraniumOreItem(b, p, 3))
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/uranium"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/uranium"))
         .build()
         .register();
 
@@ -497,10 +497,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNTags.forgeBlockTag("ores/lead")
+            CNTags.neoForgeBlockTag("ores/lead")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/lead"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/lead"))
         .build()
         .register();
 
@@ -520,10 +520,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNTags.forgeBlockTag("ores/thorium")
+            CNTags.neoForgeBlockTag("ores/thorium")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/thorium"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/thorium"))
         .build()
         .register();
 
@@ -540,10 +540,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNTags.forgeBlockTag("ores/nitrate")
+            CNTags.neoForgeBlockTag("ores/nitrate")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/nitrate"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/nitrate"))
         .build()
         .register();
 
@@ -561,10 +561,10 @@ public class CNBlocks {
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,
             Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNTags.forgeBlockTag("ores/nitrate")
+            CNTags.neoForgeBlockTag("ores/nitrate")
         )
         .item()
-        .tag(Tags.Items.ORES, CNTags.forgeItemTag("ores/nitrate"))
+        .tag(Tags.Items.ORES, CNTags.neoForgeItemTag("ores/nitrate"))
         .build()
         .register();
 
@@ -575,11 +575,11 @@ public class CNBlocks {
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/raw_uranium")
+            CNTags.neoForgeBlockTag("storage_blocks/raw_uranium")
         )
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
-            .unlockedBy("has_raw_materials_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/uranium")))
-            .define('R', CNTags.forgeItemTag("raw_materials/uranium"))
+            .unlockedBy("has_raw_materials_uranium", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("raw_materials/uranium")))
+            .define('R', CNTags.neoForgeItemTag("raw_materials/uranium"))
             .pattern("RRR")
             .pattern("RRR")
             .pattern("RRR")
@@ -587,7 +587,7 @@ public class CNBlocks {
         .item((b, p) -> new UraniumOreItem(b, p, 27))
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/raw_uranium")
+            CNTags.neoForgeItemTag("storage_blocks/raw_uranium")
         )
         .build()
         .register();
@@ -598,11 +598,11 @@ public class CNBlocks {
         .transform(pickaxeOnly())
         .tag(
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/raw_lead")
+            CNTags.neoForgeBlockTag("storage_blocks/raw_lead")
         )
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
-            .unlockedBy("has_raw_materials_lead", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/lead")))
-            .define('R', CNTags.forgeItemTag("raw_materials/lead"))
+            .unlockedBy("has_raw_materials_lead", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("raw_materials/lead")))
+            .define('R', CNTags.neoForgeItemTag("raw_materials/lead"))
             .pattern("RRR")
             .pattern("RRR")
             .pattern("RRR")
@@ -610,7 +610,7 @@ public class CNBlocks {
         .item()
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/raw_lead")
+            CNTags.neoForgeItemTag("storage_blocks/raw_lead")
         )
         .build()
         .register();
@@ -623,11 +623,11 @@ public class CNBlocks {
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/raw_thorium")
+            CNTags.neoForgeBlockTag("storage_blocks/raw_thorium")
         )
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
-            .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/thorium")))
-            .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
+            .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("raw_materials/thorium")))
+            .define('R', CNTags.neoForgeItemTag("raw_materials/thorium"))
             .pattern("RRR")
             .pattern("RRR")
             .pattern("RRR")
@@ -635,7 +635,7 @@ public class CNBlocks {
         .item()
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/raw_thorium")
+            CNTags.neoForgeItemTag("storage_blocks/raw_thorium")
         )
         .build()
         .register();
@@ -646,12 +646,12 @@ public class CNBlocks {
         .transform(pickaxeOnly())
         .tag(
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/lead")
+            CNTags.neoForgeBlockTag("storage_blocks/lead")
         )
         .item()
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/lead")
+            CNTags.neoForgeItemTag("storage_blocks/lead")
         )
         .build()
         .register();
@@ -662,12 +662,12 @@ public class CNBlocks {
         .transform(pickaxeOnly())
         .tag(
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/thorium")
+            CNTags.neoForgeBlockTag("storage_blocks/thorium")
         )
         .item()
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/thorium")
+            CNTags.neoForgeItemTag("storage_blocks/thorium")
         )
         .build()
         .register();
@@ -678,12 +678,12 @@ public class CNBlocks {
         .transform(pickaxeOnly())
         .tag(
             Tags.Blocks.STORAGE_BLOCKS,
-            CNTags.forgeBlockTag("storage_blocks/steel")
+            CNTags.neoForgeBlockTag("storage_blocks/steel")
         )
         .item()
         .tag(
             Tags.Items.STORAGE_BLOCKS,
-            CNTags.forgeItemTag("storage_blocks/steel")
+            CNTags.neoForgeItemTag("storage_blocks/steel")
         )
         .build()
         .register();

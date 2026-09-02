@@ -54,14 +54,6 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
-| `content/uraniumOre/UraniumOreBlock.java:18-19` | `EnchantmentHelper`, `Enchantments` ne servent qu'au bloc XP commenté (l.93-96). | 🟢 |
-| `content/multiblock/controller/ReactorControllerBlockEntity.java:8-14` | `import net.minecraft.core.*;` rend redondants les imports explicites `BlockPos`, `Direction`, `HolderLookup` ; imports totalement inutilisés en plus : `SimpleMultiBlockAislePatternBuilder`, `CatnipServices`, `ChatFormatting`. | 🟢 |
-| `lib/multiblock/SimpleMultiBlockAislePatternBuilder.java:5-7` | `import lib.multiblock.impl.IMultiBlockPatternBuilder;` importé deux fois (lignes 5 et 7). | 🟢 |
-| `api/ItemRodTypesValue.java:5,10`, `api/ReactorFluidTypesValue.java:5,10` | Imports inutilisés `HolderSet`, `Collections`. | 🟢 |
-| `net/nuclearteam/createnuclear/CNSoundEvents.java:5` | Import `com.simibubi.create.AllSoundEvents` inutile (seuls les types imbriqués, importés séparément, sont utilisés). | 🟢 |
-| `net/nuclearteam/createnuclear/CNParticleRegistry.java:4-5` | Imports `BlockParticleOption`/`ItemParticleOption` inutilisés. | 🟢 |
-| `content/multiblock/bluePrintItem/ReactorBluePrintMenu.java:16`, `content/multiblock/output/ReactorOutput.java:35` | Imports wildcard `net.nuclearteam.createnuclear.*` masquant les dépendances réelles de la classe. | 🟢 |
-| `content/multiblock/controller/snapshot/ReactorInputSnapshotBuilder.java:12` | Import `VirtualReactorInputsItem` devenu inutile après la suppression de la variable locale `virtualItems` (ex-champ mort §1.3, cf. §8) qui l'utilisait. | 🟢 |
 
 ### 1.6 Code commenté pouvant être supprimé
 
@@ -70,7 +62,6 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | `content/multiblock/input/item/ReactorRodInputEntity.java:86-93` | Bloc commenté utilisant explicitement l'ancienne API de capacités Forge (`Capability<?>`, `ForgeCapabilities.ITEM_HANDLER`, `ResetableLazy<T>`) — reliquat direct jamais retiré après le passage aux capacités NeoForge. | 🟠 |
 | `compat/jei/CreateNuclearJEI.java:145-148` | Bloc commenté pour générer des fluides de potion par `BottleType`, dupliqué juste après par le code actif qui ne gère que `REGULAR`. | 🟡 |
 | `net/nuclearteam/createnuclear/CNFluids.java:114` | Ligne d'enregistrement `//.onRegister(ReactorFluidTypesValue.setReactorFluidTypeInfos(8196, 100))` commentée sur `LIQUID_NITROGEN`. | 🟢 |
-| `content/uraniumOre/UraniumOreBlock.java:93-96` | Bloc XP entièrement commenté dans `spawnAfterBreak`. | 🟢 |
 | `foundation/utility/RenderHelper.java:52` | `//graphics.pose().scale(coverage, coverage, 1f);` commenté : la branche `coverage != 1f` (l.48-57) devient strictement équivalente à la branche `coverage == 1f` (l.59-61), au `pushPose`/`translate` inutile près. | 🟢 |
 | `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:54-58` | Bloc commenté mort laissé dans le code actif (`//if (!fluidInItem.isEmpty()...)`). | 🟡 |
 | `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:66-68` | Bloc conditionnel `if (player.isCreative() && !onClient) { }` entièrement vide, sans effet. | 🟡 |
@@ -123,7 +114,7 @@ Le style du projet est très majoritairement en anglais.
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
-| `net/nuclearteam/createnuclear/CNTags.java:32-46,52` | Méthodes `forgeTag`/`forgeBlockTag`/`forgeItemTag`/`forgeFluidTag` : nommage hérité de l'ère Forge alors qu'elles pointent en réalité vers `NEO_FORGE`, lui-même aliasé sur le namespace commun `"c"`. `FORGE("forge")` (l.52) est **confirmée inutilisée** : plus aucune référence dans le projet. | 🟠 |
+| `net/nuclearteam/createnuclear/CNTags.java:32-46,52` | Méthodes `neoForgeTag`/`neoForgeBlockTag`/`neoForgeItemTag`/`neoForgeFluidTag` : nommage hérité de l'ère Forge alors qu'elles pointent en réalité vers `NEO_FORGE`, lui-même aliasé sur le namespace commun `"c"`. `FORGE("forge")` (l.52) est **confirmée inutilisée** : plus aucune référence dans le projet. | 🟠 |
 | `content/multiblock/controller/ReactorControllerBlockEntity.java:195-197,233-237` | Le Javadoc *« Main constructor allowing dependency injection for testability and DIP compliance. »* est dupliqué : il documente en réalité `getMultiblockPos()` (l.195), alors que le vrai constructeur porte le même texte plus bas (l.233) — reliquat de copier-coller après refactorisation. | 🟠 |
 | `content/multiblock/controller/snapshot/ReactorInputSnapshot.java:13-16` | Javadoc obsolète : décrit des champs `bigFuelItem`/`bigCoolerItem` qui n'existent plus dans le record actuel (`items`, `fluids`, `maxFluidCapacity`). | 🟠 |
 | `api/ItemRodTypesValue.java:51-53` | Javadoc affirmant l'existence d'une valeur `MIXTE` dans `RodType.TypeRod` (« For MIXTE we keep the builder default... »), alors que cet enum ne définit que `FUEL`, `COOLER`, `NONE` (`api/multiblock/rods/RodType.java:312-324`) et que le `switch` associé lève une exception pour toute autre valeur. | 🟠 |
@@ -175,7 +166,7 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 |---|---|---|
 | `net/nuclearteam/createnuclear/CreateNuclear.java:70,106` | `IEventBus forgeEventBus = NeoForge.EVENT_BUS;` — variable nommée d'après l'ancienne API alors qu'elle référence le bus NeoForge ; utilisée telle quelle l.106. | 🟠 |
 | `net/nuclearteam/createnuclear/CreateNuclear.java:110` | `//DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ...)` — `DistExecutor` est une API Forge, remplacée en NeoForge par `@Mod(dist = Dist.CLIENT)` (déjà utilisée correctement dans `CreateNuclearClient.java`). Ligne morte à supprimer. | 🟠 |
-| `net/nuclearteam/createnuclear/CNTags.java:32-52` | `forgeTag`/`forgeBlockTag`/`forgeItemTag`/`forgeFluidTag` et enum `FORGE("forge")` : nommage hérité de Forge pour un mécanisme qui pointe désormais vers le namespace commun `"c"`. Fonctionne correctement mais induit en erreur (utilisé des dizaines de fois dans `CNBlocks.java`, `CNItems.java`, `CreateNuclearRegistrateTags.java`). | 🟠 |
+| `net/nuclearteam/createnuclear/CNTags.java:32-52` | `neoForgeTag`/`neoForgeBlockTag`/`neoForgeItemTag`/`neoForgeFluidTag` et enum `FORGE("forge")` : nommage hérité de Forge pour un mécanisme qui pointe désormais vers le namespace commun `"c"`. Fonctionne correctement mais induit en erreur (utilisé des dizaines de fois dans `CNBlocks.java`, `CNItems.java`, `CreateNuclearRegistrateTags.java`). | 🟠 |
 | `content/multiblock/input/item/ReactorRodInputEntity.java:86-93` | Bloc commenté sur l'ancienne API de capacités Forge — reliquat direct jamais retiré après le passage aux capacités NeoForge (`Capabilities.ItemHandler.BLOCK` utilisé ailleurs dans le même package). | 🟠 |
 | `content/multiblock/input/fluid/ReactorFluidInputEntity.java:91,101` | Commentaires d'incertitude explicites sur la bonne API post-migration (« Pensez à passer registries si requis par la v1.20+... », « Pareil ici selon l'implémentation de SmartFluidTank ») — notes-à-soi-même jamais tranchées. | 🟠 |
 | `content/multiblock/input/fluid/ReactorFluidInput.java:91` | « Convertit le vieux InteractionResult en ItemInteractionResult si nécessaire pour NeoForge » — le « si nécessaire » signale une incertitude non tranchée. | 🟡 |
@@ -197,7 +188,7 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 - Une fois le nommage `CNTags.forgeXxxTag` validé comme voulu ou non, renommer en `commonXxxTag` ; supprimer dans tous les cas l'entrée `FORGE("forge")` (l.52), confirmée sans référence.
 - Supprimer ou câbler `CNFanProcessingTypes.LEGACY_NAME_MAP` (`ofLegacyName`/`parseLegacy`, ses seuls lecteurs, ont déjà été supprimés — le champ est désormais orphelin).
 - Retirer la branche `coverage != 1f` (l.39-48 de `RenderHelper.renderOverlay`) rendue équivalente au cas `coverage == 1f` par le `scale` commenté.
-- Nettoyer les imports/blocs commentés listés en §1.5/§1.6 (`UraniumOreBlock`, `CreateNuclearJEI`, `CNFluids`, `ReactorInputSnapshotBuilder`).
+- Nettoyer les blocs commentés listés en §1.6 (`CreateNuclearJEI`, `CNFluids`).
 - Supprimer `content/compat/alexscave/AlexscaveCompat.java` (ou le réécrire proprement) une fois qu'Alex's Caves publie une version 1.21.1 compatible et qu'une vraie intégration est décidée.
 - Retirer le champ mort `countCoolerRod` de `ReactorControllerBlockEntity` (ou l'implémenter réellement) — attention : `@SuppressWarnings({"unused"})` sur la classe masque ce type de code mort, à retirer une fois le nettoyage fait pour que l'IDE le détecte à nouveau.
 - Corriger l'incohérence de paquet `foundation/damageTypes/CNDamageSources.java` : le dossier est `damageTypes` mais le fichier déclare `package ...foundation.damagesTypes;` (avec un « s » superflu). Compile aujourd'hui car les deux importeurs (`RadiationEffect.java`, `CNFanProcessingTypes.java`) utilisent la même faute, mais cassera tout futur refactor IDE automatique.
@@ -269,7 +260,7 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 ### 🟢 Faible
 
-- Imports et blocs commentés isolés (`UraniumOreBlock`, `CNFluids`, `RenderHelper`, imports dupliqués/inutilisés dans `lib/multiblock`, `ItemRodTypesValue`/`ReactorFluidTypesValue`, `CNSoundEvents`, `CNParticleRegistry`, imports wildcard).
+- Blocs commentés isolés (`CNFluids`, `RenderHelper`).
 - Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`, `RadiationCapability.radiation_desactive`) et chemins de sons `"reacteur/..."`.
 - Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`), commentaires paraphrasant le code (`RadiationEffect`), note `@goshante` dans `CreateNuclearJEI`.
 - Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, générateurs de recettes `create(...)` (Crushing/Washing), trio ingot/nugget `CNItems`, `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput).
@@ -309,6 +300,14 @@ Points listés dans une version antérieure de cet audit, corrigés depuis et re
 | — | `content/multiblock/controller/ReactorControllerBlockEntity.java:69` | `private final ReactorPattern pattern = new ReactorPattern();` instancié à chaque bloc-entité mais jamais lu ni utilisé ailleurs dans la classe. | Champ (et son import `ReactorPattern`) supprimés. | 02/09/2026 |
 | — | `content/multiblock/output/ReactorOutputEntity.java:67,77-79,90-92` | `outputPos` n'était jamais assigné ailleurs que dans `read()` (pas de setter, pas d'autre usage) : toujours `null` en pratique bien que lu/écrit en NBT. | Champ retiré, ainsi que sa lecture/écriture NBT dans `read()`/`write()`. | 02/09/2026 |
 | — | `net/nuclearteam/createnuclear/api/multiblock/MultiBlockManagerBeta.java:16` | Constructeur vide `public MultiBlockManagerBeta() {}` redondant. | Supprimé. | 02/09/2026 |
+| — | `content/uraniumOre/UraniumOreBlock.java:18-19,93-96` | `EnchantmentHelper`/`Enchantments` ne servaient qu'au bloc XP commenté de `spawnAfterBreak`. | **Le bloc XP n'est plus commenté** : `spawnAfterBreak` est désormais actif (lookup silk touch + `popExperience`), donc les deux imports sont réellement utilisés — ce n'était pas un nettoyage d'import mais l'activation de la fonctionnalité elle-même. | 02/09/2026 |
+| — | `content/multiblock/controller/ReactorControllerBlockEntity.java:8-14` | `import net.minecraft.core.*;` rendait redondants les imports explicites `BlockPos`/`Direction`/`HolderLookup` ; imports totalement inutilisés en plus : `SimpleMultiBlockAislePatternBuilder`, `CatnipServices`, `ChatFormatting`. | Wildcard et imports inutilisés retirés ; ne restent que les imports explicites nécessaires. | 02/09/2026 |
+| — | `lib/multiblock/SimpleMultiBlockAislePatternBuilder.java:5-7` | `import lib.multiblock.impl.IMultiBlockPatternBuilder;` importé deux fois. | Doublon retiré. | 02/09/2026 |
+| — | `api/ItemRodTypesValue.java:5,10`, `api/ReactorFluidTypesValue.java:5,10` | Imports inutilisés `HolderSet`, `Collections`. | Retirés. | 02/09/2026 |
+| — | `net/nuclearteam/createnuclear/CNSoundEvents.java:5` | Import `com.simibubi.create.AllSoundEvents` inutile (seuls les types imbriqués, importés séparément, sont utilisés). | Retiré. | 02/09/2026 |
+| — | `net/nuclearteam/createnuclear/CNParticleRegistry.java:4-5` | Imports `BlockParticleOption`/`ItemParticleOption` inutilisés. | Retirés. | 02/09/2026 |
+| — | `content/multiblock/bluePrintItem/ReactorBluePrintMenu.java:16`, `content/multiblock/output/ReactorOutput.java:35` | Imports wildcard `net.nuclearteam.createnuclear.*` masquant les dépendances réelles de la classe. | Remplacés par des imports explicites dans les deux fichiers. | 02/09/2026 |
+| — | `content/multiblock/controller/snapshot/ReactorInputSnapshotBuilder.java:12` | Import `VirtualReactorInputsItem` devenu inutile après la suppression de la variable locale `virtualItems`. | Retiré. | 02/09/2026 |
 
 ---
 ## Prompt d'origin

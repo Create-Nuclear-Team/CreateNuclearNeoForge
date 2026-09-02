@@ -82,15 +82,4 @@ public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvi
         super.tick();
     }
 
-
-    /*protected boolean isItemHandlerCap(Capability<?> cap) {
-        return cap == ForgeCapabilities.ITEM_HANDLER;
-    }*/
-
-    /*@Override
-    public <T> ResetableLazy<T> getCapability(Capability<T> cap, Direction side) {
-        if (isItemHandlerCap(cap))
-            return inventoryProvider.cast();
-        return super.getCapability(cap, side);
-    }*/
 }

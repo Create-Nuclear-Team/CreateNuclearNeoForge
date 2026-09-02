@@ -29,20 +29,20 @@ public class CNTags {
         return TagKey.create(registry.key(), id);
     }
 
-    public static <T> TagKey<T> forgeTag(Registry<T> registry, String path) {
+    public static <T> TagKey<T> neoForgeTag(Registry<T> registry, String path) {
         return optionalTag(registry, ResourceLocation.fromNamespaceAndPath(NEO_FORGE.id, path));
     }
 
-    public static TagKey<Block> forgeBlockTag(String path) {
-        return forgeTag(BuiltInRegistries.BLOCK, path);
+    public static TagKey<Block> neoForgeBlockTag(String path) {
+        return neoForgeTag(BuiltInRegistries.BLOCK, path);
     }
 
-    public static TagKey<Item> forgeItemTag(String path) {
-        return forgeTag(BuiltInRegistries.ITEM, path);
+    public static TagKey<Item> neoForgeItemTag(String path) {
+        return neoForgeTag(BuiltInRegistries.ITEM, path);
     }
 
-    public static TagKey<Fluid> forgeFluidTag(String path) {
-        return forgeTag(BuiltInRegistries.FLUID, path);
+    public static TagKey<Fluid> neoForgeFluidTag(String path) {
+        return neoForgeTag(BuiltInRegistries.FLUID, path);
     }
 
     public enum NameSpace {

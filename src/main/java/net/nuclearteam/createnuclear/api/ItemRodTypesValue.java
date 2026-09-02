@@ -7,10 +7,6 @@ import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import static net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod.NONE;
 
-import java.util.Collections;
-
-import net.minecraft.core.HolderSet;
-
 public class ItemRodTypesValue {
     public static final SimpleRegistry<Item, RodType> ROD_TYPE = SimpleRegistry.create();
     /**

@@ -67,7 +67,7 @@ public class CreateNuclearRegistrateTags {
     private static void genFluidTags(RegistrateTagsProvider<Fluid> provIn) {
         CreateTagsProvider<Fluid> prov = new CreateTagsProvider<>(provIn, Fluid::builtInRegistryHolder);
 
-        prov.tag(CNTags.forgeFluidTag("uranium"))
+        prov.tag(CNTags.neoForgeFluidTag("uranium"))
                 .addTag(CNFluidTags.URANIUM.tag)
         ;
 

@@ -5,7 +5,6 @@ import com.simibubi.create.api.data.recipe.ItemApplicationRecipeGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
@@ -17,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
 
     GeneratedRecipe REACTOR_CASING = itemApplication("reactor_casing_from_steel_and_brass_casing",
-            Ingredient.of(CNTags.forgeItemTag("ingots/steel")),
+            Ingredient.of(CNTags.neoForgeItemTag("ingots/steel")),
             AllBlocks.BRASS_CASING.get(),
             CNBlocks.REACTOR_CASING.get()
     );

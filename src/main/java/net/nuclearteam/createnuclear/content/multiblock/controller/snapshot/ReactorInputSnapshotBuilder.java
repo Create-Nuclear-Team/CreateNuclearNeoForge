@@ -9,7 +9,6 @@ import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputFluidManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 
 import java.util.HashMap;
 import java.util.List;

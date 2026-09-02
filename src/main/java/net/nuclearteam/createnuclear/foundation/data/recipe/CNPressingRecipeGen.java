@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
-import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.api.data.recipe.PressingRecipeGen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -15,7 +14,7 @@ public class CNPressingRecipeGen extends PressingRecipeGen {
 
     GeneratedRecipe
         GRAPHENE = create("graphene", b -> b
-            .require(Ingredient.of(CNTags.forgeItemTag("dusts/coal")))
+            .require(Ingredient.of(CNTags.neoForgeItemTag("dusts/coal")))
             .output(CNItems.GRAPHENE)
     )
     ;
