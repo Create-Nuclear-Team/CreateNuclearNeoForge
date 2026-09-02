@@ -17,14 +17,14 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
-@EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = CreateNuclear.MOD_ID)
 public class CommentEvents {
     @SubscribeEvent
     public static void onBrewingRecipeRegister(RegisterBrewingRecipesEvent event) {
         CNPotions.registerPotionsRecipes(event);
     }
 
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber()
     public static class ModBusEvents {
         @SubscribeEvent
         public static void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -36,7 +36,7 @@ public class CommentEvents {
         }
     }
 
-    @EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = CreateNuclear.MOD_ID)
     public static class RadiationEvent {
         @SubscribeEvent
         public static void onEntityAttribute(EntityAttributeModificationEvent event) {
