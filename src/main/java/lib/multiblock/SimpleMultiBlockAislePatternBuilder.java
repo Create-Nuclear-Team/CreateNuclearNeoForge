@@ -79,10 +79,4 @@ public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBu
         data.forEach((k,v)-> list.addAll(v));
         return builder.make(list, lookup, blockProvider);
     }
-
-    public BlockPos getDistanceController(char character) {
-        var data = Util.parseBlockPattern(pattern, lookup.keySet());
-        var coreList = data.get(character);
-        return coreList.get(0).pos();
-    }
 }

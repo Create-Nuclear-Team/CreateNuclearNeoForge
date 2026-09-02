@@ -365,9 +365,9 @@ public class CNAdvancement implements DataProvider {
             .description("Craft a reactor frame to build your nuclear reactor")
             .after(REACTOR_COOLER)
             .whenIconCollected()
-    )
+    ),
 
-    ;
+    END = null;
 
     private final PackOutput output;
     private final CompletableFuture<HolderLookup.Provider> registries;

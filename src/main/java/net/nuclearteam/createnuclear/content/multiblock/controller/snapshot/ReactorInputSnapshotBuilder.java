@@ -38,11 +38,8 @@ public class ReactorInputSnapshotBuilder {
             }
         }
 
-        VirtualReactorInputsItem virtualItems = inputManager.getInventory(level);
         VirtualReactorInputFluid virtualFluid = inputFluidManager.getInventory(level);
         List<BigFluidStack> fluids = VirtualReactorInputFluid.toBigList(virtualFluid.fluids());
-
-
 
         return new ReactorInputSnapshot(items, fluids, maxFluidCapacity);
     }

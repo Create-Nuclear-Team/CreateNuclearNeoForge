@@ -50,20 +50,7 @@ public class CNFanProcessingTypes {
         return Registry.register(CreateBuiltInRegistries.FAN_PROCESSING_TYPE, CreateNuclear.asResource(id), type);
     }
 
-    @Nullable
-    public static FanProcessingType ofLegacyName(String name) {
-        return LEGACY_NAME_MAP.get(name);
-    }
-
     public static void register() {}
-
-    public static FanProcessingType parseLegacy(String str) {
-        FanProcessingType type = ofLegacyName(str);
-        if (type != null) {
-            return type;
-        }
-        return FanProcessingType.parse(str);
-    }
 
     public static class EnrichedType implements FanProcessingType {
         private static final double FAN_ENRICHING_DOSE = 5.0D;

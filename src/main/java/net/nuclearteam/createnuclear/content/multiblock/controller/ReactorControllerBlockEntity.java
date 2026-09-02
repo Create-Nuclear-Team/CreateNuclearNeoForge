@@ -6,9 +6,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
-import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
-import net.createmod.catnip.platform.CatnipServices;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -19,8 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -52,7 +47,6 @@ import java.util.List;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
-import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
@@ -60,13 +54,7 @@ import static net.nuclearteam.createnuclear.content.multiblock.controller.Reacto
 @SuppressWarnings({ "unused" })
 public class ReactorControllerBlockEntity extends SmartBlockEntity
         implements IInteractionChecker, IHaveGoggleInformation, IMultiblockController {
-    /**
-     * The assembled state is stored in the block state
-     * (`ReactorControllerBlock.ASSEMBLED`).
-     * Use the helper accessors below to query or toggle it to keep
-     * entity/blockstate consistent.
-     */
-    private final ReactorPattern pattern = new ReactorPattern();
+
     private final ReactorControllerInventory inventory;
     private int countFuelRod;
     private int countCoolerRod;

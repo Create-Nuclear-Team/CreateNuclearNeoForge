@@ -42,8 +42,6 @@ public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
     private final DeferredHolder<RecipeType<?>, RecipeType<?>> typeObject;
     private final Supplier<RecipeType<?>> type;
 
-    private boolean isProcessingRecipe;
-
     public static final Codec<CNRecipeTypes> CODEC = StringRepresentable.fromEnum(CNRecipeTypes::values);
 
     CNRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier, Supplier<RecipeType<?>> typeSupplier, boolean registerType) {
@@ -58,7 +56,6 @@ public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
             typeObject = null;
             type = typeSupplier;
         }
-        isProcessingRecipe = false;
     }
 
     CNRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier) {
@@ -68,12 +65,10 @@ public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
         serializerObject = Registers.SERIALIZER_REGISTER.register(name, serializerSupplier);
         typeObject = Registers.TYPE_REGISTER.register(name, () -> RecipeType.simple(id));
         type = typeObject;
-        isProcessingRecipe = false;
     }
 
     CNRecipeTypes(StandardProcessingRecipe.Factory<?> processingFactory) {
         this(() -> new StandardProcessingRecipe.Serializer<>(processingFactory));
-        isProcessingRecipe = true;
     }
 
     public static void register(IEventBus modEventBus) {

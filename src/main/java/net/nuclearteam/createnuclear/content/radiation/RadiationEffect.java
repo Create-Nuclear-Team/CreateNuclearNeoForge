@@ -19,9 +19,8 @@ public class RadiationEffect extends VicinityEffect {
      */
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
-                amplifier -> 10,
-                RadiationCapability::canBeIrradiated,
-                timer -> {}); // Custom color (hex value)
+            amplifier -> 10,
+            RadiationCapability::canBeIrradiated); // Custom color (hex value)
 
         // Reduces movement speed by 20%
         this.addAttributeModifier(

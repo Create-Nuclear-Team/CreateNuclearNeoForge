@@ -522,8 +522,6 @@ public class IrradiatedCat extends TamableAnimal {
 
         public CatAvoidEntityGoal(IrradiatedCat cat, Class<T> entityClassToAvoid, float maxDist, double walkSpeedModifier, double sprintSpeedModifier) {
             super(cat, entityClassToAvoid, maxDist, walkSpeedModifier, sprintSpeedModifier);
-            Predicate<Entity> var10006 = EntitySelector.NO_CREATIVE_OR_SPECTATOR;
-            Objects.requireNonNull(var10006);
             this.cat = cat;
         }
 

@@ -19,7 +19,7 @@ public abstract class VicinityEffect extends MobEffect {
     // Stores the GameTime tick when the cooldown expires for each entity
     private final Map<UUID, Long> cooldowns = new HashMap<>();
 
-    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Consumer<Integer> timer) {
+    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter) {
         super(category, color);
 
         this.areaSize = areaSize;
