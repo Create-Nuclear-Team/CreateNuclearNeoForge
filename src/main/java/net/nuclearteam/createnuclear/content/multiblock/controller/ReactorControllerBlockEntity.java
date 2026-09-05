@@ -358,7 +358,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (meltdownState == IReactorMeltdownMonitor.MeltdownState.EXPLODE) {
             if (level instanceof ServerLevel serverLevel) {
                 this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countFuelRod);
-
             }
             isExploding = true;
             return;

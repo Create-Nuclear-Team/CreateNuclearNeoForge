@@ -6,6 +6,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameRules;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.compat.aeronotics.sable.SableCompat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -16,8 +18,11 @@ public class ReactorMeltdownExecutor implements IExplosionService {
     @Override
     public void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int countFuelRod, int notifyRadius, boolean notifyWarnAll) {
         BlockPos explosionPos = controllerPos.above(5);
+        BlockPos globalNotifyPos = SableCompat.toGlobal(level, explosionPos);
+        BlockPos globalExplosionPos = SableCompat.toGlobal(level, explosionPos);
 
-        NotifyUtil.sendTitle(level, controllerPos,
+
+        NotifyUtil.sendTitle(level, globalNotifyPos,
                 CreateNuclearLang.translate("notification.reactor.destroyed"),
                 CreateNuclearLang.translate("notification.reactor.meltdown_finished"),
                 ChatFormatting.DARK_RED, notifyRadius, notifyWarnAll, 10, 60, 20
@@ -33,7 +38,7 @@ public class ReactorMeltdownExecutor implements IExplosionService {
 
         level.destroyBlock(controllerPos, false);
 
-        BiomeIrradiationService.circularArea(level, explosionPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
+        BiomeIrradiationService.circularArea(level, globalExplosionPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
 
     }
 

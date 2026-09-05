@@ -24,9 +24,13 @@ import net.nuclearteam.createnuclear.foundation.utility.Maths;
 import net.nuclearteam.createnuclear.CNDamageTypes;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NuclearExplosionEntity extends Entity {
+    private static final Set<UUID> MUSHROOM_CLOUD_SPAWNED = ConcurrentHashMap.newKeySet();
 
     private boolean spawnedParticle = false;
     private Stack<BlockPos> destroyingChunks = new Stack<>();
@@ -35,12 +39,9 @@ public class NuclearExplosionEntity extends Entity {
     private static final EntityDataAccessor<Boolean> INTENTIONAL_GAME_DESIGN = SynchedEntityData.defineId(NuclearExplosionEntity.class, EntityDataSerializers.BOOLEAN);
     private boolean loadingChunks = false;
 
-
     public NuclearExplosionEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
-
-
 
     public void tick() {
         super.tick();
@@ -48,11 +49,14 @@ public class NuclearExplosionEntity extends Entity {
         int radius = chunksAffected * 15;
         if (!spawnedParticle) {
             spawnedParticle = true;
-            int particleY = (int) Math.ceil(this.getY());
-            while (particleY > level().getMinBuildHeight() && particleY > this.getY() - radius / 2F && isDestroyable(level().getBlockState(BlockPos.containing(this.getX(), particleY, this.getZ())))) {
-                particleY--;
+            if (level().isClientSide && MUSHROOM_CLOUD_SPAWNED.add(this.getUUID())) {
+                int particleY = (int) Math.ceil(this.getY());
+                while (particleY > level().getMinBuildHeight() && particleY > this.getY() - radius / 2F && isDestroyable(level().getBlockState(BlockPos.containing(this.getX(), particleY, this.getZ())))) {
+                    particleY--;
+                }
+                
+                level().addAlwaysVisibleParticle(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), true, this.getX(), particleY + 2, this.getZ(), this.getSize(), isIntentionalGameDesign() ? 1.0F : 0.0F, 0);
             }
-            level().addAlwaysVisibleParticle(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), true, this.getX(), particleY + 2, this.getZ(), this.getSize(), isIntentionalGameDesign() ? 1.0F : 0.0F, 0);
         }
         if (tickCount > 40 && destroyingChunks.isEmpty()) {
             this.remove(RemovalReason.DISCARDED);
@@ -84,24 +88,26 @@ public class NuclearExplosionEntity extends Entity {
             float flingStrength = getSize() * 0.33F;
             float maximumDistance = radius + radius * 0.5F + 1;
 
-            for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, killBox)) {
-                float dist = entity.distanceTo(this);
-                float damage = calculateDamage(dist, maximumDistance);
-                Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
-                float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
-
-                if (damage > 0) {
-                    if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
-                        damage *= 0.25F;
-                        playerFling *= 0.1F;
-
-                    }
+            if (!level().isClientSide) {
+                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, killBox)) {
+                    float dist = entity.distanceTo(this);
+                    float damage = calculateDamage(dist, maximumDistance);
+                    Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
+                    float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
 
                     if (damage > 0) {
-                        entity.hurt(CNDamageTypes.radiation(entity.level()), damage);
+                        if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
+                            damage *= 0.25F;
+                            playerFling *= 0.1F;
+
+                        }
+
+                        if (damage > 0) {
+                            entity.hurt(CNDamageTypes.radiation(entity.level()), damage);
+                        }
                     }
+                    entity.setDeltaMovement(vec3.scale(damage * 0.1F * playerFling));
                 }
-                entity.setDeltaMovement(vec3.scale(damage * 0.1F * playerFling));
             }
         }
     }

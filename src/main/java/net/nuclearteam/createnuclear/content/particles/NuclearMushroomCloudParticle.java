@@ -131,6 +131,7 @@ public class NuclearMushroomCloudParticle extends Particle {
             if (xSpeed == 0.0) {
                 xSpeed = 1.0F;
             }
+
             return new NuclearMushroomCloudParticle(worldIn, x, y, z, (float) Math.max(0.5F, xSpeed), ySpeed >= 1.0F);
         }
     }
