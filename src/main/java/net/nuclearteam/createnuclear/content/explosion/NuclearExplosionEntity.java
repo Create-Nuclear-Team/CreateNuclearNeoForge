@@ -88,26 +88,23 @@ public class NuclearExplosionEntity extends Entity {
             float flingStrength = getSize() * 0.33F;
             float maximumDistance = radius + radius * 0.5F + 1;
 
-            if (!level().isClientSide) {
-                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, killBox)) {
-                    float dist = entity.distanceTo(this);
-                    float damage = calculateDamage(dist, maximumDistance);
-                    Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
-                    float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
+            for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, killBox)) {
+                float dist = entity.distanceTo(this);
+                float damage = calculateDamage(dist, maximumDistance);
+                Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
+                float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
+
+                if (damage > 0) {
+                    if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
+                        damage *= 0.25F;
+                        playerFling *= 0.1F;
+                    }
 
                     if (damage > 0) {
-                        if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
-                            damage *= 0.25F;
-                            playerFling *= 0.1F;
-
-                        }
-
-                        if (damage > 0) {
-                            entity.hurt(CNDamageTypes.radiation(entity.level()), damage);
-                        }
+                        entity.hurt(CNDamageTypes.radiation(entity.level()), damage);
                     }
-                    entity.setDeltaMovement(vec3.scale(damage * 0.1F * playerFling));
                 }
+                entity.setDeltaMovement(vec3.scale(damage * 0.1F * playerFling));
             }
         }
     }

@@ -1,10 +1,3 @@
-/fillbiome
-/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
-/gamemode survival
-/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
-/time set day
-/gamemode spectator
-/gamemode creative
 /effect give Dev createnuclear:iodine
 /effect give Dev createnuclear:radiation
 /time set day
@@ -56,3 +49,10 @@
 /tp 121.53 37.00 413.49
 /effect give Dev minecraft:night_vision infinite 255 false
 /weather clear
+/time set day
+/kill @e[type=!minecraft:player]d
+/kill @e[type=!minecraft:player]
+/tp 127 -53 419
+/data get block
+/data get block 20481028 129 20481029
+/data get block 111 -55 448
