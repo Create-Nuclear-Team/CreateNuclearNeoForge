@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-
 @ParametersAreNonnullByDefault
 public class ReactorRodInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorRodInputEntity> {
 

@@ -168,8 +168,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             int configRadius = CNConfigs.server().notify.warningDistance.get();
             boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
             NotifyUtil.sendActionBar(worldIn, pos,
-                    CreateNuclearLang.translate("notification.reactor.disassembled"),
-                    ChatFormatting.GOLD, configRadius, configWarnAll
+                CreateNuclearLang.translate("notification.reactor.disassembled"),
+                ChatFormatting.GOLD, configRadius, configWarnAll
             );
         }
     }
