@@ -61,22 +61,23 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     /**
      * Remove any tracked positions that are no longer valid in the given level.
      */
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         List<BlockPos> toRemove = new ArrayList<>();
-        for (BlockPos p: positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) {
-                toRemove.add(p);
+                toRemove.add(offset);
                 continue;
             }
 
             BlockEntity be = level.getBlockEntity(p);
             if (be == null) {
-                toRemove.add(p);
+                toRemove.add(offset);
                 continue;
             }
 
             IFluidHandler cap = level.getCapability(Capabilities.FluidHandler.BLOCK, p, null);
-            if (cap == null) toRemove.add(p);
+            if (cap == null) toRemove.add(offset);
         }
 
         positions.removeAll(toRemove);
@@ -87,22 +88,24 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
      * Return an immutable list of tracked block positions that correspond
      * to fluid input entities in the given level.
      */
-    public List<BlockPos> getBlocksPosition(Level level) {
-        List<BlockPos> positions = new ArrayList<>();
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        List<BlockPos> result = new ArrayList<>();
 
-        for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorFluidInputEntity) positions.add(p);
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
+            if (level.getBlockEntity(p) instanceof ReactorFluidInputEntity) result.add(p);
         }
-        return List.copyOf(positions);
+        return List.copyOf(result);
     }
 
     @Override
     /**
      * Collect and return fluid handler capabilities for all tracked positions.
      */
-    public List<IFluidHandler> getFuildHandlers(Level level) {
+    public List<IFluidHandler> getFuildHandlers(Level level, BlockPos controllerPos) {
         List<IFluidHandler> handlers = new ArrayList<>();
-        for (BlockPos p : new ArrayList<>(positions)) {
+        for (BlockPos offset : new ArrayList<>(positions)) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) continue;
             BlockEntity be = level.getBlockEntity(p);
             if (be == null) continue;
@@ -119,9 +122,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     /**
      * Build and return a virtual aggregated inventory of all input fluids.
      */
-    public VirtualReactorInputFluid getInventory(Level level) {
+    public VirtualReactorInputFluid getInventory(Level level, BlockPos controllerPos) {
         VirtualReactorInputFluid virtualReactorInputFluid = new VirtualReactorInputFluid();
-        List<IFluidHandler> handlers = this.getFuildHandlers(level);
+        List<IFluidHandler> handlers = this.getFuildHandlers(level, controllerPos);
         if (handlers.isEmpty()) return new VirtualReactorInputFluid();
 
         for (IFluidHandler h : handlers) {
@@ -143,9 +146,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
      *         than refusing to run.
      */
     @Override
-    public boolean extractFluids(Level level, int fluidNeeded) {
+    public boolean extractFluids(Level level, BlockPos controllerPos, int fluidNeeded) {
         if (level == null || fluidNeeded <= 0) return false;
-        List<IFluidHandler> handlers = getFuildHandlers(level);
+        List<IFluidHandler> handlers = getFuildHandlers(level, controllerPos);
         if (handlers.isEmpty()) return false;
 
         int remaining = fluidNeeded;

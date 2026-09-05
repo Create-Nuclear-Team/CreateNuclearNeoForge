@@ -28,7 +28,7 @@ public class DefaultPersistenceService implements IPersistenceService {
                     : ReactorDisplayState.EMPTY
             );
         }
-        owner.setConfiguredPattern(ItemStack.parse(registries, compound.getCompound("items")).orElse(ItemStack.EMPTY));
+        owner.setConfiguredPattern(ItemStack.parseOptional(registries, compound.getCompound("items")));
 
     }
 

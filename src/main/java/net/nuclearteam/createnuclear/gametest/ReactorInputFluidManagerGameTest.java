@@ -40,6 +40,14 @@ import java.util.List;
  * instead of Forge's {@code be.getCapability(ForgeCapabilities.FLUID_HANDLER)}, and fluid ids are
  * resolved via {@code BuiltInRegistries.FLUID} instead of {@code ForgeRegistries.FLUIDS}.
  * <p>
+ * Tracked positions are stored RELATIVE to a reactor controller (see
+ * {@link net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorIOManager}).
+ * These tests have no real controller, so the structure's own origin
+ * ({@code helper.absolutePos(BlockPos.ZERO)}) stands in for the controller's
+ * position: the structure-relative {@code rel} positions used throughout are
+ * added to the manager as-is (already relative offsets from that origin), and
+ * every {@link Level}-touching call passes {@link #controllerPos(GameTestHelper)}.
+ * <p>
  * Tests named "*_expectedContract" cover the two extractFluids defects fixed on both branches:
  * fluidNeeded was never decremented between handlers (so a request of 10 units drained 10 from
  * EVERY input), and a request for exactly one unit was silently dropped by an
@@ -53,6 +61,11 @@ public class ReactorInputFluidManagerGameTest {
     private static final String STRUCTURE = "empty_platform";
 
     // ---------- test fixtures ----------
+
+    /** Stand-in controller position: the structure's own origin. */
+    private static BlockPos controllerPos(GameTestHelper helper) {
+        return helper.absolutePos(BlockPos.ZERO);
+    }
 
     private static void place(GameTestHelper helper, BlockPos rel, Direction facing) {
         helper.setBlock(rel, CNBlocks.REACTOR_FLUID_INPUT.get().defaultBlockState()
@@ -73,9 +86,10 @@ public class ReactorInputFluidManagerGameTest {
         return h == null ? -1 : h.getFluidInTank(0).getAmount();
     }
 
+    /** Positions are stored relative to {@link #controllerPos(GameTestHelper)}, i.e. as-is. */
     private static ReactorInputFluidManager manager(GameTestHelper helper, BlockPos... relPositions) {
         ReactorInputFluidManager manager = new ReactorInputFluidManager();
-        for (BlockPos rel : relPositions) manager.addBlock(helper.absolutePos(rel));
+        for (BlockPos rel : relPositions) manager.addBlock(rel);
         return manager;
     }
 
@@ -185,7 +199,7 @@ public class ReactorInputFluidManagerGameTest {
         BlockPos rel = new BlockPos(1, 1, 1); // never placed: air, no block entity
         ReactorInputFluidManager manager = manager(helper, rel);
 
-        manager.clearInvalid(helper.getLevel());
+        manager.clearInvalid(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(manager.size() == 0, "a position without a block entity should be removed");
         helper.succeed();
@@ -197,7 +211,7 @@ public class ReactorInputFluidManagerGameTest {
         helper.setBlock(rel, Blocks.CHEST.defaultBlockState()); // real BE, no fluid capability
         ReactorInputFluidManager manager = manager(helper, rel);
 
-        manager.clearInvalid(helper.getLevel());
+        manager.clearInvalid(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(manager.size() == 0, "a block entity without a fluid capability should be removed");
         helper.succeed();
@@ -209,7 +223,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         ReactorInputFluidManager manager = manager(helper, rel);
 
-        manager.clearInvalid(helper.getLevel());
+        manager.clearInvalid(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(manager.size() == 1, "a valid ReactorFluidInputEntity should be kept");
         helper.succeed();
@@ -225,15 +239,15 @@ public class ReactorInputFluidManagerGameTest {
         helper.setBlock(chest, Blocks.CHEST.defaultBlockState());
 
         ReactorInputFluidManager manager = manager(helper, valid, chest, missing);
-        manager.clearInvalid(helper.getLevel());
+        manager.clearInvalid(helper.getLevel(), controllerPos(helper));
 
-        helper.assertTrue(manager.getBlocksPosition().equals(List.of(helper.absolutePos(valid))),
+        helper.assertTrue(manager.getBlocksPosition().equals(List.of(valid)),
                 "only the valid fluid input position should remain, found " + manager.getBlocksPosition());
         helper.succeed();
     }
 
     // ================================================================
-    // getBlocksPosition(Level)
+    // getBlocksPosition(Level, BlockPos)
     // ================================================================
 
     @GameTest(template = STRUCTURE)
@@ -245,7 +259,7 @@ public class ReactorInputFluidManagerGameTest {
 
         ReactorInputFluidManager manager = manager(helper, validRel, otherRel);
 
-        List<BlockPos> result = manager.getBlocksPosition(helper.getLevel());
+        List<BlockPos> result = manager.getBlocksPosition(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(result.equals(List.of(helper.absolutePos(validRel))),
                 "only the ReactorFluidInputEntity position should be returned, found " + result);
@@ -262,7 +276,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 500));
 
-        List<IFluidHandler> handlers = manager(helper, rel).getFuildHandlers(helper.getLevel());
+        List<IFluidHandler> handlers = manager(helper, rel).getFuildHandlers(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(handlers.size() == 1, "expected exactly one handler");
         helper.assertTrue(handlers.get(0).getFluidInTank(0).getAmount() == 500,
@@ -279,7 +293,7 @@ public class ReactorInputFluidManagerGameTest {
         fill(helper, rel1, new FluidStack(Fluids.WATER, 100));
         fill(helper, rel2, new FluidStack(Fluids.LAVA, 200));
 
-        List<IFluidHandler> handlers = manager(helper, rel1, rel2).getFuildHandlers(helper.getLevel());
+        List<IFluidHandler> handlers = manager(helper, rel1, rel2).getFuildHandlers(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(handlers.size() == 2, "expected two handlers");
         helper.assertTrue(handlers.get(0).getFluidInTank(0).getFluid() == Fluids.WATER,
@@ -295,7 +309,7 @@ public class ReactorInputFluidManagerGameTest {
 
     @GameTest(template = STRUCTURE)
     public static void getInventory_noHandlers_returnsEmpty(GameTestHelper helper) {
-        VirtualReactorInputFluid inventory = new ReactorInputFluidManager().getInventory(helper.getLevel());
+        VirtualReactorInputFluid inventory = new ReactorInputFluidManager().getInventory(helper.getLevel(), controllerPos(helper));
 
         helper.assertTrue(inventory.fluids().isEmpty(), "expected an empty inventory with no tracked handlers");
         helper.succeed();
@@ -310,7 +324,7 @@ public class ReactorInputFluidManagerGameTest {
         fill(helper, rel1, new FluidStack(Fluids.WATER, 300));
         fill(helper, rel2, new FluidStack(Fluids.WATER, 250));
 
-        VirtualReactorInputFluid inventory = manager(helper, rel1, rel2).getInventory(helper.getLevel());
+        VirtualReactorInputFluid inventory = manager(helper, rel1, rel2).getInventory(helper.getLevel(), controllerPos(helper));
 
         ResourceLocation waterId = BuiltInRegistries.FLUID.getKey(Fluids.WATER);
         long total = inventory.getAmount(waterId);
@@ -324,14 +338,14 @@ public class ReactorInputFluidManagerGameTest {
 
     @GameTest(template = STRUCTURE)
     public static void extractFluids_nullLevel_returnsFalse(GameTestHelper helper) {
-        boolean result = new ReactorInputFluidManager().extractFluids(null, 10);
+        boolean result = new ReactorInputFluidManager().extractFluids(null, controllerPos(helper), 10);
         helper.assertTrue(!result, "extractFluids should return false for a null level");
         helper.succeed();
     }
 
     @GameTest(template = STRUCTURE)
     public static void extractFluids_noHandlers_returnsFalse(GameTestHelper helper) {
-        boolean result = new ReactorInputFluidManager().extractFluids(helper.getLevel(), 10);
+        boolean result = new ReactorInputFluidManager().extractFluids(helper.getLevel(), controllerPos(helper), 10);
         helper.assertTrue(!result, "extractFluids should return false when there are no handlers");
         helper.succeed();
     }
@@ -342,7 +356,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 1000));
 
-        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), 400);
+        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), controllerPos(helper), 400);
 
         helper.assertTrue(result, "extraction should succeed when enough fluid is available");
         helper.assertTrue(tankAmount(helper, rel) == 600, "expected 600 remaining, found " + tankAmount(helper, rel));
@@ -355,7 +369,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 30));
 
-        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), 100);
+        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), controllerPos(helper), 100);
 
         helper.assertTrue(result, "extraction should be reported successful even for a partial drain");
         helper.assertTrue(tankAmount(helper, rel) == 0, "all 30 available units should have been drained");
@@ -372,7 +386,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 5));
 
-        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), 1);
+        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), controllerPos(helper), 1);
 
         helper.assertTrue(result, "a request for exactly 1 unit with stock available should succeed");
         helper.assertTrue(tankAmount(helper, rel) == 4, "expected exactly 1 unit to be drained");
@@ -394,7 +408,7 @@ public class ReactorInputFluidManagerGameTest {
         fill(helper, rel1, new FluidStack(Fluids.WATER, 10));
         fill(helper, rel2, new FluidStack(Fluids.WATER, 10));
 
-        manager(helper, rel1, rel2).extractFluids(helper.getLevel(), 10);
+        manager(helper, rel1, rel2).extractFluids(helper.getLevel(), controllerPos(helper), 10);
 
         int totalRemaining = tankAmount(helper, rel1) + tankAmount(helper, rel2);
         helper.assertTrue(totalRemaining == 10,
@@ -411,7 +425,7 @@ public class ReactorInputFluidManagerGameTest {
         fill(helper, rel1, new FluidStack(Fluids.WATER, 10));
         fill(helper, rel2, new FluidStack(Fluids.WATER, 10));
 
-        boolean result = manager(helper, rel1, rel2).extractFluids(helper.getLevel(), 0);
+        boolean result = manager(helper, rel1, rel2).extractFluids(helper.getLevel(), controllerPos(helper), 0);
 
         helper.assertTrue(!result, "a non-positive fluidNeeded should never extract anything");
         helper.assertTrue(tankAmount(helper, rel1) == 10 && tankAmount(helper, rel2) == 10,
@@ -427,7 +441,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel2, Direction.NORTH);
         fill(helper, rel2, new FluidStack(Fluids.WATER, 20));
 
-        boolean result = manager(helper, rel1, rel2).extractFluids(helper.getLevel(), 15);
+        boolean result = manager(helper, rel1, rel2).extractFluids(helper.getLevel(), controllerPos(helper), 15);
 
         helper.assertTrue(result, "the second, non-empty handler should still be usable");
         helper.assertTrue(tankAmount(helper, rel1) == 0, "empty handler should stay untouched");
@@ -446,7 +460,7 @@ public class ReactorInputFluidManagerGameTest {
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 30));
 
-        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), 100);
+        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), controllerPos(helper), 100);
 
         helper.assertTrue(result, "a partial extraction should still report success");
         helper.assertTrue(tankAmount(helper, rel) == 0, "all available fluid should have been drained");

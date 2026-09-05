@@ -52,13 +52,15 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     /**
-     * Retrieves all `IItemHandler` instances located at the input positions.
+     * Retrieves all `IItemHandler` instances located at the input positions,
+     * resolved from the controller's current position.
      * Returns an empty list when no handlers are found.
      */
     @Override
-    public List<IItemHandler> getItemHandlers(Level level) {
+    public List<IItemHandler> getItemHandlers(Level level, BlockPos controllerPos) {
         List<IItemHandler> handlers = new ArrayList<>();
-        for (BlockPos p: new ArrayList<>(positions)) {
+        for (BlockPos offset : new ArrayList<>(positions)) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) continue;
             BlockEntity be = level.getBlockEntity(p);
             if (be == null) continue;
@@ -72,8 +74,8 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public VirtualReactorInputsItem getInventory(Level level) {
-        List<IItemHandler> handlers = this.getItemHandlers(level);
+    public VirtualReactorInputsItem getInventory(Level level, BlockPos controllerPos) {
+        List<IItemHandler> handlers = this.getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return new VirtualReactorInputsItem();
 
         int totalFuel = 0;
@@ -92,9 +94,9 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public boolean extractItems(Level level, int fuelNeeded, int coolerNeeded) {
+    public boolean extractItems(Level level, BlockPos controllerPos, int fuelNeeded, int coolerNeeded) {
         if (level == null) return false;
-        List<IItemHandler> handlers = getItemHandlers(level);
+        List<IItemHandler> handlers = getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return false;
 
         int fuelRemaining = fuelNeeded;
@@ -123,10 +125,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         return fuelRemaining <= 0 && coolerRemaining <= 0;
     }
 
-    public boolean extractItemByName(Level level, String itemName) {
+    @Override
+    public boolean extractItemByName(Level level, BlockPos controllerPos, String itemName) {
         if (level == null || itemName == null) return false;
 
-        List<IItemHandler> handlers = getItemHandlers(level);
+        List<IItemHandler> handlers = getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return false;
 
         for (IItemHandler handler : handlers) {
@@ -168,28 +171,30 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
      * or not a `Container`).
      */
     @Override
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         List<BlockPos> toRemove = new ArrayList<>();
-        for (BlockPos p: positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) {
-                toRemove.add(p);
+                toRemove.add(offset);
                 continue;
             }
 
             BlockEntity be = level.getBlockEntity(p);
-            if (be == null || !(be instanceof Container)) toRemove.add(p);
+            if (be == null || !(be instanceof Container)) toRemove.add(offset);
         }
 
         positions.removeAll(toRemove);
     }
 
     @Override
-    public List<BlockPos> getBlocksPosition(Level level) {
-        List<BlockPos> positions = new ArrayList<>();
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        List<BlockPos> result = new ArrayList<>();
 
-        for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) positions.add(p);
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
+            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) result.add(p);
         }
-        return List.copyOf(positions);
+        return List.copyOf(result);
     }
 }

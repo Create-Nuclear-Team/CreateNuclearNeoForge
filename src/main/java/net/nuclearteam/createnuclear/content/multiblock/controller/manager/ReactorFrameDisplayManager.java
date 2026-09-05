@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -35,7 +36,7 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
      * input tanks (whose contents are synced to the client), so they always agree
      * regardless of the fluid type.
      */
-    private void refreshFrameFluidCache(@Nullable Level level, ReactorInputFluidManagerI handlers) {
+    private void refreshFrameFluidCache(@Nullable Level level, BlockPos controllerPos, ReactorInputFluidManagerI handlers) {
         if (level == null) return;
         long now = level.getGameTime();
 
@@ -45,7 +46,7 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
         long amount = 0, capacity = 0;
         FluidStack fluid = FluidStack.EMPTY;
 
-        for (IFluidHandler handler : handlers.getFuildHandlers(level)) {
+        for (IFluidHandler handler : handlers.getFuildHandlers(level, controllerPos)) {
             int tanks = handler.getTanks();
             for (int t = 0; t < tanks; t++) {
                 FluidStack stack = handler.getFluidInTank(t);
@@ -64,8 +65,8 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
      * The fluid currently shown in the reactor frame windows (may be empty).
      */
     @Override
-    public FluidStack getDisplayedFluid(Level level, ReactorInputFluidManagerI handlers) {
-        refreshFrameFluidCache(level, handlers);
+    public FluidStack getDisplayedFluid(Level level, BlockPos controllerPos, ReactorInputFluidManagerI handlers) {
+        refreshFrameFluidCache(level, controllerPos, handlers);
 
         return frameFluidCache;
     }
@@ -75,8 +76,8 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
      * the frame renderer to size the visible liquid column.
      */
     @Override
-    public float getDisplayedFluidFillRatio(Level level, ReactorInputFluidManagerI handlers) {
-        refreshFrameFluidCache(level, handlers);
+    public float getDisplayedFluidFillRatio(Level level, BlockPos controllerPos, ReactorInputFluidManagerI handlers) {
+        refreshFrameFluidCache(level, controllerPos, handlers);
 
         return frameFluidFillRatioCache;
     }

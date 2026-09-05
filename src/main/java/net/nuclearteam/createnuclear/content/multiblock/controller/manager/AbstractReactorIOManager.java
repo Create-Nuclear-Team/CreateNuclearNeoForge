@@ -25,10 +25,10 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
      * Adds `pos` if non-null and not already present; returns true when added.
      */
     @Override
-    public void addBlock(BlockPos pos) {
-        if (pos == null) return;
-        if (!contains(pos)) {
-            positions.add(pos);
+    public void addBlock(BlockPos relativeOffset) {
+        if (relativeOffset == null) return;
+        if (!contains(relativeOffset)) {
+            positions.add(relativeOffset);
         }
     }
 
@@ -58,15 +58,24 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
         return List.copyOf(positions);
     }
 
+    @Override
+    public List<BlockPos> getAbsolutePositions(BlockPos controllerPos) {
+        List<BlockPos> result = new ArrayList<>(positions.size());
+        for (BlockPos offset : positions) {
+            result.add(controllerPos.offset(offset));
+        }
+        return result;
+    }
+
     /**
      * Resolves each position with `resolver` and returns a list of non-null results.
      * Useful to convert positions to block entities or handlers.
      */
     @Override
-    public <T> List<T> resolveBlock(Level level, Function<BlockPos, T> resolver) {
+    public <T> List<T> resolveBlock(Level level, BlockPos controllerPos, Function<BlockPos, T> resolver) {
         List<T> result = new ArrayList<>();
-        for (BlockPos p: new ArrayList<>(positions)) {
-            T r = resolver.apply(p);
+        for (BlockPos offset : new ArrayList<>(positions)) {
+            T r = resolver.apply(controllerPos.offset(offset));
             if (r != null) result.add(r);
         }
         return result;
@@ -85,5 +94,5 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
      * Subclasses must implement manager-specific validation logic.
      */
     @Override
-    public abstract void clearInvalid(Level level);
+    public abstract void clearInvalid(Level level, BlockPos controllerPos);
 }

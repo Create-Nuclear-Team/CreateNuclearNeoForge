@@ -9,12 +9,18 @@ import java.util.function.Function;
 
 /**
  * Generic manager interface for reactor IO positions (inputs or outputs).
- * Defines expected operations to manage a collection of `BlockPos` instances:
- * serialization, validation, and resolution into concrete objects via a `resolver`.
+ * <p>
+ * Tracked positions are stored RELATIVE to the reactor controller (an offset,
+ * not a world-absolute BlockPos), so the reactor keeps working correctly after
+ * the whole multiblock is physically relocated (e.g. Aeronautics/Sable, or a
+ * Create Contraption) without needing to re-run assembly detection. Any
+ * method that needs to touch the actual {@link Level} therefore takes the
+ * controller's CURRENT position ({@code controllerPos}) so it can resolve
+ * each offset back to a world position on demand.
  */
 public interface ReactorIOManager {
-    /** Returns true when the position is known. */
-    boolean contains(BlockPos pos);
+    /** Returns true when the relative offset is already tracked. */
+    boolean contains(BlockPos relativeOffset);
 
     /** Current number of tracked positions. */
     int size();
@@ -25,25 +31,27 @@ public interface ReactorIOManager {
     /** Writes state to an NBT tag (serialization). */
     void write(CompoundTag compound);
 
-    /**
-     * Adds a position; returns true if added.
-     */
-    void addBlock(BlockPos pos);
+    /** Adds a relative offset; no-op if already tracked. */
+    void addBlock(BlockPos relativeOffset);
 
-    /**
-     * Removes a position; returns true if it was present and removed.
-     */
-    void removeBlock(BlockPos pos);
+    /** Removes a relative offset if present. */
+    void removeBlock(BlockPos relativeOffset);
 
-    /** Returns an immutable copy of tracked positions. */
+    /** Returns an immutable copy of the tracked relative offsets. */
     List<BlockPos> getBlocksPosition();
 
-    /** Removes invalid positions for the provided `level` (e.g. missing block entity). */
-    void clearInvalid(Level level);
+    /**
+     * Resolves every tracked offset to its current world position, given the
+     * controller's current {@code controllerPos}.
+     */
+    List<BlockPos> getAbsolutePositions(BlockPos controllerPos);
+
+    /** Removes offsets that no longer resolve to a valid block in {@code level}. */
+    void clearInvalid(Level level, BlockPos controllerPos);
 
     /**
-     * Resolves each `BlockPos` into an instance using `resolver` and returns
-     * the list of non-null results.
+     * Resolves each tracked offset into an instance using {@code resolver} and
+     * returns the list of non-null results.
      */
-    <T> List<T> resolveBlock(Level level, Function<BlockPos, T> resolver);
+    <T> List<T> resolveBlock(Level level, BlockPos controllerPos, Function<BlockPos, T> resolver);
 }

@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.snapshot;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,10 +18,11 @@ import java.util.Map;
 public class ReactorInputSnapshotBuilder {
     private ReactorInputSnapshotBuilder() {}
 
-    public static ReactorInputSnapshot build(Level level, ReactorInputManagerI inputManager, ReactorInputFluidManagerI inputFluidManager) {
+    public static ReactorInputSnapshot build(Level level, BlockPos controllerPos,
+                                             ReactorInputManagerI inputManager, ReactorInputFluidManagerI inputFluidManager) {
         // Populate display fields for client sync
         Map<Item, Integer> items = new HashMap<>();
-        List<IItemHandler> itemHandlers = inputManager.getItemHandlers(level);
+        List<IItemHandler> itemHandlers = inputManager.getItemHandlers(level, controllerPos);
         for (IItemHandler h : itemHandlers) {
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
@@ -31,13 +33,13 @@ public class ReactorInputSnapshotBuilder {
         }
 
         long maxFluidCapacity = 0;
-        for (IFluidHandler h : inputFluidManager.getFuildHandlers(level)) {
+        for (IFluidHandler h : inputFluidManager.getFuildHandlers(level, controllerPos)) {
             if (h.getTanks() > 0) {
                 maxFluidCapacity += h.getTankCapacity(0);
             }
         }
 
-        VirtualReactorInputFluid virtualFluid = inputFluidManager.getInventory(level);
+        VirtualReactorInputFluid virtualFluid = inputFluidManager.getInventory(level, controllerPos);
         List<BigFluidStack> fluids = VirtualReactorInputFluid.toBigList(virtualFluid.fluids());
 
         return new ReactorInputSnapshot(items, fluids, maxFluidCapacity);

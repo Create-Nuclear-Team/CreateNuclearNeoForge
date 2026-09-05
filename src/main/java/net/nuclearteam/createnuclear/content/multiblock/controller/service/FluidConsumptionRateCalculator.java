@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputFluidManagerI;
@@ -23,7 +24,7 @@ public class FluidConsumptionRateCalculator implements IFluidConsumptionRateCalc
      */
     @Override
     public double tick(BigFluidStack fluidStack, int reactorSize, Level level,
-                       ReactorInputFluidManagerI inputFluidManager, double fluidBuffer) {
+                       ReactorInputFluidManagerI inputFluidManager, BlockPos controllerPos, double fluidBuffer) {
         if (fluidStack == null || fluidStack.amount <= 1) {
             return fluidBuffer;
         }
@@ -43,7 +44,7 @@ public class FluidConsumptionRateCalculator implements IFluidConsumptionRateCalc
             // decremented across multiple tracked input handlers, so each handler may drain up
             // to toExtract independently (possible over-extraction with several inputs).
             // Intentionally left untouched here; out of scope for this calculator.
-            if (inputFluidManager.extractFluids(level, toExtract)) {
+            if (inputFluidManager.extractFluids(level, controllerPos, toExtract)) {
                 fluidBuffer -= toExtract;
             }
         }

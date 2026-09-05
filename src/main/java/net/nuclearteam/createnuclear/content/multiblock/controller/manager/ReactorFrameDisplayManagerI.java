@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -14,14 +15,14 @@ public interface ReactorFrameDisplayManagerI {
      * empty). Recomputes the underlying cache at most once per game tick from
      * the given fluid handlers.
      */
-    FluidStack getDisplayedFluid(Level level, ReactorInputFluidManagerI handlers);
+    FluidStack getDisplayedFluid(Level level, BlockPos controllerPos, ReactorInputFluidManagerI handlers);
 
     /**
      * Returns how full the reactor's fluid input is, in the range {@code [0, 1]}.
      * Recomputes the underlying cache at most once per game tick from the
      * given fluid handlers.
      */
-    float getDisplayedFluidFillRatio(Level level, ReactorInputFluidManagerI handlers);
+    float getDisplayedFluidFillRatio(Level level, BlockPos controllerPos, ReactorInputFluidManagerI handlers);
 
     /**
      * Records the lowest and highest frame block-Y of the assembled reactor.

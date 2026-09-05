@@ -132,7 +132,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
                     //be.clearTimers(); // uncomment if the timer should reset when the reactor stops
-                    be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
+                    be.getOutputManager().rotateOutputs(be.getLevel(), be.getBlockPos(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });
                 // Blueprint removed: the multiblock stays assembled, it just stops producing.
@@ -153,22 +153,25 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
             return;
 
-        withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
-        worldIn.removeBlockEntity(pos);
+        if (!isMoving && !state.is(newState.getBlock())) {
+            withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
+            worldIn.removeBlockEntity(pos);
 
-        if (worldIn instanceof ServerLevel serverLevel) {
-            PersistentFluidLocks.get(serverLevel).clearLock(pos);
+            if (worldIn instanceof ServerLevel serverLevel) {
+                PersistentFluidLocks.get(serverLevel).clearLock(pos);
+            }
+
+            if (!state.getValue(ASSEMBLED)) {
+                return;
+            }
+
+            int configRadius = CNConfigs.server().notify.warningDistance.get();
+            boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+            NotifyUtil.sendActionBar(worldIn, pos,
+                    CreateNuclearLang.translate("notification.reactor.disassembled"),
+                    ChatFormatting.GOLD, configRadius, configWarnAll
+            );
         }
-
-          if (!state.getValue(ASSEMBLED))
-            return;
-
-        int configRadius = CNConfigs.server().notify.warningDistance.get();
-        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-        NotifyUtil.sendActionBar(worldIn, pos,
-                CreateNuclearLang.translate("notification.reactor.disassembled"),
-                ChatFormatting.GOLD, configRadius, configWarnAll
-        );
     }
 
     @Override

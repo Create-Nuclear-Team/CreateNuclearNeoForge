@@ -318,7 +318,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void logReactorConnections(Player player) {
-        ReactorDebugDiagnostics.sendReactorConnectionsTo(player, level, inputManager, inputFluidManager, outputManager, alarmManager);
+        ReactorDebugDiagnostics.sendReactorConnectionsTo(player, level, getBlockPos(), inputManager, inputFluidManager, outputManager, alarmManager);
     }
 
     private void updateReactorStateVisibility() {
@@ -351,7 +351,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         int currentHeat = getConfiguredPatternHeat();
         boolean isDanger = alarmCoordinator.computeDanger(currentHeat, this.getMultiblockSize());
 
-        alarmCoordinator.update(level, alarmManager, isDanger);
+        alarmCoordinator.update(level, alarmManager, getBlockPos(), isDanger);
 
         IReactorMeltdownMonitor.MeltdownState meltdownState = meltdownMonitor.tick(level, getBlockPos(), isDanger);
 
@@ -374,7 +374,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         }
         resolveEntitiesIfNeeded();
 
-        ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
+        ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, getBlockPos(), inputManager, inputFluidManager);
         this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
         this.bigFluidStack = snapshot.fluids();
 
@@ -426,7 +426,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private void resolveEntitiesIfNeeded() {
         if (!needsToResolveEntities)
             return;
-        List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+        List<IItemHandler> handlers = inputManager.getItemHandlers(level, getBlockPos());
         CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
         needsToResolveEntities = false;
         this.setChanged();
@@ -442,8 +442,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private void handleAssembledState() {
         if (!heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled())) {
             heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), heatBalance, heat, inventory, level, isAssembled());
-            if (!outputManager.getBlocksPosition(getLevel()).isEmpty()) {
-                outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
+            if (!outputManager.getBlocksPosition(getLevel(), getBlockPos()).isEmpty()) {
+                outputManager.rotateOutputs(getLevel(), getBlockPos(), getAssembled(), 0);
             }
 
             setChanged();
@@ -456,14 +456,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         BigFluidStack fluidStack = currentFluidStack();
         heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, heatBalance, heat, inventory, level, displayState);
-        fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, fluidBuffer);
-        cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
+        fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, getBlockPos(), fluidBuffer);
+        cycleManager.update(configuredPattern, level, inputManager, getBlockPos(), level.getGameTime() % 20 == 0);
 
-        if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level).isEmpty()) {
+        if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level, getBlockPos()).isEmpty()) {
             if (Math.abs(heat - lastAppliedOutputHeat) >= ReactorOutputManager.RPM_DIVIDER / 2) {
                 lastAppliedOutputHeat = heat;
             }
-            outputManager.rotateOutputs(getLevel(), getAssembled(), lastAppliedOutputHeat);
+            outputManager.rotateOutputs(getLevel(), getBlockPos(), getAssembled(), lastAppliedOutputHeat);
         }
     }
 
@@ -471,33 +471,37 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return getConfiguredPatternData() == ReactorBluePrintData.EMPTY;
     }
 
+    /**
+     * @param inputPos absolute world position of the input block, converted here
+     *                 to an offset relative to this controller (see {@link ReactorIOManager}).
+     */
     public void addInput(BlockPos inputPos) {
-        this.inputManager.addBlock(inputPos);
+        this.inputManager.addBlock(inputPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void removeInput(BlockPos inputPos) {
-        this.inputManager.removeBlock(inputPos);
+        this.inputManager.removeBlock(inputPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void addOutput(BlockPos outputPos) {
-        this.outputManager.addBlock(outputPos);
+        this.outputManager.addBlock(outputPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void removeOutput(BlockPos outputPos) {
-        this.outputManager.removeBlock(outputPos);
+        this.outputManager.removeBlock(outputPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void addInputFluid(BlockPos outputPos) {
-        this.inputFluidManager.addBlock(outputPos);
+        this.inputFluidManager.addBlock(outputPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void removeInputFluid(BlockPos outputPos) {
-        this.inputFluidManager.removeBlock(outputPos);
+        this.inputFluidManager.removeBlock(outputPos.subtract(getBlockPos()));
         this.setChanged();
         // Breaking a fluid input discards its tank contents along with the block entity.
         // Re-evaluate the fluid lock so a different fluid can be accepted once no remaining
@@ -506,17 +510,17 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void addAlarm(BlockPos alarmPos) {
-        this.alarmManager.addBlock(alarmPos);
+        this.alarmManager.addBlock(alarmPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void removeAlarm(BlockPos alarmPos) {
-        this.alarmManager.removeBlock(alarmPos);
+        this.alarmManager.removeBlock(alarmPos.subtract(getBlockPos()));
         this.setChanged();
     }
 
     public void removeIOAll() {
-        allManagers().forEach(m -> m.clearInvalid(level));
+        allManagers().forEach(m -> m.clearInvalid(level, getBlockPos()));
         this.setChanged();
     }
 
@@ -553,7 +557,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide)
             return;
 
-        boolean anyNonEmpty = getInputFluidManager().getFuildHandlers(level).stream()
+        boolean anyNonEmpty = getInputFluidManager().getFuildHandlers(level, getBlockPos()).stream()
             .anyMatch(handler -> {
                 for (int t = 0; t < handler.getTanks(); t++)
                     if (!handler.getFluidInTank(t).isEmpty())

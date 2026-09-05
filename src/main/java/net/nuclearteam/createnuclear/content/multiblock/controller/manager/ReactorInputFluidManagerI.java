@@ -13,20 +13,19 @@ public interface ReactorInputFluidManagerI extends ReactorIOManager {
      * Implementations track input fluid sources and provide
      * accessors and extraction methods for reactor consumption.
      */
-    /** Returns an immutable copy of tracked positions. */
-    List<BlockPos> getBlocksPosition(Level level);
+    List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos);
 
     /**
      * Returns a list of fluid handler capabilities for the tracked positions.
      * @param level the current world level
      */
-    List<IFluidHandler> getFuildHandlers(Level level);
+    List<IFluidHandler> getFuildHandlers(Level level, BlockPos controllerPos);
 
     /**
      * Returns a virtual aggregated inventory representing all tracked input fluids.
      * @param level the current world level
      */
-    VirtualReactorInputFluid getInventory(Level level);
+    VirtualReactorInputFluid getInventory(Level level, BlockPos controllerPos);
 
     /**
      * Attempt to extract the requested amount of fluid from tracked sources.
@@ -34,5 +33,5 @@ public interface ReactorInputFluidManagerI extends ReactorIOManager {
      * @param fluidNeeded amount of fluid required
      * @return true if the requested amount was successfully extracted
      */
-    boolean extractFluids(Level level, int fluidNeeded);
+    boolean extractFluids(Level level, BlockPos controllerPos, int fluidNeeded);
 }

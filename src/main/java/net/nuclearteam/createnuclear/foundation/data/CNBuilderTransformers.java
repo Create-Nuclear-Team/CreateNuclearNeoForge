@@ -77,12 +77,12 @@ public class CNBuilderTransformers {
 
             for (Tier tier : tiers) {
                 ItemModelBuilder child = p.withExistingParent("item/biome_irradiation_extractor/" + tier.name(), p.mcLoc("item/generated"))
-                        .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
+                    .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
 
                 outer.override()
-                        .predicate(CreateNuclear.asResource(BiomeIrradiationExtractorItem.TAG), tier.threshold())
-                        .model(child)
-                        .end();
+                    .predicate(CreateNuclear.asResource(BiomeIrradiationExtractorItem.TAG), tier.threshold())
+                    .model(child)
+                    .end();
             }
         };
     }

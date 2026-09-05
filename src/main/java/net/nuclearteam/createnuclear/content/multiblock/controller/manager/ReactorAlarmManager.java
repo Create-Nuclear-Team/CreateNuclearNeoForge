@@ -39,27 +39,29 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         if (level == null) return;
         List<BlockPos> toRemove = new ArrayList<>();
 
-        for (BlockPos p : positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (!level.isLoaded(p)) continue; // On ne supprime pas si le chunk est juste déchargé
 
             BlockEntity be = level.getBlockEntity(p);
             if (be == null || !(be instanceof ReactorAlarmEntity)) {
-                toRemove.add(p);
+                toRemove.add(offset);
             }
         }
         positions.removeAll(toRemove);
     }
 
     @Override
-    public List<BlockPos> getBlocksPosition(Level level) {
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
         if (level == null) return List.of();
 
         List<BlockPos> validPositions = new ArrayList<>();
-        for (BlockPos p : this.positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (level.isLoaded(p) && level.getBlockEntity(p) instanceof ReactorAlarmEntity) {
                 validPositions.add(p);
             }

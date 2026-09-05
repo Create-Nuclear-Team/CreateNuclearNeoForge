@@ -79,7 +79,7 @@ public class ReactorRodInput extends MultiDirectionalReactorBlock implements IWr
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         // Only act when the block is actually removed/replaced, not on a mere state change
         // (e.g. a FACING update) — otherwise rotating the block would spill its rods.
-        if (!pState.is(pNewState.getBlock())) {
+        if (!pIsMoving && !pState.is(pNewState.getBlock())) {
             // Drop the contents BEFORE super removes the block entity: super.onRemove()
             // calls level.removeBlockEntity(pos), after which the inventory is gone.
             withBlockEntityDo(pLevel, pPos, be -> ItemHelper.dropContents(pLevel, pPos, be.inventory));

@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputFluidManagerI;
@@ -17,9 +18,10 @@ public interface IFluidConsumptionRateCalculator {
      * @param reactorSize      reactor size, used to determine the consumption rate
      * @param level            current level, used to resolve the fluid type
      * @param inputFluidManager input manager responsible for extracting the consumed fluid
+     * @param controllerPos    the reactor controller's current position
      * @param fluidBuffer      fractional remainder accumulated since the previous tick
      * @return the new fractional remainder to carry over to the next tick
      */
     double tick(BigFluidStack fluidStack, int reactorSize, Level level,
-                ReactorInputFluidManagerI inputFluidManager, double fluidBuffer);
+                ReactorInputFluidManagerI inputFluidManager, BlockPos controllerPos, double fluidBuffer);
 }
