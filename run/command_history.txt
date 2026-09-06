@@ -1,13 +1,3 @@
-/effect give Dev createnuclear:iodine
-/effect give Dev createnuclear:radiation
-/time set day
-/effect clear Dev
-/effect give Dev createnuclear:radiation
-/effect give Dev createnuclear:radiation 30000
-/effect give Dev minecraft:regeneration infinite 255 true
-/effect give Dev createnuclear:radiation
-/effect give Dev createnuclear:radiation infinite
-/effect give Dev minecraft:saturation infinite 255 true
 /effect give Dev createnuclear:radiation infinite
 /effect give Dev createnuclear:radiation
 /playsound createnuclear:alarm/alarm
@@ -56,3 +46,13 @@
 /data get block
 /data get block 20481028 129 20481029
 /data get block 111 -55 448
+/effect give Dev createnuclear:iodine infinite 255 true
+/time set day
+/weather clear
+/playsound createnuclear:reacteur/activation
+/playsound createnuclear:reacteur/activation block Dev -495.46 68.45 491.00 255
+/playsound createnuclear:reacteur/activation block Dev -495.46 68.45 491.00 255 1
+/playsound createnuclear:reacteur/activation master Dev -495.46 68.45 491.00 255 1
+/playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 1
+/playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 2 1
+/playsound createnuclear:reacteur/running master Dev ~ ~ ~ 255 2 1

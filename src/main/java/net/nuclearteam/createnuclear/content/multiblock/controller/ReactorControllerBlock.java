@@ -116,7 +116,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 // Inserting the blueprint is what starts energy production: this is the activation
                 // cue, not the multiblock assembly one (that lives in ReactorAssembler).
                 // One-shot played server-side (null player) so it broadcasts to nearby clients.
-                level.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
+                level.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 255.0f, 1.0f);
                 return ItemInteractionResult.SUCCESS;
 
             }
