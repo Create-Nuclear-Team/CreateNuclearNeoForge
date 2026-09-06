@@ -59,7 +59,7 @@ public class NuclearMushroomCloudParticle extends Particle {
         if(age > BALL_FOR / 2 + 5){
             if(!playedExplosion){
                 playedExplosion = true;
-                CreateNuclear.LOGGER.info("EXPLOSIOOOOOON");
+                CreateNuclear.LOGGER.debug("EXPLOSIOOOOOON");
                 playSound(CNSoundEvents.NUCLEAR_EXPLOSION_MAIN.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
             }
         }
@@ -67,7 +67,6 @@ public class NuclearMushroomCloudParticle extends Particle {
             if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
                 playedRinging = true;
                 playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
-                // playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE.getMainEvent(), 100, 50, 0.05F, true);
             }
             CNClientProxy.renderNukeFlashFor = 16;
         } else if (age < lifetime - FADE_SPEED) {

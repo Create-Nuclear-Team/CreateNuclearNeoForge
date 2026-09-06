@@ -21,10 +21,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvider {
-    protected BlockPos block;
-
     public ReactorRodInputInventory inventory;
-
 
     public ReactorRodInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -33,9 +30,9 @@ public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvi
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                CNBlockEntityTypes.REACTOR_INPUT.get(),
-                (be, context) -> be.inventory
+            Capabilities.ItemHandler.BLOCK,
+            CNBlockEntityTypes.REACTOR_INPUT.get(),
+            (be, context) -> be.inventory
         );
     }
 
@@ -81,5 +78,4 @@ public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvi
     public void tick() {
         super.tick();
     }
-
 }

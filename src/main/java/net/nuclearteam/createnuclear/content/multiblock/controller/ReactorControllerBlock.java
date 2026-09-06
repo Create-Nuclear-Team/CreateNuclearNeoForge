@@ -102,49 +102,45 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             withBlockEntityDo(level, pos, be -> be.logReactorConnections(player));
         }
 
-        if (!state.getValue(ASSEMBLED)) {
+        if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()
+                && heldItem.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) != ReactorBluePrintData.EMPTY){
+            withBlockEntityDo(level, pos, be -> {
+                be.getInventoryObject().setStackInSlot(0, heldItem);
+                be.setConfiguredPattern(heldItem);
+
+                player.setItemInHand(hand, ItemStack.EMPTY);
+            });
+            // Inserting the blueprint is what starts energy production: this is the activation
+            // cue, not the multiblock assembly one (that lives in ReactorAssembler).
+            // One-shot played server-side (null player) so it broadcasts to nearby clients.
+            level.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 255.0f, 1.0f);
+            return ItemInteractionResult.SUCCESS;
+
         }
-        else {
-            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()
-                    && heldItem.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) != ReactorBluePrintData.EMPTY){
-                withBlockEntityDo(level, pos, be -> {
-                    be.getInventoryObject().setStackInSlot(0, heldItem);
-                    be.setConfiguredPattern(heldItem);
+        else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
+            withBlockEntityDo(level, pos, be -> {
+                ItemStack blueprint = be.getInventoryObject().getItem(0);
+                int storedHeat = Math.round(blueprint.getOrDefault(CNDataComponents.HEAT, 0f));
+                if (IHeat.HeatLevel.of(storedHeat, be.getMultiblockSize()) == IHeat.HeatLevel.DANGER) {
+                    be.getAdvancement().setPlayer(player.getUUID());
+                    be.getAdvancement().awardPlayer(CNAdvancement.NO_TIME_TO_DIE);
+                }
+                player.setItemInHand(hand, blueprint);
+                be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
+                be.setConfiguredPattern(ItemStack.EMPTY);
+                be.getOutputManager().rotateOutputs(be.getLevel(), be.getBlockPos(), be.getAssembled(), 0);
+                be.notifyUpdate();
+            });
+            // Blueprint removed: the multiblock stays assembled, it just stops producing.
+            level.playSound(null, pos, CNSoundEvents.REACTOR_SHUT_OFF.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
+            state.setValue(ASSEMBLED, false);
+            return ItemInteractionResult.SUCCESS;
 
-                    player.setItemInHand(hand, ItemStack.EMPTY);
-                });
-                // Inserting the blueprint is what starts energy production: this is the activation
-                // cue, not the multiblock assembly one (that lives in ReactorAssembler).
-                // One-shot played server-side (null player) so it broadcasts to nearby clients.
-                level.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 255.0f, 1.0f);
-                return ItemInteractionResult.SUCCESS;
-
-            }
-            else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
-                withBlockEntityDo(level, pos, be -> {
-                    ItemStack blueprint = be.getInventoryObject().getItem(0);
-                    int storedHeat = Math.round(blueprint.getOrDefault(CNDataComponents.HEAT, 0f));
-                    if (IHeat.HeatLevel.of(storedHeat, be.getMultiblockSize()) == IHeat.HeatLevel.DANGER) {
-                        be.getAdvancement().setPlayer(player.getUUID());
-                        be.getAdvancement().awardPlayer(CNAdvancement.NO_TIME_TO_DIE);
-                    }
-                    player.setItemInHand(hand, blueprint);
-                    be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
-                    be.setConfiguredPattern(ItemStack.EMPTY);
-                    //be.clearTimers(); // uncomment if the timer should reset when the reactor stops
-                    be.getOutputManager().rotateOutputs(be.getLevel(), be.getBlockPos(), be.getAssembled(), 0);
-                    be.notifyUpdate();
-                });
-                // Blueprint removed: the multiblock stays assembled, it just stops producing.
-                level.playSound(null, pos, CNSoundEvents.REACTOR_SHUT_OFF.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
-                state.setValue(ASSEMBLED, false);
-                return ItemInteractionResult.SUCCESS;
-
-            }
-            else if (!heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            }
         }
+        else if (!heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
         return ItemInteractionResult.SUCCESS;
     }
 
@@ -191,7 +187,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         for (Player p : level.players()) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
         }
-//        entity.removeIOAll();
     }
 
     @Override

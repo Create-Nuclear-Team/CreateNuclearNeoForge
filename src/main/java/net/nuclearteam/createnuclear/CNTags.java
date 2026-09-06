@@ -49,7 +49,6 @@ public class CNTags {
         MOD(CreateNuclear.MOD_ID, false, true),
         COMMON("c"),
         CREATE("create"),
-        FORGE("forge"),
         NEO_FORGE(COMMON.id),
         MINECRAFT("minecraft")
         ;

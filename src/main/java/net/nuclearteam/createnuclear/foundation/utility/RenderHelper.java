@@ -25,7 +25,7 @@ public class RenderHelper {
                                      float alpha, float coverage, boolean onlyFirstPerson) {
         boolean isFirstPerson = Minecraft.getInstance().options.getCameraType().isFirstPerson();
 
-        // If rendering is restricted to first-person and we're not in it, skip
+        // If rendering is restricted to first-person, and we're not in it, skip
         if (onlyFirstPerson && !isFirstPerson) return;
 
         int width = graphics.guiWidth();
@@ -40,7 +40,6 @@ public class RenderHelper {
             // Center + scale
             graphics.pose().pushPose();
             graphics.pose().translate(width / 2f, height / 2f, 0);
-            //graphics.pose().scale(coverage, coverage, 1f);
 
             graphics.pose().translate(-width / 2f, -height / 2f, 0);
             graphics.blit(texture, 0, 0, -90, 0, 0, width, height, width, height);

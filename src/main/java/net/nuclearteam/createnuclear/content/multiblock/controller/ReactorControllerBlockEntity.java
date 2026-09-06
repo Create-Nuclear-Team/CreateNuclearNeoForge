@@ -357,7 +357,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         if (meltdownState == IReactorMeltdownMonitor.MeltdownState.EXPLODE) {
             if (level instanceof ServerLevel serverLevel) {
-                CreateNuclear.LOGGER.info("[MeltdownDebug] destroying structure, multiblockBounds={}", getMultiblockPos());
                 this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), getMultiblockPos(), reactorSize, countFuelRod);
             }
             isExploding = true;
