@@ -60,7 +60,6 @@
   "createnuclear.tooltip.typeRod": "Rod Type: %s",
   "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",
 
-
   "tag.item.c.coal_dusts": "Coal Dusts",
   "tag.item.c.ingots.lead": "Tags Lead ingots",
   "tag.item.c.ingots.steel": "Tags Steel ingots",
@@ -74,9 +73,6 @@
   "tag.item.minecraft.campfires": "Campfires",
 
   "tag.item.trinkets.head.face": "Head Face",
-
-
-  "overlay.event_message": "⚠ Warning ⚠ %s timer",
 
   "attribute.name.createnuclear.generic.irradiated_resistance": "Radiation Resistance"
 }
