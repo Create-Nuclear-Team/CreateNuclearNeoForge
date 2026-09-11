@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
 
     GeneratedRecipe REACTOR_CASING = itemApplication("reactor_casing_from_steel_and_brass_casing",
-            Ingredient.of(CNTags.neoForgeItemTag("ingots/steel")),
+            Ingredient.of(CNMaterialTags.STEEL.ingots()),
             AllBlocks.BRASS_CASING.get(),
             CNBlocks.REACTOR_CASING.get()
     );

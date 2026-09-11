@@ -8,7 +8,6 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 import net.nuclearteam.createnuclear.CNFluids;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.concurrent.CompletableFuture;
@@ -17,18 +16,18 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
 
     GeneratedRecipe
         STEEL = create("steel", b -> b
-            .require(CNTags.neoForgeItemTag("dusts/coal"))
+            .require(CNMaterialTags.COAL.dusts())
             .require(Tags.Items.INGOTS_IRON)
             .output(CNItems.STEEL_INGOT)
         ),
 
         URANIUM_FLUID = create("uranium_fluid", b -> b
-            .require(CNTags.neoForgeItemTag("dusts/uranium"))
+            .require(CNMaterialTags.URANIUM.dusts())
             .output(CNFluids.URANIUM.get(), 25)
         ),
 
         THORIUM_FLUID = create("thorium_fluid", b -> b
-                .require(CNTags.neoForgeItemTag("dusts/thorium"))
+                .require(CNMaterialTags.THORIUM.dusts())
                 .output(CNFluids.THORIUM.get(), 25)
                 .requiresHeat(HeatCondition.HEATED)
         ),

@@ -7,6 +7,7 @@ import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformer
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -23,6 +24,7 @@ import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
+import net.nuclearteam.createnuclear.foundation.data.recipe.CNMaterialTags;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
@@ -60,17 +62,17 @@ public class CNItems {
 
         RAW_URANIUM = CreateNuclear.REGISTRATE
             .item("raw_uranium", p -> new RadiationItem(p, 3))
-            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNTags.neoForgeItemTag("raw_materials/uranium"))
+            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNMaterialTags.URANIUM.rawMaterials())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/raw_uranium")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/raw_uranium"))
+                .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNMaterialTags.URANIUM.rawStorageBlocks().items()))
+                .requires(CNMaterialTags.URANIUM.rawStorageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         URANIUM_POWDER = CreateNuclear.REGISTRATE
             .item("uranium_powder", p -> new RadiationItem(p, 2))
-            .tag(Tags.Items.DUSTS, CNTags.neoForgeItemTag("dusts/uranium"))
+            .tag(Tags.Items.DUSTS, CNMaterialTags.URANIUM.dusts())
             .register(),
 
         URANIUM_ROD = CreateNuclear.REGISTRATE
@@ -87,27 +89,27 @@ public class CNItems {
     public static final ItemEntry<Item>
         RAW_LEAD = CreateNuclear.REGISTRATE
             .item("raw_lead", Item::new)
-            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNTags.neoForgeItemTag("raw_materials/lead"))
+            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNMaterialTags.LEAD.rawMaterials())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_raw_lead", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/raw_lead")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/raw_lead"))
+                .unlockedBy("has_storage_blocks_raw_lead", RegistrateRecipeProvider.has(CNMaterialTags.LEAD.rawStorageBlocks().items()))
+                .requires(CNMaterialTags.LEAD.rawStorageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         STEEL_INGOT = CreateNuclear.REGISTRATE
             .item("steel_ingot", Item::new)
-            .tag(Tags.Items.INGOTS, CNTags.neoForgeItemTag("ingots/steel"))
+            .tag(Tags.Items.INGOTS, CNMaterialTags.STEEL.ingots())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_steel", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/steel")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/steel"))
+                .unlockedBy("has_storage_blocks_steel", RegistrateRecipeProvider.has(CNMaterialTags.STEEL.storageBlocks().items()))
+                .requires(CNMaterialTags.STEEL.storageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         COAL_DUST = CreateNuclear.REGISTRATE
             .item("coal_dust", Item::new)
-            .tag(Tags.Items.DUSTS, CNTags.neoForgeItemTag("dusts/coal"))
+            .tag(Tags.Items.DUSTS, CNMaterialTags.COAL.dusts())
             .register(),
 
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
@@ -123,30 +125,30 @@ public class CNItems {
 
         LEAD_INGOT = CreateNuclear.REGISTRATE
             .item("lead_ingot", Item::new)
-            .tag(Tags.Items.INGOTS, CNTags.neoForgeItemTag("ingots/lead"))
+            .tag(Tags.Items.INGOTS, CNMaterialTags.LEAD.ingots())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(),9)
-                .unlockedBy("has_storage_blocks_lead", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/lead")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/lead"))
+                .unlockedBy("has_storage_blocks_lead", RegistrateRecipeProvider.has(CNMaterialTags.LEAD.storageBlocks().items()))
+                .requires(CNMaterialTags.LEAD.storageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         STEEL_NUGGET = CreateNuclear.REGISTRATE
             .item("steel_nugget", Item::new)
-            .tag(Tags.Items.NUGGETS, CNTags.neoForgeItemTag("nuggets/steel"))
+            .tag(Tags.Items.NUGGETS, CNMaterialTags.STEEL.nuggets())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("ingots/steel")))
-                .requires(CNTags.neoForgeItemTag("ingots/steel"))
+                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNMaterialTags.STEEL.ingots()))
+                .requires(CNMaterialTags.STEEL.ingots())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         LEAD_NUGGET = CreateNuclear.REGISTRATE
             .item("lead_nugget", Item::new)
-            .tag(Tags.Items.NUGGETS, CNTags.neoForgeItemTag("nuggets/lead"))
+            .tag(Tags.Items.NUGGETS, CNMaterialTags.LEAD.nuggets())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_lead_nugget", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("ingots/lead")))
-                .requires(CNTags.neoForgeItemTag("ingots/lead"))
+                .unlockedBy("has_storage_blocks_lead_nugget", RegistrateRecipeProvider.has(CNMaterialTags.LEAD.ingots()))
+                .requires(CNMaterialTags.LEAD.ingots())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
@@ -157,26 +159,26 @@ public class CNItems {
 
         RAW_THORIUM = CreateNuclear.REGISTRATE
             .item("raw_thorium", Item::new)
-            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNTags.neoForgeItemTag("raw_materials/thorium"))
+            .tag(CNTags.neoForgeItemTag("raw_ores"), Tags.Items.RAW_MATERIALS, CNMaterialTags.THORIUM.rawMaterials())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_raw_thorium", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/raw_thorium")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/raw_thorium"))
+                .unlockedBy("has_storage_blocks_raw_thorium", RegistrateRecipeProvider.has(CNMaterialTags.THORIUM.rawStorageBlocks().items()))
+                .requires(CNMaterialTags.THORIUM.rawStorageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
 
         THORIUM_DUST = CreateNuclear.REGISTRATE
             .item("thorium_dust", Item::new)
-            .tag(Tags.Items.DUSTS, CNTags.neoForgeItemTag("dusts/thorium"))
+            .tag(Tags.Items.DUSTS, CNMaterialTags.THORIUM.dusts())
             .register(),
 
         THORIUM_NUGGET = CreateNuclear.REGISTRATE
             .item("thorium_nugget", Item::new)
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_nugget")))
-            .tag(Tags.Items.NUGGETS, CNTags.neoForgeItemTag("nuggets/thorium"))
+            .tag(Tags.Items.NUGGETS, CNMaterialTags.THORIUM.nuggets())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("ingots/thorium")))
-                .requires(CNTags.neoForgeItemTag("ingots/thorium"))
+                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNMaterialTags.THORIUM.ingots()))
+                .requires(CNMaterialTags.THORIUM.ingots())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
@@ -184,10 +186,10 @@ public class CNItems {
         THORIUM_INGOT = CreateNuclear.REGISTRATE
             .item("thorium_ingot", Item::new)
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_ingot")))
-            .tag(Tags.Items.INGOTS, CNTags.neoForgeItemTag("ingots/thorium"))
+            .tag(Tags.Items.INGOTS, CNMaterialTags.THORIUM.ingots())
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_thorium", RegistrateRecipeProvider.has(CNTags.neoForgeItemTag("storage_blocks/thorium")))
-                .requires(CNTags.neoForgeItemTag("storage_blocks/thorium"))
+                .unlockedBy("has_storage_blocks_thorium", RegistrateRecipeProvider.has(CNMaterialTags.THORIUM.storageBlocks().items()))
+                .requires(CNMaterialTags.THORIUM.storageBlocks().items())
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),
@@ -233,8 +235,8 @@ public class CNItems {
         .recipe((c, p) -> {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                .define('X', CNTags.neoForgeItemTag("ingots/lead"))
-                .define('Y', CNTags.neoForgeItemTag("ingots/brass"))
+                .define('X', CNMaterialTags.LEAD.ingots())
+                .define('Y', CommonMetal.BRASS.ingots)
                 .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
                 .pattern("YXY")
                 .pattern("XZX")
@@ -272,8 +274,8 @@ public class CNItems {
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                    .define('X', CNTags.neoForgeItemTag("ingots/lead"))
-                    .define('Y', CNTags.neoForgeItemTag("ingots/brass"))
+                    .define('X', CNMaterialTags.LEAD.ingots())
+                    .define('Y', CommonMetal.BRASS.ingots)
                     .define('Z', CNItems.GRAPHITE_ROD)
                     .pattern("Y Y")
                     .pattern("XXX")
@@ -312,8 +314,8 @@ public class CNItems {
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                    .define('X', CNTags.neoForgeItemTag("ingots/lead"))
-                    .define('Y', CNTags.neoForgeItemTag("ingots/brass"))
+                    .define('X', CNMaterialTags.LEAD.ingots())
+                    .define('Y', CommonMetal.BRASS.ingots)
                     .pattern("YXY")
                     .pattern("X X")
                     .pattern("Y Y")
@@ -352,8 +354,8 @@ public class CNItems {
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                    .define('X', CNTags.neoForgeItemTag("ingots/lead"))
-                    .define('Y', CNTags.neoForgeItemTag("ingots/brass"))
+                    .define('X', CNMaterialTags.LEAD.ingots())
+                    .define('Y', CommonMetal.BRASS.ingots)
                     .pattern("Y Y")
                     .pattern("X X")
                     .showNotification(true)
@@ -409,7 +411,7 @@ public class CNItems {
         .recipe((c, p) -> {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get())
                 .unlockedBy("has_reactor_controller", RegistrateRecipeProvider.has(CNBlocks.REACTOR_CONTROLLER.get()))
-                .define('S', CNTags.neoForgeItemTag("ingots/steel"))
+                .define('S', CNMaterialTags.STEEL.ingots())
                 .define('D', AllBlocks.DISPLAY_BOARD)
                 .define('P', AllItems.PRECISION_MECHANISM)
                 .define('E', AllItems.EMPTY_SCHEMATIC)

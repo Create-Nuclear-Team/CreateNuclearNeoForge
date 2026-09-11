@@ -35,6 +35,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.data.recipe.CNMaterialTags;
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
 
@@ -49,7 +50,7 @@ public class CNFluids {
     public static final FluidEntry<BaseFlowingFluid.Flowing> URANIUM =
             CreateNuclear.REGISTRATE.standardFluid("uranium", SolidRenderedPlaceableFluidity.create(0x38FF08, () -> 1f / 32f))
                     .lang("Liquid Uranium")
-                    .tag(CNFluidTags.URANIUM.tag)
+                    .tag(CNFluidTags.URANIUM.tag, CNMaterialTags.URANIUM.fluid())
                     .properties(p -> p.viscosity(2500)
                         .density(1600)
                         .canSwim(false)
@@ -65,7 +66,7 @@ public class CNFluids {
                     .source(BaseFlowingFluid.Source::new)
                     .bucket((s, p) -> new RadiationBucketItem(s instanceof Fluid ? (Fluid) s : ((Supplier<? extends Fluid>) s).get(), p, 20))
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
-                    .tag(CNTags.neoForgeItemTag("buckets/uranium"))
+                    .tag(CNMaterialTags.URANIUM.buckets())
                     .lang("Uranium Bucket")
                     .build()
                     .register();
@@ -73,7 +74,7 @@ public class CNFluids {
     public static final FluidEntry<BaseFlowingFluid.Flowing> THORIUM =
             CreateNuclear.REGISTRATE.standardFluid("thorium", SolidRenderedPlaceableFluidity.create(0x38f9ff, () -> 1f / 32f))
                     .lang("Liquid Thorium")
-                    .tag(CNFluidTags.THORIUM.tag)
+                    .tag(CNFluidTags.THORIUM.tag, CNMaterialTags.THORIUM.fluid())
                     .properties(p -> p.viscosity(200)
                         .density(100)
                         .canSwim(false)
@@ -89,7 +90,7 @@ public class CNFluids {
                     .source(BaseFlowingFluid.Source::new)
                     .bucket()
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
-                    .tag(CNTags.neoForgeItemTag("buckets/thorium"))
+                    .tag(CNMaterialTags.THORIUM.buckets())
                     .lang("Thorium Bucket")
                     .build()
                     .register();
@@ -97,7 +98,7 @@ public class CNFluids {
     public static final FluidEntry<BaseFlowingFluid.Flowing> LIQUID_NITROGEN =
             CreateNuclear.REGISTRATE.standardFluid("nitrogen", SolidRenderedPlaceableFluidity.create(0x23ECD5, () -> 1f / 16f))
                     .lang("Liquid Nitrogen")
-                    .tag(CNFluidTags.NITROGEN.tag)
+                    .tag(CNFluidTags.NITROGEN.tag, CNMaterialTags.NITROGEN.fluid())
                     .properties(p -> p.viscosity(1000)
                         .density(1000)
                         .canSwim(true)
@@ -114,7 +115,7 @@ public class CNFluids {
                     .bucket()
                     .onRegister(CNFluids::registerFluidDispenseBehavior)
                     .lang("Nitrogen Bucket")
-                    .tag(CNTags.neoForgeItemTag("buckets/nitrogen"))
+                    .tag(CNMaterialTags.NITROGEN.buckets())
                     .build()
                     .register();
 

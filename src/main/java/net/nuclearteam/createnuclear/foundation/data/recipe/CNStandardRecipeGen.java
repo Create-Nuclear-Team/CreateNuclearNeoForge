@@ -39,7 +39,6 @@ import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.conditions.NotCondition;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import org.jetbrains.annotations.Nullable;
@@ -80,20 +79,20 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             ),
 
         LEAD_COMPACTING = metalCompacting(ImmutableList.of(CNItems.LEAD_NUGGET, CNItems.LEAD_INGOT, CNBlocks.LEAD_BLOCK),
-            ImmutableList.of(() -> CNTags.neoForgeItemTag("nuggets/lead"), () -> CNTags.neoForgeItemTag("ingots/lead"), () -> CNTags.neoForgeItemTag("storage_blocks/lead"))),
+            ImmutableList.of(CNMaterialTags.LEAD::nuggets, CNMaterialTags.LEAD::ingots, () -> CNMaterialTags.LEAD.storageBlocks().items())),
 
         STEEL_COMPACTING = metalCompacting(ImmutableList.of(CNItems.STEEL_NUGGET, CNItems.STEEL_INGOT, CNBlocks.STEEL_BLOCK),
-            ImmutableList.of(() -> CNTags.neoForgeItemTag("nuggets/steel"), () -> CNTags.neoForgeItemTag("ingots/steel"), () -> CNTags.neoForgeItemTag("storage_blocks/steel"))),
+            ImmutableList.of(CNMaterialTags.STEEL::nuggets, CNMaterialTags.STEEL::ingots, () -> CNMaterialTags.STEEL.storageBlocks().items())),
 
         THORIUM_COMPACTING = metalCompacting(ImmutableList.of(CNItems.THORIUM_NUGGET, CNItems.THORIUM_INGOT, CNBlocks.THORIUM_BLOCK),
-            ImmutableList.of(() -> CNTags.neoForgeItemTag("nuggets/thorium"), () -> CNTags.neoForgeItemTag("ingots/thorium"), () -> CNTags.neoForgeItemTag("storage_blocks/thorium")))
+            ImmutableList.of(CNMaterialTags.THORIUM::nuggets, CNMaterialTags.THORIUM::ingots, () -> CNMaterialTags.THORIUM.storageBlocks().items()))
         ;
 
     private final Marker BLAST_FURNACE = enterFolder("blast_furnace");
     GeneratedRecipe
-        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNTags.neoForgeItemTag("ores/uranium"), "_for_uranium_ore", 4),
-        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNTags.neoForgeItemTag("ores/lead"), "_for_lead_ore", 1),
-        RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.neoForgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
+        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNMaterialTags.URANIUM.ores().items(), "_for_uranium_ore", 4),
+        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNMaterialTags.LEAD.ores().items(), "_for_lead_ore", 1),
+        RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, CNMaterialTags.LEAD::rawMaterials, "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1),
         NITROGEN_CONCENTRATE = blastFurnaceRecipe(CNItems.NITROGEN_CONCENTRATE::get, CNItems.NITRATE::get, "_for_nitrogen_concentrate", 1)
     ;

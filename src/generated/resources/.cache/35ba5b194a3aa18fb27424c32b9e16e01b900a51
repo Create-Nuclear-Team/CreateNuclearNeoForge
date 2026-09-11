@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-05T15:25:04.2669277	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-09-11T20:06:32.7536963	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -48,8 +48,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-bee8dbce89685e5f62e1ece385cc9868c35e8a8c assets/createnuclear/lang/en_ud.json
-c4f4133959e5530fb6c3ca432fb3a456f02d69cd assets/createnuclear/lang/en_us.json
+f3c72f5cc033fb8abacda57a7b3175fd788640ec assets/createnuclear/lang/en_ud.json
+0729c91b22db7c95bbaadc1f2a67a633d5238388 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -409,9 +409,9 @@ e9881aa1d6af63ece64dbe5a9a7d412de3840c20 data/createnuclear/advancement/recipes/
 a1b0ce29f7b72108255deaf87bde4e4cdb878e7b data/createnuclear/advancement/recipes/misc/crafting/enriching_campfire.json
 4f06a9916362a31e032d558004c7daca76d50a4e data/createnuclear/advancement/recipes/misc/crafting/lead_ingot_from_decompacting.json
 7942dbc0681d08d4eb45fd8c7efe439f45e8749b data/createnuclear/advancement/recipes/misc/crafting/lead_nugget_from_decompacting.json
-58995ff78a4223f9aff3f40e055773e704ffa67a data/createnuclear/advancement/recipes/misc/crafting/raw_lead_from_decompacting.json
-40bb7871906e8dbd5b59a99fec6a35a84c514a76 data/createnuclear/advancement/recipes/misc/crafting/raw_thorium_from_decompacting.json
-01f9b9dd8545687992a425693e25923db093cc7f data/createnuclear/advancement/recipes/misc/crafting/raw_uranium_from_decompacting.json
+04fe3d727fb927c2ad6b7386587a743e4296c83f data/createnuclear/advancement/recipes/misc/crafting/raw_lead_from_decompacting.json
+f3eb1e16f772ba433bbb6f87f4db3a35e82102ee data/createnuclear/advancement/recipes/misc/crafting/raw_thorium_from_decompacting.json
+5103c139df6e60c68f2d2060ffa6a5cf7833c9a2 data/createnuclear/advancement/recipes/misc/crafting/raw_uranium_from_decompacting.json
 8b9d3beac96fa049754d6792a18d46fae4e16510 data/createnuclear/advancement/recipes/misc/crafting/reactor_blueprint_item.json
 608ba81e528f6e9bdb5e8ab007dcc743397a33f9 data/createnuclear/advancement/recipes/misc/crafting/steel_ingot_from_decompacting.json
 92f6a4abe3553b8c5958650d750f65907963015b data/createnuclear/advancement/recipes/misc/crafting/steel_nugget_from_decompacting.json
@@ -481,10 +481,10 @@ ac1aafbe0f6261f8cf77462fdc7e6ebbffac5431 data/createnuclear/recipe/crafting/lead
 fd535efce0c108d879e5a1f13aface5586fc3127 data/createnuclear/recipe/crafting/lead_nugget_from_decompacting.json
 ffa1683a0ba90fa9a0945bbf64947f74e6ee8796 data/createnuclear/recipe/crafting/raw/raw_thorium_block.json
 4ecbbca33f6971b904c365a41d67d1f610ca368d data/createnuclear/recipe/crafting/raw_lead_block.json
-c9dce33293c71961aea5c4ca04ca837449b87ac7 data/createnuclear/recipe/crafting/raw_lead_from_decompacting.json
-a788f72de2d442f171a11a97d5b3d25ebaf48695 data/createnuclear/recipe/crafting/raw_thorium_from_decompacting.json
+05eccca03af9dde754af0c3ede28aeda8d6eb49c data/createnuclear/recipe/crafting/raw_lead_from_decompacting.json
+e5596ac121be63b56eaf6f4bc65f1d91706fe471 data/createnuclear/recipe/crafting/raw_thorium_from_decompacting.json
 a8368b7ba6ad28c6073653978c11a17b8e61c009 data/createnuclear/recipe/crafting/raw_uranium_block.json
-9a0f17a6a4970542ecf42b775fdcea11f0617c74 data/createnuclear/recipe/crafting/raw_uranium_from_decompacting.json
+1d33845f3145dad22e8df3358cb89d5087df88a8 data/createnuclear/recipe/crafting/raw_uranium_from_decompacting.json
 ed745f567cc3683a58121f3d617ed9d0971a7681 data/createnuclear/recipe/crafting/reactor/reinforced_glass.json
 57ce2170813201b6a6c6de35ca8e901c8563894d data/createnuclear/recipe/crafting/reactor_blueprint_item.json
 b11529eb646973ecb4096507eff951f55a649a3d data/createnuclear/recipe/crafting/reinforced_glass_bottle.json
@@ -629,14 +629,16 @@ d8d6ad7a4fc31fd68a98b368207c359fb610f417 data/create/tags/block/safe_nbt.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/c/tags/block/ores/uranium.json
 4f1ebc0bb505bc510c52671c5935494270ec7008 data/c/tags/block/ores_in_ground/deepslate.json
 a04457046c7b0dc46d430af61f83518a84a508d2 data/c/tags/block/ores_in_ground/stone.json
+2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/c/tags/block/raw_storage_blocks/lead.json
+725644962932169e20d6f2726e69af199ce3800c data/c/tags/block/raw_storage_blocks/thorium.json
+0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/block/raw_storage_blocks/uranium.json
 1f9b1d0abae115bee9a7d66e47f36a0b651d555a data/c/tags/block/storage_blocks.json
 a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/block/storage_blocks/lead.json
-2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/c/tags/block/storage_blocks/raw_lead.json
-725644962932169e20d6f2726e69af199ce3800c data/c/tags/block/storage_blocks/raw_thorium.json
-0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/block/storage_blocks/raw_uranium.json
 f8074cdbc6e2b560acb4e9da953b23f9825486a6 data/c/tags/block/storage_blocks/steel.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/c/tags/block/storage_blocks/thorium.json
-a63487094743744be756ad497f483fcd4d11e9bc data/c/tags/fluid/uranium.json
+410aa6d101788f25baa176741887c6f314006f29 data/c/tags/fluid/nitrogen.json
+dd07a117bf2a657aba3d776ee718829150a1c0af data/c/tags/fluid/thorium.json
+bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/c/tags/fluid/uranium.json
 bce34f53cb2d00f7dee84683e8fdd429dabbcc1d data/c/tags/item/armors.json
 e15fb3153f19574ecf55a117c026f6bf028f3a87 data/c/tags/item/armors/boots.json
 fb238dbddaf54871f03731ee7cce881af0932459 data/c/tags/item/armors/chestplates.json
@@ -668,12 +670,12 @@ bad88bea18fec41c7ad6fa4d396feacc0346a137 data/c/tags/item/ores/uranium.json
 61f6f1f4b16790c36a45f769141900772ce4529a data/c/tags/item/raw_materials/thorium.json
 03a88f0d9f44d3c338b82bf92b22a14dec490bef data/c/tags/item/raw_materials/uranium.json
 494676a581ac065ec9c0802aa63c30acdd72be5b data/c/tags/item/raw_ores.json
+2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/c/tags/item/raw_storage_blocks/lead.json
+725644962932169e20d6f2726e69af199ce3800c data/c/tags/item/raw_storage_blocks/thorium.json
+0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/item/raw_storage_blocks/uranium.json
 5b4967b0dfcb637e942604f39d4d9179fca5b776 data/c/tags/item/rods.json
 1f9b1d0abae115bee9a7d66e47f36a0b651d555a data/c/tags/item/storage_blocks.json
 a7258ae3454252e874b324fbd81b880ce52759c4 data/c/tags/item/storage_blocks/lead.json
-2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/c/tags/item/storage_blocks/raw_lead.json
-725644962932169e20d6f2726e69af199ce3800c data/c/tags/item/storage_blocks/raw_thorium.json
-0aafd338eaffcc3f48fb8dc9d18fc969318b06e0 data/c/tags/item/storage_blocks/raw_uranium.json
 f8074cdbc6e2b560acb4e9da953b23f9825486a6 data/c/tags/item/storage_blocks/steel.json
 baae2dfd7e19770072d6261ec68ce157a32be80c data/c/tags/item/storage_blocks/thorium.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/block/azalea_root_replaceable.json
