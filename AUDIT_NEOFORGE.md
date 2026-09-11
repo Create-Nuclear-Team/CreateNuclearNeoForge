@@ -1,7 +1,7 @@
 # Audit de code — Migration Forge → NeoForge (CreateNuclearNeoForge)
 
 Document de suivi vivant. **Ne contient que les points encore ouverts.**
-Dernière re-vérification intégrale contre le code : **23/08/2026** (branche `V2-Audit`, commit `d2c7078`), complétée par des **re-vérifications incrémentales** le 06/09/2026 (commit `5fa0cb7`, 11 commits) puis le 11/09/2026 (commits `7c27b91`→`cd82e97`, dont le refactor `CNMaterialTags` qui centralise les tags communs par matériau).
+Dernière re-vérification intégrale contre le code : **23/08/2026** (branche `V2-Audit`, commit `d2c7078`), complétée par des **re-vérifications incrémentales** le 06/09/2026 (commit `5fa0cb7`, 11 commits) et le 11/09/2026 (commits `7c27b91`→`cd82e97`), puis par une **seconde passe intégrale le 11/09/2026** couvrant l'intégralité de `src/main/java` hors `content/multiblock` (déjà repassé en revue lors des passes précédentes) — répartie par sous-système (compat/foundation/infrastructure/gametest/impl/lib, contenu hors multiblock, registres racine/api), chaque fichier lu en entier avec recherche d'appelants pour toute affirmation de code mort.
 Tout point corrigé depuis l'audit initial a été retiré du fichier — l'historique complet reste disponible dans `git log`.
 
 Périmètre : `src/main/java` (292 fichiers), à l'exclusion des ressources/datagen JSON.
@@ -29,6 +29,8 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 
 | # | Fichier:ligne | Problème | Priorité |
 |---|---|---|---|
+| B8 | `content/contraptions/irradiated/cat/IrradiatedCat.java:283-292` | `finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)` déclare un 5ᵉ paramètre `CompoundTag dataTag` qui n'existe plus dans la signature réelle de `Mob#finalizeSpawn` en 1.21.1 (confirmé par comparaison avec `IrradiatedWolf.java:137`, qui utilise la bonne signature à 4 paramètres). Sans `@Override` et avec une signature qui ne correspond à aucune méthode parente, cette surcharge n'est **jamais appelée par le moteur de spawn** : la vérification de structure « chat noir » (`StructureTags.CATS_SPAWN_AS_BLACK` → `setPersistenceRequired()`) ne s'exécute donc jamais en jeu. Résidu de portage (signature d'une ancienne version de Minecraft/Forge jamais mise à jour). | 🟠 |
+| B9 | `content/effects/VicinityEffect.java:20,44-49` | `cooldowns` (`HashMap<UUID, Long>`) accumule une entrée par entité jamais purgée (pas de retrait à la mort/déchargement de l'entité, pas de nettoyage périodique). `MobEffect` étant un singleton à durée de vie du serveur, cette map grossit sans limite sur un serveur longue durée. Pas de crash immédiat, mais fuite mémoire non bornée réelle. | 🟠 |
 
 ---
 
@@ -38,22 +40,52 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 
 | Fichier | Détail | Priorité |
 |---|---|---|
+| `infrastructure/config/CExplode.java` | Classe de configuration entière (`size`, `type`, `time`) jamais imbriquée dans `CNCServer`/`CNCClient`/`CNCCommon` ni enregistrée nulle part — confirmé sans aucune référence hors du fichier lui-même. | 🟡 |
 
 ### 1.2 Méthodes inutilisées
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
+| `api/ReactorFluidTypesValue.java:53,71` | Les deux surcharges de `setReactorFluidTypeInfos(...)` n'ont aucun appelant dans le projet. L'enregistrement réel des types de fluide de réacteur passe par le bootstrap de registre `content/multiblock/fluid/CNReactorFluidTypes.java`, vérifié en premier par `ReactorFluidType.resolveReactorFluidType`. Le registre `REACTOR_FLUID_TYPE` que cette classe expose reste donc en permanence vide, et `getReactorFluidType(Fluid)` (qui a 2 appelants réels) retourne toujours `DEFAULT_REACTOR_FLUID_TYPE`. Tout le côté écriture de cette classe est vestigial. | 🟡 |
+| `compat/jei/CreateNuclearJEI.java:158-208` | `consumeAllRecipes`, `consumeTypedRecipes`, `getTypedRecipes`, `getTypedRecipesExcluding`, `doInputsMatch`, `doOutputsMatch` n'ont aucun appelant hors d'eux-mêmes ; le champ statique `runtime` (l.67/212) est write-only. Masqué par `@SuppressWarnings("unused")` sur la classe. | 🟡 |
+| `foundation/data/recipe/CNStandardRecipeGen.java` | `createSpecial` (l.122), `blastCrushedMetal` (l.131), `recycleGlass` (l.138), `recycleGlassPane` (l.146), `conversionCycle` (l.194), `clearData` (l.206), `whenModLoaded`/`whenModMissing` (l.270-276, donc `recipeConditions` n'est jamais peuplé), `viaNetheriteSmithing` (l.312), `inSmoker()`/`inSmoker(builder)` (l.380-388) : aucun appelant projet-large. Masqué par `@SuppressWarnings("unused")` sur la classe. | 🟡 |
+| `content/equipment/armor/CNArmorMaterials.java:71-75` | `durabilityForType(Type)` sans aucun appelant (tous les appels réels passent par `setArmorDurability`) — distinct du point déjà tracké sur le tableau `BASE_DURABILITY` recréé à chaque appel. | 🟡 |
+| `content/logistics/BigFluidStack.java:64-70,95-100` | `receive(RegistryFriendlyByteBuf)`, `comparator()`, `duplicateWrappers(List<BigFluidStack>)` sans appelant. | 🟡 |
+| `api/ItemRodTypesValue.java:58-74` | Surcharge `setRodTypeInfos(int, int, int, RodType.TypeRod)` sans appelant (seule la surcharge par `Builder`, l.38, est utilisée, 3× dans `CNItems`). Le message d'exception associé référence en plus le nom pré-migration du projet (« ...CreateNuclearForge mod »). | 🟢 |
+| `foundation/damageTypes/CNDamageSources.java:28-36` | Surcharges privées `source(...)` à 3 et 4 arguments sans appelant (les deux méthodes publiques n'utilisent que la surcharge à 2 arguments). | 🟢 |
+| `foundation/utility/CreateNuclearLang.java` | `blockName(BlockState)` (l.38), `fluidName(FluidStack)` (l.48), `text(String)` (l.61) : aucun appelant. | 🟢 |
+| `foundation/utility/NotifyUtil.java:113-131` | Les deux surcharges de `quickAlert` n'ont aucun appelant. | 🟢 |
+| `foundation/utility/TextUtils.java:37-60` | `formatInt(int)` et `formatInt(int, String)` sans appelant. | 🟢 |
+| `infrastructure/config/CNConfigs.java:38-40` | `byType(ModConfig.Type)` sans appelant. | 🟢 |
+| `infrastructure/worldgen/biome/CNDensityFunctions.java:34-36` | `registerAndWrap(...)` (privée) sans appelant. | 🟢 |
+| `infrastructure/worldgen/biome/PersistentIrradiatedZones.java:40-42` | `isInsideAnyZone(BlockPos)` sans appelant. | 🟢 |
+| `infrastructure/worldgen/biome/surfacerule/IrradiatedSurfaceRules.java:66-68` | Surcharge `biome(TagKey<Biome>)` sans appelant (tous les usages réels passent par la surcharge vararg `ResourceKey...`) — le seul chemin qui instancierait `BiomeTagRule` n'est donc jamais emprunté. | 🟢 |
+| `lib/multiblock/impl/IMultiBlockPattern.java:22-32` | Surcharges par défaut `matches(Level, BlockPos)`, `matchesWithResult(Level, BlockPos, Direction)`, `matchesWithResult(Level, BlockPos)` sans appelant. | 🟢 |
+| `content/contraptions/irradiated/IrradiatedAnimal.java:64-89` | Méthode par défaut `getConversionProgress()` sans appelant. | 🟢 |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf.java:434-436` | `checkWolfSpawnRules(EntityType<Wolf>, ...)` sans appelant, paramètre `wolf` lui-même inutilisé dans le corps. | 🟢 |
+| `content/decoration/palettes/PaletteBlockPattern.java:152-158` | `cubeBottomTop(String)` sans appelant (seules les fabriques `cubeAll`/`pillar`/`cubeColumn` sont câblées). | 🟢 |
+| `content/explosion/CNAdvancedModelBox.java:125-127` | `getParent()` sans appelant (le champ `parent` est écrit via `setParent` mais jamais relu). | 🟢 |
+| `content/explosion/CNBasicModelPart.java:36-38,40-47,65-67` | Constructeurs `CNBasicModelPart(CNBasicEntityModel, int, int)`/`CNBasicModelPart(int, int, int, int)` et la surcharge `render(...)` à 4 arguments : aucun appelant (seuls le constructeur à 1 argument et le `render(...)` à 8 arguments sont utilisés). | 🟢 |
+| `content/explosion/CNAdvancedEntityModel.java:9,21-23` | Champ `movementScale` et son accesseur `getMovementScale()` : jamais réécrit hors de l'initialiseur, jamais relu ailleurs que dans l'accesseur lui-même. | 🟢 |
+| `content/enriching/campfire/EnrichingCampfireBlock.java:79-81` | Constructeur `EnrichingCampfireBlock(int fireDamage, Properties property)` sans appelant (seul le constructeur à 3 arguments, utilisé par `CNBlocks.java:321`, est utilisé). | 🟢 |
+| `foundation/data/recipe/CNDeployingRecipeGen.java:36-42`, `CNItemApplicationRecipeGen.java:23-29,31-37` | Chacune de ces classes déclare deux surcharges (`Ingredient` vs `Item`) au corps identique pour un même helper ; dans les deux fichiers, tous les appels réels ne résolvent qu'une seule des deux surcharges (l'autre — `Ingredient` pour `CNDeployingRecipeGen`, `Item` pour `CNItemApplicationRecipeGen` — n'est jamais invoquée). | 🟢 |
 
 ### 1.3 Champs inutilisés
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
 | `content/multiblock/controller/ReactorControllerBlockEntity.java:60,372` | `countCoolerRod` est assigné en `tick()` mais jamais relu ensuite (champ « write-only »). **Confirmé pré-existant côté Forge** : `countCoolerRod` y est aussi write-only sur cette classe (`triggerExplosion` ne prend que `countFuelRod`), ce n'est donc pas un artefact de migration. Vu la symétrie avec `countFuelRod` (qui, lui, alimente `triggerExplosion`), il a probablement été prévu pour atténuer l'explosion via les cooler rods mais n'a jamais été branché. **Point mis de côté** : à discuter plus tard (câbler dans `triggerExplosion`, ou supprimer avec `getConfiguredPatternCoolerRodCount()`) — aucune décision prise pour l'instant. | 🟡 |
+| `content/decoration/palettes/PaletteBlockPattern.java:66-67` | Champ `private RenderType renderType;` (annoté `@OnlyIn(Dist.CLIENT)`) sans getter/setter, jamais assigné ni lu. | 🟢 |
+| `content/decoration/palettes/CNPaletteStoneTypes.java:45-47` | `getVariant()` et le champ `variant` qu'il expose : jamais appelé nulle part (état write-only). | 🟢 |
 
 ### 1.4 Constantes inutilisées
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
+| `foundation/gui/CNGuiTextures.java:15-16,31-33` | Constantes d'enum `REACTOR_CONTROLLER`/`REACTOR_CONTROLLER_PROGRESS` jamais référencées par leur nom, et le constructeur raccourci `(int startX, int startY)` (l.31-33) jamais utilisé par aucune entrée. | 🟢 |
+| `infrastructure/config/CRods.java:33` | `Comments.maxFuelPerCooled` : constante de chaîne définie mais jamais passée à un appel `i()`/`f()`. | 🟢 |
+| `compat/Mods.java:16` | `ALEXS_CAVE` jamais référencée hors de sa propre déclaration (le seul consommateur de `Mods` est `SableCompat`/`ReactorMeltdownExecutor`, qui utilisent `SABLE`). À rapprocher du point déjà tracké sur `AlexscaveCompat` (§4) : cette classe n'est même pas instanciée nulle part dans le projet — pas seulement « gelée », mais entièrement orpheline. | 🟢 |
+| `content/decoration/palettes/PaletteBlockPattern.java:47` | `VANILLA_RANGE` jamais référencé nulle part, et strictement identique à `STANDARD_RANGE` (l.49), qui est le tableau réellement utilisé par `CNPaletteStoneTypes` — cf. duplication en §3. | 🟡 |
 
 *(La constante `CNTags.NameSpace.FORGE`, listée ici précédemment, a été retirée dans l'arbre de travail local ; voir §8.)*
 
@@ -62,12 +94,35 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
 | `foundation/data/recipe/CNMaterialTags.java:10` | `import java.util.*;` (wildcard) dans un fichier neuf (ajouté par `cd82e97`, 11/09/2026) — incohérent avec le nettoyage déjà fait ailleurs dans le projet, qui a remplacé les imports wildcard par des imports explicites (cf. §8, `ReactorBluePrintMenu`/`ReactorOutput`). Pas un import inutile à proprement parler (`EnumMap`, `EnumSet`, `Arrays`, `Map`, `Set` sont bien utilisés), mais masque les dépendances réelles de la classe. | 🟢 |
+| `CNClientProxy.java:4`, `CNCreativeModeTabs.java:9,16`, `CNDisplaySources.java:6`, `CNItems.java:4,18`, `CNRecipeTypes.java:14` | Imports wildcard (`com.mojang.blaze3d.vertex.*`, `fastutil.objects.*`, `net.minecraft.world.item.*`, `content.redstone.displayLink.source.*`, static `AntiRadiationArmorItem.*`, `net.minecraft.world.item.crafting.*`) masquant les dépendances réelles — même style d'incohérence que ci-dessus, dans des fichiers plus anciens cette fois. Aucun n'est un import inutilisé au sens strict. | 🟢 |
+| `api/multiblock/fluid/ReactorFluidType.java:7,9,26` | Imports inutilisés `HolderSet`, `RegistryCodecs`, `Collectors` (aucun des trois symboles n'apparaît dans le corps du fichier). | 🟢 |
+| `content/radiation/RadiationBucketItem.java:9` | `import java.util.function.Supplier;` inutilisé (le cast `Supplier` a lieu côté appelant, dans `CNFluids.java:67`, pas ici). | 🟢 |
+| `content/redstone/displayLink/source/ReactorSummaryDisplaySource.java:11,15` | `import net.minecraft.core.component.DataComponents;` et `import net.minecraft.world.item.component.CustomData;` : reliquats de l'ancienne lecture de la chaleur par tag NBT (cf. commentaire de migration l.157-159), jamais retirés après le passage à `controller.getConfiguredPatternHeat()`. | 🟢 |
+| `content/equipment/armor/AntiRadiationArmorClientExtensions.java:7,14` | Imports inutilisés `net.minecraft.world.entity.Entity` et `foundation/utility/ClothTagHelper`. | 🟢 |
+| `content/equipment/armor/CNArmorMaterials.java:4` | Import inutilisé `NonNullBiConsumer`. | 🟢 |
+| `foundation/advancement/CNAdvancementBehaviour.java:3-4` | Imports inutilisés `AdvancementBehaviour`, `CreateAdvancement` — reliquats de la méthode `tryAward` déjà supprimée (cf. §8). | 🟢 |
+| `foundation/advancement/CreateNuclearAdvancement.java:3` | Import inutilisé `CreateAdvancement`. | 🟢 |
+| `infrastructure/config/CBiomeRestore.java:5` | Import inutilisé `CNParticleTypes`. | 🟢 |
+| `infrastructure/worldgen/biome/BiomeIrradiationService.java:10` | Import inutilisé `ServerPlayer`. | 🟢 |
+| `api/radiation/IRadiationSource.java:4` | Import inutilisé `net.minecraft.world.entity.player.Player` (l'interface n'utilise que `LivingEntity`/`ItemStack`). | 🟢 |
+| `content/contraptions/irradiated/chicken/IrradiatedChickenRenderer.java:5` | Import inutilisé `net.minecraft.client.renderer.MultiBufferSource`. | 🟢 |
+| `content/logistics/BigFluidStack.java:5,9` | Imports inutilisés `NBTHelper`, `NbtUtils`. | 🟢 |
 
 ### 1.6 Code commenté pouvant être supprimé
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
 | `foundation/utility/RenderHelper.java:39-51` | La branche `coverage != 1f` fait un `pushPose()`/`translate` qui s'annule exactement, puis blit à `(0,0)` — strictement identique à la branche `coverage == 1f` : le paramètre `coverage` de `renderOverlay` n'a plus aucun effet (l'appel `scale(...)` correspondant, autrefois commenté, a depuis été supprimé sans être remplacé). Seul appelant du projet (`HelmetOverlay.java:71`) passe toujours `coverage = 1f`, donc aucun effet visible aujourd'hui. **Mis de côté** : le mainteneur a choisi de ne rien changer pour l'instant (ni réimplémenter le scale, ni retirer le paramètre mort) — aucune décision prise. | 🟢 |
+| `foundation/gui/CNGuiTextures.java:14` | Ancienne entrée d'enum `REACTOR_CONTROLLER("toolbox", 188, 171)` laissée en commentaire. | 🟢 |
+| `content/contraptions/irradiated/cat/IrradiatedCatModel.java:32,64,66,77` | Champ `state` initialisé à `1` et jamais réassigné nulle part : les branches `state == 2` et `state == 3` de `setupAnim` sont du code mort inatteignable, signe d'une fonctionnalité d'état d'animation jamais câblée. | 🟡 |
+| `net/nuclearteam/createnuclear/CNCreativeModeTabs.java:112-113` | `PackageStyles.STANDARD_BOXES.forEach(item -> { });` — lambda à corps vide, la boucle ne fait rien. | 🟢 |
+| `content/enriching/campfire/EnrichingCampfireBlockEntity.java:27` | `i = state.getValue(EnrichingCampfireBlock.FACING).get2DDataValue();` : valeur calculée puis jamais utilisée (variable de boucle réutilisée puis abandonnée) — reliquat de code décompilé/porté sans effet. | 🟢 |
+| `content/explosion/NuclearExplosionEntity.java:150` | `float itemDropModifier = 0.025F / Math.min(1, this.getSize());` calculée puis jamais utilisée dans `removeChunk(...)` — suggère une fonctionnalité de taux de drop d'item jamais branchée. | 🟡 |
+| `net/nuclearteam/createnuclear/CNBlocks.java:390,415` | Dans les blocs `DEEPSLATE_URANIUM_ORE`/`DEEPSLATE_LEAD_ORE`, `HolderLookup.RegistryLookup<Enchantment> enchantmentRegistryLookup` est calculée puis jamais lue (le code appelle directement `lt.getRegistries().holderOrThrow(...)`) — incohérent avec les blocs jumeaux `URANIUM_ORE`/`LEAD_ORE` (l.465,490) qui, eux, réutilisent bien cette variable. | 🟢 |
+| `infrastructure/ponder/CNCreateNuclearPonderTags.java:22-23` | Variable locale `itemHelper` calculée puis jamais utilisée. | 🟢 |
+| `infrastructure/ponder/scenes/CNPonderReactorScenes.java:142-147` | `minX`/`maxX`/`minZ`/`maxZ`/`minY`/`maxY` calculées dans `showReactorStructure` puis jamais relues dans la méthode. | 🟢 |
+| `content/contraptions/irradiated/wolf/IrradiatedWolf.java:137-141` | `finalizeSpawn` calcule `Holder<Biome> holder = level.getBiome(this.blockPosition());` puis ne l'utilise jamais. | 🟢 |
+| `content/contraptions/irradiated/cat/IrradiatedCat.java:127-133` | `addAdditionalSaveData`/`readAdditionalSaveData` ne font qu'appeler `super(...)` sans logique additionnelle — contrairement aux versions poulet/loup qui persistent de vrais champs. | 🟢 |
 
 *(Tous les autres blocs commentés précédemment listés ici — `CreateNuclearJEI`, `CNFluids`, `PlayerInteractReactorFluidInput` ×2, `ReactorControllerBlock` ×3, `NuclearMushroomCloudParticle`, `HelmetOverlay` — ont été nettoyés dans l'arbre de travail local ; voir §8.)*
 
@@ -93,11 +148,14 @@ Le style du projet est très majoritairement en anglais.
 | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:45` | `//ici pour le titre`. | 🟢 |
 | `foundation/ponder/CNPonderIndex.java:16` | « Reactor - Storyboards pour chaque taille ». | 🟢 |
 | `net/nuclearteam/createnuclear/CNSoundEvents.java:40,45,50,85,90` | Chemins de ressources en français : `create("reacteur/activation")`, `"reacteur/running"`, `"reacteur/shut_off"`, `"reacteur/assemble_deassemble/..."`. Impacte l'arborescence des assets, donc plus coûteux à renommer. | 🟢 |
+| `infrastructure/config/CRods.java:14` | Commentaire mélangeant anglais et français : « the calcul will be... » (« calcul » au lieu de « calculation »). | 🟢 |
 
 ### 2.2 Commentaires peu explicites ou ambigus
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
+| `foundation/events/CommentEvents.java` | Le nom de la classe ne correspond à rien de son contenu (elle enregistre des recettes de brassage, des capacités, des modificateurs d'attribut d'entité — rien à voir avec des « commentaires ») ; vraisemblablement une coquille pour `CommonEvents`. | 🟢 |
+| `infrastructure/config/CExplode.java:8` | Commentaire « Duration before exploration » (coquille pour « explosion »). | 🟢 |
 
 *(Le commentaire `@goshante` de `CreateNuclearJEI`, listé ici précédemment, a disparu avec le bloc mort qu'il annotait, supprimé dans l'arbre de travail local ; voir §8.)*
 
@@ -110,6 +168,7 @@ Le style du projet est très majoritairement en anglais.
 | `content/multiblock/rod/CNRodTypes.java:12-33` | Javadoc utile mais mal placée : elle documente la classe et `RodType.Builder` en général, alors qu'elle est apposée sur la méthode `bootstrap()`. | 🟢 |
 | `content/radiation/RadiationEffect.java:26,34,42` | Commentaires inline répétant littéralement le code (`// Reduces movement speed by 20%` juste au-dessus de la ligne qui applique `-0.2D`). | 🟢 |
 | `content/multiblock/controller/manager/ReactorFrameDisplayManager.java:29-31` | Javadoc tronqué : *« On the client this reads the synced ; on the server it reads the aggregated. »* — les mots attendus après « synced » et « aggregated » manquent. | 🟡 |
+| `gametest/ReactorInputFluidManagerGameTest.java:49` | Javadoc de classe contenant `{@link Level}` sans import de `Level` dans le fichier — référence Javadoc non résolue. | 🟢 |
 
 ### 2.4 Commentaires devenus obsolètes
 
@@ -120,6 +179,9 @@ Le style du projet est très majoritairement en anglais.
 | `content/multiblock/controller/snapshot/ReactorInputSnapshot.java:13-16` | Javadoc obsolète : décrit des champs `bigFuelItem`/`bigCoolerItem` qui n'existent plus dans le record actuel (`items`, `fluids`, `maxFluidCapacity`). | 🟠 |
 | `api/ItemRodTypesValue.java:51-53` | Javadoc affirmant l'existence d'une valeur `MIXTE` dans `RodType.TypeRod` (« For MIXTE we keep the builder default... »), alors que cet enum ne définit que `FUEL`, `COOLER`, `NONE` (`api/multiblock/rods/RodType.java:312-324`) et que le `switch` associé lève une exception pour toute autre valeur. | 🟠 |
 | `api/data/recipe/EnrichedRecipeGen.java:18` | Javadoc copié de Create : *« The base class for **Haunting** recipe generation »*, alors que la classe concerne les recettes « Enriched » (four à vent enrichissant), pas le système « Haunting » de Create. | 🟡 |
+| `foundation/utility/InventoryHashUtil.java:48-51` | `@implNote` décrit l'algorithme comme utilisant `tag.hashCode()` (terminologie NBT), alors que l'implémentation réelle (l.91) utilise `stack.getComponents().hashCode()` — un patch de data components, pas du NBT. Description obsolète de l'algorithme qu'elle documente. | 🟡 |
+| `foundation/utility/Maths.java:1-4` | Bandeau d'en-tête « Source code recreated from a .class file by IntelliJ IDEA (FernFlower decompiler) » obsolète : d'après §8, le fichier a déjà été réécrit pour ne garder que `smin`/`sampleNoise3D` — l'attribution au décompilateur ne correspond plus au contenu (désormais retouché à la main). | 🟢 |
+| `content/contraptions/irradiated/cow/IrradiatedCow.java:44-45` | Commentaire « Define the base food of the animal (e.g., Wheat for Cows) » obsolète/trompeur : l'ingrédient réel de `FOOD_ITEMS` est `CNItems.YELLOWCAKE`, pas du blé. | 🟡 |
 
 ---
 
@@ -128,6 +190,10 @@ Le style du projet est très majoritairement en anglais.
 | Fichier(s) | Détail | Priorité |
 |---|---|---|
 | `.../manager/ReactorInputManager.java:191`, `ReactorOutputManager.java:70`, `ReactorInputFluidManager.java:91`, `ReactorAlarmManager.java:59` | `getBlocksPosition(Level level, BlockPos controllerPos)` réimplémente **4 fois** le même filtre `instanceof XxxEntity` (résolution relative à `controllerPos.offset(offset)` incluse). | 🟡 |
+| `content/redstone/displayLink/source/ReactorSizeDisplaySource.java:28,37` vs `ReactorSummaryDisplaySource.java:203` (`formatSize`) | Même calcul de palier (`size <= 5 ? small : size <= 7 ? medium : large`) et même motif de clé de traduction `"display_source.reactor.size." + key` dupliqués entre les deux classes. | 🟡 |
+| `content/redstone/displayLink/source/ReactorSizeDisplaySource.java:16-41` | Réimplémente en ligne le switch valeur/pourcentage/jauge déjà centralisé dans `AbstractReactorStatDisplaySource.provideLine` (l.34-42) : la classe étend directement `NumericSingleLineDisplaySource` au lieu de la base abstraite déjà utilisée par les autres sources d'affichage. | 🟡 |
+| `content/decoration/palettes/PaletteBlockPattern.java:47,49` | `VANILLA_RANGE` et `STANDARD_RANGE` déclarés avec un contenu strictement identique ; combiné au fait que `VANILLA_RANGE` n'a aucun appelant (§1.4), ceci ressemble à un doublon oublié plutôt qu'à une intention. | 🟡 |
+| `foundation/data/recipe/CNDeployingRecipeGen.java` et `CNItemApplicationRecipeGen.java` | Chacune déclare 2 surcharges (`Ingredient`/`Item`) au corps identique pour un même helper — cf. §1.2, une des deux surcharges est de toute façon inatteignable dans chaque fichier. | 🟢 |
 | `foundation/block/HorizontalDirectionalReactorBlock.java` vs `MultiDirectionalReactorBlock.java` | Structure `rotate`/`mirror` identique (≈30 lignes chacune), seule la propriété (`HORIZONTAL_FACING` vs `FACING`) diffère. | 🟡 |
 | `net/nuclearteam/createnuclear/CNItems.java` | Motif de recette « `_from_decompacting` » répété **9 fois** de façon quasi identique. | 🟡 |
 | `content/radiation/capability/RadiationCapability.java:137-151` | `computeItemRadiation(Player)` réimplémente inline la logique déjà factorisée dans `getStackRadiation(ItemStack, LivingEntity)` (l.153-158), que la surcharge `computeItemRadiation(LivingEntity)` utilise pourtant correctement. | 🟡 |
@@ -166,15 +232,13 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
-| `net/nuclearteam/createnuclear/CreateNuclear.java:70,106` | `IEventBus forgeEventBus = NeoForge.EVENT_BUS;` — variable nommée d'après l'ancienne API alors qu'elle référence le bus NeoForge ; utilisée telle quelle l.106. | 🟠 |
-| `net/nuclearteam/createnuclear/CreateNuclear.java:110` | `//DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ...)` — `DistExecutor` est une API Forge, remplacée en NeoForge par `@Mod(dist = Dist.CLIENT)` (déjà utilisée correctement dans `CreateNuclearClient.java`). Ligne morte à supprimer. | 🟠 |
 | `content/multiblock/input/fluid/ReactorFluidInputEntity.java:91,101` | Commentaires d'incertitude explicites sur la bonne API post-migration (« Pensez à passer registries si requis par la v1.20+... », « Pareil ici selon l'implémentation de SmartFluidTank ») — notes-à-soi-même jamais tranchées. | 🟠 |
 | `content/multiblock/input/fluid/ReactorFluidInput.java:91` | « Convertit le vieux InteractionResult en ItemInteractionResult si nécessaire pour NeoForge » — le « si nécessaire » signale une incertitude non tranchée. | 🟡 |
 | `net/nuclearteam/createnuclear/CreateNuclearClient.java:27` | `IEventBus neoEventBus = NeoForge.EVENT_BUS;` déclarée mais jamais utilisée — vestige d'un ancien câblage d'événements client. | 🟡 |
 | `content/kinetics/fan/processing/CNFanProcessingTypes.java:39-47` | `LEGACY_NAME_MAP` : shim de compatibilité de noms lié à d'anciennes sauvegardes/NBT pré-migration. `ofLegacyName`/`parseLegacy`, ses seuls lecteurs, ont été supprimés (aucun appelant) ; le champ et son bloc d'initialisation statique sont donc désormais eux aussi orphelins — soit câbler `LEGACY_NAME_MAP` là où les NBT legacy sont lus, soit le supprimer avec le champ. | 🟡 |
 | `content/contraptions/irradiated/cat/IrradiatedCatRenderer.java:5`, `wolf/IrradiatedWolf.java:3`, `foundation/block/HorizontalDirectionalReactorBlock.java:3`, `MultiDirectionalReactorBlock.java:3` | Import `com.mojang.math.MethodsReturnNonnullByDefault` au lieu de `net.minecraft.MethodsReturnNonnullByDefault` (utilisé partout ailleurs) — incohérence probablement issue d'un auto-import IDE pendant le portage. | 🟡 |
 | `foundation/data/recipe/CNCrushingRecipeGen.java:42-56` | Différences de contenu de recette apparues pendant le portage, à trancher (voulu ou régression) : (1) nouvelle recette `RAW_URANIUM_BLOCK` absente côté Forge ; (2) `RAW_THORIUM_BLOCK` : la sortie secondaire `0.75f ×AllItems.EXP_NUGGET` (Forge) a été remplacée par `0.5f ×CNItems.THORIUM_DUST×72` ; (3) `RAW_THORIUM_ITEM` : même changement, `0.75f×EXP_NUGGET` → `0.5f×THORIUM_DUST×8`. Les recettes de fer/or (l.61,68) ont bien gardé leur `EXP_NUGGET`, ce qui rend l'écart d'autant plus visible. | 🟡 |
-| `content/compat/alexscave/AlexscaveCompat.java:14-66` | Compat entièrement gelée en code Forge commenté (`MobSpawn`, `NukeParam`, `UpdateACProxy`, plus les méthodes entièrement commentées `isRaycat`, `isTremorzilla`, `ACResConfig`, `ACDestroyable`, `GetACSounds`, `GetACConfig`) ; le commentaire de classe indique explicitement que le mod tiers n'a pas encore de version 1.21.1. Coquille vide en attente côté NeoForge. | 🟠 |
+| `content/compat/alexscave/AlexscaveCompat.java:14-66` | Compat entièrement gelée en code Forge commenté (`MobSpawn`, `NukeParam`, `UpdateACProxy`, plus les méthodes entièrement commentées `isRaycat`, `isTremorzilla`, `ACResConfig`, `ACDestroyable`, `GetACSounds`, `GetACConfig`) ; le commentaire de classe indique explicitement que le mod tiers n'a pas encore de version 1.21.1. Coquille vide en attente côté NeoForge. **Confirmé** : la classe n'est même instanciée nulle part dans le projet (pas seulement « gelée » en interne, mais entièrement orpheline) ; `Mods.ALEXS_CAVE` (le seul point d'entrée logique pour l'activer un jour) est lui aussi sans référence — cf. §1.4. | 🟠 |
 | `content/multiblock/frame/ReactorFrameRenderer.java:74-77` | `CatnipServices.FLUID_RENDERER` est déclaré `FluidRenderHelper<?>`, obligeant un cast non vérifié (`@SuppressWarnings("unchecked")`) vers `FluidRenderHelper<FluidStack>` de NeoForge : shim multiplateforme (Catnip/Create, Forge vs NeoForge) laissé tel quel. | 🟡 |
 
 ---
@@ -183,14 +247,12 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 
 Éléments à retirer une fois la migration complètement terminée et les points de la section 4 tranchés.
 
-- Renommer `forgeEventBus` → `neoForgeEventBus` dans `CreateNuclear.java:70`, retirer la ligne `DistExecutor` commentée (l.110), retirer `neoEventBus` inutilisé dans `CreateNuclearClient.java:27`.
-- Supprimer l'entrée `FORGE("forge")` de `CNTags.java:52`, confirmée sans référence depuis le renommage `forgeXxxTag`→`neoForgeXxxTag`.
-- Retirer ou repasser en `debug()` le log `CreateNuclear.LOGGER.info("[MeltdownDebug]...")` de `ReactorControllerBlockEntity.java:360` une fois la destruction du multiblock au meltdown stabilisée.
+- Retirer `CreateNuclearClient.java:27` (`neoEventBus` inutilisé).
 - Supprimer ou câbler `CNFanProcessingTypes.LEGACY_NAME_MAP` (`ofLegacyName`/`parseLegacy`, ses seuls lecteurs, ont déjà été supprimés — le champ est désormais orphelin).
-- Nettoyer les blocs commentés listés en §1.6 (`CreateNuclearJEI`, `CNFluids`).
-- Supprimer `content/compat/alexscave/AlexscaveCompat.java` (ou le réécrire proprement) une fois qu'Alex's Caves publie une version 1.21.1 compatible et qu'une vraie intégration est décidée.
-- Retirer le champ mort `countCoolerRod` de `ReactorControllerBlockEntity` (ou l'implémenter réellement) — attention : `@SuppressWarnings({"unused"})` sur la classe masque ce type de code mort, à retirer une fois le nettoyage fait pour que l'IDE le détecte à nouveau.
+- Supprimer `content/compat/alexscave/AlexscaveCompat.java` et l'entrée `Mods.ALEXS_CAVE` (ou les réécrire proprement) une fois qu'Alex's Caves publie une version 1.21.1 compatible et qu'une vraie intégration est décidée — les deux sont aujourd'hui totalement orphelins (§1.4).
+- Retirer le champ mort `countCoolerRod` de `ReactorControllerBlockEntity` (ou l'implémenter réellement) — attention : `@SuppressWarnings({"unused"})` sur la classe masque ce type de code mort, à retirer une fois le nettoyage fait pour que l'IDE le détecte à nouveau. Le même masquage existe sur `CreateNuclearJEI`, `CNStandardRecipeGen` et `UraniumOreBlock` (`@SuppressWarnings("unused")` sur la classe entière) — à retirer une fois leurs méthodes/champs morts respectifs nettoyés (§1.2), pour que l'IDE redétecte tout code mort futur.
 - Corriger l'incohérence de paquet `foundation/damageTypes/CNDamageSources.java` : le dossier est `damageTypes` mais le fichier déclare `package ...foundation.damagesTypes;` (avec un « s » superflu). Compile aujourd'hui car les deux importeurs (`RadiationEffect.java`, `CNFanProcessingTypes.java`) utilisent la même faute, mais cassera tout futur refactor IDE automatique.
+- Supprimer les blocs de code mort listés en §1.2 une fois confirmés inutiles pour de bon : `ReactorFluidTypesValue.setReactorFluidTypeInfos`, le cluster de méthodes mortes de `CreateNuclearJEI` et de `CNStandardRecipeGen`, `CExplode` (classe entière), `BigFluidStack` (3 méthodes), et les surcharges inatteignables listées.
 
 ---
 
@@ -229,6 +291,10 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
   Points bloquants principaux : **2** (aucune lecture de pattern côté fluide aujourd'hui) et **3** (les deux modèles de consommation — discret vs continu — ne sont pas directement compatibles).
 
   À noter : `ReactorControllerBlockEntity.java:71` déclare `private double liquidLife;` juste à côté du champ `cycleManager` (l.70), ni lu ni écrit ailleurs dans le fichier. Vu son emplacement et son nom, c'est vraisemblablement un reliquat/placeholder posé en prévision de cette même intégration fluide (un accumulateur de durée de vie de fluide, pendant du `remainingTicks` de `ConsumableTimer`) plutôt qu'un oubli isolé — à traiter avec le reste de ce chantier plutôt qu'à supprimer isolément.
+- **`ReactorSizeDisplaySource`** : le faire hériter de `AbstractReactorStatDisplaySource` comme les autres sources d'affichage, au lieu de réimplémenter en ligne le switch valeur/pourcentage/jauge déjà centralisé dans `provideLine`.
+- **`content/explosion`** (`CNAdvancedModelBox`, `CNTabulaModelRenderUtils`) : renommer les paramètres décompilés à la MCP (`p_228300_1_`, `p_i225950_3_`, etc.) restés tels quels après le portage — purement cosmétique, aucun changement de comportement.
+- **`CNBasicModelPart.java:76`** : renommer la variable locale qui masque le nom de sa propre classe (`CNBasicModelPart CNBasicModelPart = (CNBasicModelPart) var9.next();`) — correcte mais déroutante à la lecture.
+- **`IrradiatedCatModel`** : décider du sort du champ `state` (jamais réassigné) — soit câbler un vrai état d'animation pour les branches `state == 2`/`state == 3` de `setupAnim`, soit les retirer avec le champ.
 
 ---
 
@@ -239,27 +305,31 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 ### 🟠 Important
 
-- Débris de migration à finaliser : `CreateNuclear.forgeEventBus` + ligne `DistExecutor` commentée, notes d'incertitude non tranchées dans `ReactorFluidInputEntity`, compat `AlexscaveCompat` entièrement gelée en code Forge commenté.
+- Bugs de logique (§0) : `IrradiatedCat.finalizeSpawn` n'override plus rien depuis un changement de signature Minecraft (la vérification « chat noir » ne s'exécute jamais) ; fuite mémoire non bornée dans `VicinityEffect.cooldowns` (jamais purgée).
+- Débris de migration à finaliser : notes d'incertitude non tranchées dans `ReactorFluidInputEntity`, compat `AlexscaveCompat` entièrement gelée en code Forge commenté et confirmée totalement orpheline (avec `Mods.ALEXS_CAVE`).
 - Commentaires français masquant une incertitude technique : `ReactorFluidInputEntity`.
 - Incohérence de paquet `foundation/damageTypes` (dossier) vs `foundation.damagesTypes` (package déclaré) dans `CNDamageSources.java`.
-- Duplications significatives : `getBlocksPosition(Level)` ×4 managers (+ shadowing), `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`, 13 classes `*Factory` de `SmallNuclearExplosionParticle`, triple duplication de verrou fluide dans `ReactorFluidInputEntity`, triple duplication de scan dans `ReactorPattern`.
+- Duplications significatives : `getBlocksPosition(Level)` ×4 managers, `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`, 13 classes `*Factory` de `SmallNuclearExplosionParticle`, triple duplication de verrou fluide dans `ReactorFluidInputEntity`, triple duplication de scan dans `ReactorPattern`.
 - Javadoc trompeur/obsolète : copier-coller mal placé dans `ReactorControllerBlockEntity` (constructeur), champs disparus documentés dans `ReactorInputSnapshot`, valeur d'enum `MIXTE` inexistante dans `ItemRodTypesValue`.
 
 ### 🟡 Moyen
 
-- Duplications : `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock` (déjà listé ci-dessus), blocs multiblock `onPlace`/`onRemove`, générateurs `SpecialBlockStateGen` ×3, `CoolerDisplaySource`/`FuelDisplaySource`/`ReactorSummaryDisplaySource`, `EnrichedRecipe`/`SnowPowderRecipe` + catégories JEI, `CNTags` (5 enums ~230 lignes), `CNBlocks` (blocs de minerai), `CNItems` (armures anti-radiation), `CNDensityFunctions` (expression dupliquée), `matches`/`matchesWithResult` dans `SimpleMultiBlockPattern`.
-- Dead code : champ orphelin `CNFanProcessingTypes.LEGACY_NAME_MAP`, `countCoolerRod` write-only, abstraction `IPatternBuilder` jamais exploitée.
-- Javadoc mal placée après `@Override` dans `ReactorInputFluidManager` (6 méthodes) ; Javadoc française mal formée `ReactorAlarmManagerI` ; Javadoc tronqué `ReactorFrameDisplayManager`; Javadoc copié de Create dans `EnrichedRecipeGen` ; commentaire obsolète dans `FluidConsumptionRateCalculator` contredisant l'implémentation réelle.
+- Duplications : `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock` (déjà listé ci-dessus), blocs multiblock `onPlace`/`onRemove`, générateurs `SpecialBlockStateGen` ×3, `CoolerDisplaySource`/`FuelDisplaySource`/`ReactorSummaryDisplaySource`, `ReactorSizeDisplaySource` (formatSize + switch non centralisé), `EnrichedRecipe`/`SnowPowderRecipe` + catégories JEI, `CNTags` (5 enums ~230 lignes), `CNBlocks` (blocs de minerai), `CNItems` (armures anti-radiation), `CNDensityFunctions` (expression dupliquée), `matches`/`matchesWithResult` dans `SimpleMultiBlockPattern`, `PaletteBlockPattern.VANILLA_RANGE`/`STANDARD_RANGE` (tableaux identiques).
+- Dead code : champ orphelin `CNFanProcessingTypes.LEGACY_NAME_MAP`, `countCoolerRod` write-only, abstraction `IPatternBuilder` jamais exploitée, classe entière `CExplode` jamais référencée, clusters de méthodes mortes dans `CreateNuclearJEI` et `CNStandardRecipeGen`, `ReactorFluidTypesValue.setReactorFluidTypeInfos` (registre toujours vide), `CNArmorMaterials.durabilityForType`, `BigFluidStack` (3 méthodes), branches inatteignables `state == 2`/`3` dans `IrradiatedCatModel`.
+- Javadoc mal placée après `@Override` dans `ReactorInputFluidManager` (6 méthodes) ; Javadoc française mal formée `ReactorAlarmManagerI` ; Javadoc tronqué `ReactorFrameDisplayManager`; Javadoc copié de Create dans `EnrichedRecipeGen` ; commentaire obsolète dans `FluidConsumptionRateCalculator` contredisant l'implémentation réelle ; `@implNote` obsolète dans `InventoryHashUtil` (NBT vs data components) ; commentaire obsolète dans `IrradiatedCow` (blé vs Yellowcake).
 - Imports `com.mojang.math.MethodsReturnNonnullByDefault` (4 fichiers) ; `CreateNuclearClient.neoEventBus` ; incertitude `ReactorFluidInput.java:91` ; shim `FluidRenderHelper<?>` cast non vérifié dans `ReactorFrameRenderer`.
 - Divergences de recettes `CNCrushingRecipeGen` à trancher.
 - Incohérence de portage entre les 4 animaux irradiés (seul `IrradiatedChicken` implémente `IrradiatedAnimal`).
+- Variable locale calculée puis jamais utilisée dans `NuclearExplosionEntity.removeChunk` (`itemDropModifier`) — suggère un taux de drop d'item jamais branché.
 
 ### 🟢 Faible
 
 - Paramètre `coverage` mort dans `RenderHelper.renderOverlay` (mis de côté, pas d'action prévue).
-- Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`, `RadiationCapability.radiation_desactive`) et chemins de sons `"reacteur/..."`.
-- Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`), commentaires paraphrasant le code (`RadiationEffect`).
-- Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, variables `globalNotifyPos`/`globalExplosionPos` identiques dans `ReactorMeltdownExecutor`, générateurs de recettes `create(...)` (Crushing/Washing), trio ingot/nugget `CNItems`, `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput).
+- Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`, `RadiationCapability.radiation_desactive`, `CRods`) et chemins de sons `"reacteur/..."`.
+- Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`, `ReactorInputFluidManagerGameTest`), commentaires paraphrasant le code (`RadiationEffect`), bandeau décompilateur obsolète (`Maths.java`), noms de classe trompeurs (`CommentEvents`), coquilles (`CExplode` "exploration").
+- Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, variables `globalNotifyPos`/`globalExplosionPos` identiques dans `ReactorMeltdownExecutor`, générateurs de recettes `create(...)` (Crushing/Washing), trio ingot/nugget `CNItems`, `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput), surcharges jumelles dans `CNDeployingRecipeGen`/`CNItemApplicationRecipeGen`.
+- Dead code mineur : nombreuses méthodes/constructeurs/imports sans appelant recensés en §1.2/§1.3/§1.4/§1.5 (constantes `CNGuiTextures`, champs `PaletteBlockPattern`/`CNPaletteStoneTypes`, variables locales diverses, imports inutilisés répartis sur une quinzaine de fichiers).
+- Refactors cosmétiques : paramètres décompilés MCP non renommés (`CNAdvancedModelBox`, `CNTabulaModelRenderUtils`), variable masquant le nom de sa classe (`CNBasicModelPart`).
 
 ---
 
