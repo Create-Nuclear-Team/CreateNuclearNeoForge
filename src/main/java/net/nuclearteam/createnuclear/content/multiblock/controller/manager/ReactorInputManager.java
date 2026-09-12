@@ -138,15 +138,15 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 ItemStack stack = handler.getStackInSlot(s);
                 if (stack.isEmpty()) continue;
 
-                // On récupère le nom de l'item (ex: "uranium_rod")
+                // Get the item's name (e.g. "uranium_rod")
                 String registryPath = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-                // Comparaison intelligente : on ignore la casse et les underscores (_)
+                // Smart comparison: ignore case and underscores (_)
                 if (isMatching(registryPath, itemName)) {
-                    // On tente d'extraire 1 unité
+                    // Try to extract 1 unit
                     ItemStack extracted = handler.extractItem(s, 1, false);
 
-                    // Si l'extraction a réussi, on s'arrête là et on renvoie true
+                    // If the extraction succeeded, stop here and return true
                     if (!extracted.isEmpty()) {
                         return true;
                     }
@@ -154,11 +154,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-        return false; // On n'a pas trouvé l'item demandé
+        return false; // The requested item wasn't found
     }
 
     /**
-     * Helper pour comparer "GraphiteRod" avec "graphite_rod"
+     * Helper to compare "GraphiteRod" with "graphite_rod"
      */
     private boolean isMatching(String registryPath, String configName) {
         String cleanPath = registryPath.replace("_", "").toLowerCase();

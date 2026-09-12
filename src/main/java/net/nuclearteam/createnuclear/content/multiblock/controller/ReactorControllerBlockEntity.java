@@ -74,7 +74,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     private int reactorSize = 0;
     private Direction reactorFacing = null;
-    // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
+    // positions are [xMin, xMax, yMin, yMax, zMin, zMax]
     private BoundingBox reactorPos;
 
 

@@ -152,9 +152,9 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
         int mode = context.sourceConfig().getInt("display_mode");
 
-        // Divergence assumee vs Forge, qui lit getConfiguredPattern().getOrCreateTag().getDouble("heat") :
-        // en 1.21 la chaleur vit dans le data component CNDataComponents.HEAT, et relire le tag NBT de la
-        // stack renvoie une copie defensive ou la valeur est toujours absente (elle valait donc 0 ici).
+        // Assumed divergence vs Forge, which reads getConfiguredPattern().getOrCreateTag().getDouble("heat"):
+        // in 1.21 heat lives in the CNDataComponents.HEAT data component, and re-reading the stack's NBT
+        // tag returns a defensive copy where the value is always absent (so it was 0 here).
         int heat = controller.getConfiguredPatternHeat();
         int fuel = 0;
         int cooler = 0;

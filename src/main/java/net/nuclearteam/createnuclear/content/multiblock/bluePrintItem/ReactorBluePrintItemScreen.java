@@ -42,7 +42,7 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
         BG.render(guiGraphics, x+23, y-19);
         renderPlayerInventory(guiGraphics, x+23, y+175);
 
-        guiGraphics.drawString(font, title, x+26, y-12, 0x592424, false); //ici pour le titre
+        guiGraphics.drawString(font, title, x+26, y-12, 0x592424, false); //here for the title
 
     }
 

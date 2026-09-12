@@ -11,7 +11,7 @@ public class CRods extends ConfigBase {
     public final ConfigInt uraniumHeatRatio = i(2, -10, 10, "Heat ratio for uranium rods", Comments.warning, Comments.uraniumHeatRatio);
 
     public final ConfigInt graphiteRodLifetime = i(3600, 100, 5000, "graphite_rod_lifetime_ticks", Comments.graphiteRodLifetime, Comments.hintTick);
-    // the proximity value of coolant items are divisions so if the heat of the fuel is 64, the calcul will be "heat + 64/-4"
+    // the proximity value of coolant items are divisions so if the heat of the fuel is 64, the calculation will be "heat + 64/-4"
     public final ConfigFloat graphiteProximityMalus = f(-0.25f, -70, 70, "graphite_proximity_penalty", Comments.warning, Comments.graphiteProximityMalus);
     public final ConfigInt graphiteBaseValue = i(-32, -50, 50, "graphite_base_value", Comments.warning, Comments.graphiteBaseValue);
     public final ConfigInt graphiteHeatRatio = i(1, -10, 10, "Heat ratio for graphite rods", Comments.warning, Comments.graphiteHeatRatio);

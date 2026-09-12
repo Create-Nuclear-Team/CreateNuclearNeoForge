@@ -97,19 +97,7 @@ Le style du projet est très majoritairement en anglais.
 
 | Fichier:ligne | Extrait | Priorité |
 |---|---|---|
-| `content/multiblock/input/fluid/ReactorFluidInputEntity.java:55,91,101` | Javadoc « Capacité du tank en fonction de la taille du réacteur (tier) », plus deux notes d'incertitude technique liées à la migration (« Pensez à passer registries si requis par la v1.20+... », « Pareil ici selon l'implémentation de SmartFluidTank ») — cf. §4. | 🟠 |
-| `content/multiblock/controller/manager/ReactorAlarmManagerI.java:9-10` | Javadoc en français **et mal formée** (`/** * Retourne une copie immuable...`, astérisque en trop sur la première ligne). | 🟡 |
-| `content/multiblock/input/fluid/ReactorFluidInput.java:91` | « Convertit le vieux InteractionResult en ItemInteractionResult si nécessaire pour NeoForge » — cf. §4. | 🟡 |
-| `content/multiblock/controller/manager/ReactorInputManager.java:138,143,146,154,158` | « On récupère le nom de l'item », « On tente d'extraire 1 unité », « Si l'extraction a réussi... », « On n'a pas trouvé l'item demandé », Javadoc « Helper pour comparer "GraphiteRod" avec "graphite_rod" ». | 🟢 |
-| `content/redstone/displayLink/source/ReactorSummaryDisplaySource.java:157-159` | Commentaire de 3 lignes « Divergence assumee vs Forge, qui lit... ». | 🟢 |
-| `content/redstone/displayLink/source/HeatDisplaySource.java:28-29` | « En 1.21 la chaleur vit dans le data component... relire le tag NBT de la stack renvoie une copie defensive ». | 🟢 |
-| `net/nuclearteam/createnuclear/CNDisplaySources.java:20-24` | Javadoc « Divergence assumee vs Forge : en 1.21 Registrate type ses entrees... ». | 🟢 |
-| `content/multiblock/controller/manager/ReactorAlarmManager.java:48` | « On ne supprime pas si le chunk est juste déchargé » (dernier commentaire français restant du fichier). | 🟢 |
-| `content/multiblock/controller/ReactorControllerBlockEntity.java:90` | « les pos sont [xMin, xMax, yMin, yMax, zMin, zMax] ». | 🟢 |
-| `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:45` | `//ici pour le titre`. | 🟢 |
-| `foundation/ponder/CNPonderIndex.java:16` | « Reactor - Storyboards pour chaque taille ». | 🟢 |
 | `net/nuclearteam/createnuclear/CNSoundEvents.java:40,45,50,85,90` | Chemins de ressources en français : `create("reacteur/activation")`, `"reacteur/running"`, `"reacteur/shut_off"`, `"reacteur/assemble_deassemble/..."`. Impacte l'arborescence des assets, donc plus coûteux à renommer. | 🟢 |
-| `infrastructure/config/CRods.java:14` | Commentaire mélangeant anglais et français : « the calcul will be... » (« calcul » au lieu de « calculation »). | 🟢 |
 
 ### 2.2 Commentaires peu explicites ou ambigus
 
@@ -332,6 +320,18 @@ Points listés dans une version antérieure de cet audit, corrigés depuis et re
 | — | `content/multiblock/core/ReactorCoreEntity.java:11-23` | `tick()` ne faisait qu'un early-return conditionnel ; `countdownTicks`/`hasExploded` n'étaient jamais réellement pilotés — logique d'explosion du cœur inachevée. | L'override `tick()` et les deux champs ont été retirés ; `ReactorCoreEntity` ne fait plus qu'hériter du `tick()` de `ReactorCasingEntity` (aucune logique d'explosion propre pour l'instant, plutôt qu'une logique à moitié écrite). | 02/09/2026 |
 | — | `foundation/advancement/CNAdvancement.java:54` | `public static final CreateNuclearAdvancement START = null,` — première entrée nulle de la déclaration groupée, jamais référencée en tant que valeur. | **Voulu, pas un bug** : `START` est un marqueur de bornage lisible pour repérer le début de la longue déclaration groupée. Un `END = null` symétrique a été ajouté en toute fin de la même déclaration (après `REACTOR_FRAME`) pour marquer la fin du groupe. | 02/09/2026 |
 | — | `foundation/utility/RenderHelper.java:13-15,36-38` | `lastAlpha`, `lastCoverage`, `lastFirstPerson` : champs de « cache » assignés à chaque appel mais jamais relus. | Champs supprimés. | 02/09/2026 |
+| — | `content/multiblock/input/fluid/ReactorFluidInputEntity.java:55,91,101` | Javadoc « Capacité du tank en fonction de la taille du réacteur (tier) », plus deux notes d'incertitude technique liées à la migration (« Pensez à passer registries si requis par la v1.20+... », « Pareil ici selon l'implémentation de SmartFluidTank »). | Traduit en anglais. | 12/09/2026 |
+| — | `content/multiblock/controller/manager/ReactorAlarmManagerI.java:9-10` | Javadoc en français **et mal formée** (`/** * Retourne une copie immuable...`, astérisque en trop sur la première ligne). | Traduite en anglais et reformatée (astérisque en trop retiré). | 12/09/2026 |
+| — | `content/multiblock/input/fluid/ReactorFluidInput.java:91` | « Convertit le vieux InteractionResult en ItemInteractionResult si nécessaire pour NeoForge ». | Traduit en anglais. | 12/09/2026 |
+| — | `content/multiblock/controller/manager/ReactorInputManager.java:138,143,146,154,158` | « On récupère le nom de l'item », « On tente d'extraire 1 unité », « Si l'extraction a réussi... », « On n'a pas trouvé l'item demandé », Javadoc « Helper pour comparer "GraphiteRod" avec "graphite_rod" ». | Traduits en anglais. | 12/09/2026 |
+| — | `content/redstone/displayLink/source/ReactorSummaryDisplaySource.java:157-159` | Commentaire de 3 lignes « Divergence assumee vs Forge, qui lit... ». | Traduit en anglais. | 12/09/2026 |
+| — | `content/redstone/displayLink/source/HeatDisplaySource.java:28-29` | « En 1.21 la chaleur vit dans le data component... relire le tag NBT de la stack renvoie une copie defensive ». | Traduit en anglais. | 12/09/2026 |
+| — | `net/nuclearteam/createnuclear/CNDisplaySources.java:20-24` | Javadoc « Divergence assumee vs Forge : en 1.21 Registrate type ses entrees... ». | Traduit en anglais. | 12/09/2026 |
+| — | `content/multiblock/controller/manager/ReactorAlarmManager.java:48` | « On ne supprime pas si le chunk est juste déchargé » (dernier commentaire français restant du fichier). | Traduit en anglais. | 12/09/2026 |
+| — | `content/multiblock/controller/ReactorControllerBlockEntity.java:90` | « les pos sont [xMin, xMax, yMin, yMax, zMin, zMax] ». | Traduit en anglais. | 12/09/2026 |
+| — | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:45` | `//ici pour le titre`. | Traduit en anglais. | 12/09/2026 |
+| — | `foundation/ponder/CNPonderIndex.java:16` | « Reactor - Storyboards pour chaque taille ». | Traduit en anglais. | 12/09/2026 |
+| — | `infrastructure/config/CRods.java:14` | Commentaire mélangeant anglais et français : « the calcul will be... » (« calcul » au lieu de « calculation »). | Corrigé (« calculation »). | 12/09/2026 |
 | — | `net/nuclearteam/createnuclear/CNRecipeTypes.java:45,61,71,76` | Champ `isProcessingRecipe` assigné à 3 endroits mais jamais lu. | Supprimé. | 02/09/2026 |
 | — | `content/effects/VicinityEffect.java:22` | Paramètre constructeur `Consumer<Integer> timer` jamais stocké ni utilisé. | Paramètre supprimé du constructeur. | 02/09/2026 |
 | — | `content/multiblock/IHeat.java:28,37-41` | Champ `intColor` et son constructeur `HeatLevel(int, int)` jamais utilisés. | Supprimés. | 02/09/2026 |

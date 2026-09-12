@@ -13,7 +13,7 @@ public class CNPonderIndex {
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         PonderSceneRegistrationHelper<ItemProviderEntry<?, ?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
-        // Reactor - Storyboards pour chaque taille
+        // Reactor - Storyboards for each size
         HELPER.forComponents(CNBlocks.REACTOR_CONTROLLER)
                 .addStoryBoard("reactor/reactor_t1_ponder", CNPonderReactorScenes::t1)
                 .addStoryBoard("reactor/reactor_t2_ponder", CNPonderReactorScenes::t2)

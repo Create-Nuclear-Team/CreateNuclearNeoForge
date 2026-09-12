@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
-    /** Capacité par défaut tant que l'input n'est rattaché à aucun réacteur assemblé. */
+    /** Default capacity while this input isn't attached to any assembled reactor. */
     public static final int DEFAULT_CAPACITY = 16000;
 
     private final FluidTank internalTank;
@@ -52,7 +52,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     }
 
     /**
-     * Capacité du tank en fonction de la taille du réacteur (tier).
+     * Tank capacity based on the reactor size (tier).
      * 5x5 -> tier 1, 7x7 -> tier 2, 9x9 -> tier 3.
      */
     public static int getCapacityForReactorSize(int reactorSize) {
@@ -88,7 +88,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(tag, registries, clientPacket);
-        CompoundTag tankTag = internalTank.writeToNBT(registries, new CompoundTag()); // Pensez à passer registries si requis par la v1.20+ pour les tanks, ou conservez new CompoundTag() selon votre version
+        CompoundTag tankTag = internalTank.writeToNBT(registries, new CompoundTag()); // Remember to pass registries if required by v1.20+ for tanks, or keep new CompoundTag() depending on your version
         tag.put("tank", tankTag);
         tag.putInt("capacity", internalTank.getCapacity());
     }
@@ -98,7 +98,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         super.read(tag, registries, clientPacket);
         if (tag.contains("capacity"))
             internalTank.setCapacity(tag.getInt("capacity"));
-        internalTank.readFromNBT(registries, tag.getCompound("tank")); // Pareil ici selon l'implémentation de SmartFluidTank
+        internalTank.readFromNBT(registries, tag.getCompound("tank")); // Same here, depending on SmartFluidTank's implementation
 
         if (tag.contains("ForceFluidLevel") || fluidLevel == null)
             fluidLevel = LerpedFloat.linear()

@@ -45,7 +45,7 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
 
         for (BlockPos offset : positions) {
             BlockPos p = controllerPos.offset(offset);
-            if (!level.isLoaded(p)) continue; // On ne supprime pas si le chunk est juste déchargé
+            if (!level.isLoaded(p)) continue; // Don't remove if the chunk is just unloaded
 
             BlockEntity be = level.getBlockEntity(p);
             if (be == null || !(be instanceof ReactorAlarmEntity)) {
