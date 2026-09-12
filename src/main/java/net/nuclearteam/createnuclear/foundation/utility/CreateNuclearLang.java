@@ -35,19 +35,9 @@ public class CreateNuclearLang extends Lang {
         return new LangBuilder(CreateNuclear.MOD_ID);
     }
 
-    public static LangBuilder blockName(BlockState state) {
-        return builder().add(state.getBlock()
-                .getName());
-    }
-
     public static LangBuilder itemName(ItemStack stack) {
         return builder().add(stack.getHoverName()
-                .copy());
-    }
-
-    public static LangBuilder fluidName(FluidStack stack) {
-        return builder().add(stack.getHoverName()
-                .copy());
+            .copy());
     }
 
     public static LangBuilder number(double d) {
@@ -56,9 +46,5 @@ public class CreateNuclearLang extends Lang {
 
     public static LangBuilder translate(String langKey, Object... args) {
         return builder().translate(langKey, args);
-    }
-
-    public static LangBuilder text(String text) {
-        return builder().text(text);
     }
 }

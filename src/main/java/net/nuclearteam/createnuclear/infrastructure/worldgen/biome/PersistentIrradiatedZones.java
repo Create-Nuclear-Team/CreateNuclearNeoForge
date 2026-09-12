@@ -37,10 +37,6 @@ public class PersistentIrradiatedZones extends SavedData {
         if (changed) setDirty();
     }
 
-    public boolean isInsideAnyZone(BlockPos pos) {
-        return chunks.contains(new ChunkPos(pos));
-    }
-
     public boolean containsChunk(ChunkPos pos) {
         return chunks.contains(pos);
     }

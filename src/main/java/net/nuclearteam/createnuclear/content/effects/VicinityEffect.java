@@ -16,6 +16,8 @@ public abstract class VicinityEffect extends MobEffect {
     private final UnaryOperator<Integer> areaSize;
     private final Predicate<LivingEntity> filter;
 
+    private long lastCleanup = 0L;
+
     // Stores the GameTime tick when the cooldown expires for each entity
     private final Map<UUID, Long> cooldowns = new HashMap<>();
 
@@ -30,10 +32,15 @@ public abstract class VicinityEffect extends MobEffect {
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         long currentTime = entity.level().getGameTime();
 
+        if (currentTime - lastCleanup > 1200) {
+            cooldowns.values().removeIf(expiry -> expiry < currentTime);
+            lastCleanup = currentTime;
+        }
+
         List<Entity> nearbyEntities = entity.level().getEntities(
-                entity,
-                entity.getBoundingBox().inflate(areaSize.apply(amplifier)),
-                e -> e instanceof LivingEntity target && filter.test(target)
+            entity,
+            entity.getBoundingBox().inflate(areaSize.apply(amplifier)),
+            e -> e instanceof LivingEntity target && filter.test(target)
         );
 
         for (Entity nearbyEntity : nearbyEntities) {

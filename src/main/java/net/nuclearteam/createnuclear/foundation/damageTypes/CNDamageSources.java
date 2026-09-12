@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.damagesTypes;
+package net.nuclearteam.createnuclear.foundation.damageTypes;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -23,15 +23,5 @@ public class CNDamageSources {
     private static DamageSource source(ResourceKey<DamageType> key, LevelReader level) {
         Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         return new DamageSource(registry.getHolderOrThrow(key));
-    }
-
-    private static DamageSource source(ResourceKey<DamageType> key, LevelReader level, @Nullable Entity entity) {
-        Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        return new DamageSource(registry.getHolderOrThrow(key), entity);
-    }
-
-    private static DamageSource source(ResourceKey<DamageType> key, LevelReader level, @Nullable Entity causingEntity, @Nullable Entity directEntity) {
-        Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        return new DamageSource(registry.getHolderOrThrow(key), causingEntity, directEntity);
     }
 }

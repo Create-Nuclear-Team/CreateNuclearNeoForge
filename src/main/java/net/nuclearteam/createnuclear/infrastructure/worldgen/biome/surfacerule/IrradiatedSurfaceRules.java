@@ -63,10 +63,6 @@ public class IrradiatedSurfaceRules {
         return SurfaceRules.state(block.defaultBlockState());
     }
 
-    public static @NotNull ConditionSource biome(@NotNull TagKey<Biome> biome) {
-        return new BiomeTagRule(biome);
-    }
-
     @SafeVarargs
     public static @NotNull ConditionSource biome(@NotNull ResourceKey<Biome> @NotNull ... keys) {
         return SurfaceRules.isBiome(keys);

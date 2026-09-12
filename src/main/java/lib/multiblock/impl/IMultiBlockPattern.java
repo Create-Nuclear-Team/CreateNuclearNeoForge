@@ -19,15 +19,7 @@ public interface IMultiBlockPattern {
         return matches(level, pos, Util.DirectionToRotation(direction));
     }
 
-    default boolean matches(Level level, BlockPos pos) {
-        return matches(level, pos, Rotation.NONE);
-    }
-
     default MultiblockMatchResult matchesWithResult(Level level, BlockPos pos, Direction direction){
         return matchesWithResult(level, pos, Util.DirectionToRotation(direction));
-    }
-
-    default MultiblockMatchResult matchesWithResult(Level level, BlockPos pos) {
-        return matchesWithResult(level, pos, Rotation.NONE);
     }
 }

@@ -57,18 +57,6 @@ public class BigFluidStack {
             .getOrThrow();
     }
 
-    public boolean isInfinite() {
-        return amount >= INF;
-    }
-
-    public static BigFluidStack receive(RegistryFriendlyByteBuf buffer) {
-        return new BigFluidStack(FluidStack.STREAM_CODEC.decode(buffer), buffer.readVarInt());
-    }
-
-    public static Comparator<? super BigFluidStack> comparator() {
-        return (i1, i2) -> Integer.compare(i2.amount, i1.amount);
-    }
-
     @Override
     public boolean equals(final Object obj) {
         if (obj == this)
@@ -90,13 +78,6 @@ public class BigFluidStack {
     @Override
     public String toString() {
         return "(" + stack.getHoverName().getString() + " x" + amount + ")";
-    }
-
-    public static List<BigFluidStack> duplicateWrappers(List<BigFluidStack> list) {
-        List<BigFluidStack> copy = new ArrayList<>();
-        for (BigFluidStack bigFluidStack : list)
-            copy.add(new BigFluidStack(bigFluidStack.stack, bigFluidStack.amount));
-        return copy;
     }
 
     public ReactorFluidType getFluidtype(@Nullable Level level) {

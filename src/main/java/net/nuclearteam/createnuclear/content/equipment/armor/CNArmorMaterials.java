@@ -68,12 +68,6 @@ public class CNArmorMaterials {
         ARMOR_MATERIALS.register(eventBus);
     }
 
-    public static int durabilityForType(Type type) {
-        int[] BASE_DURABILITY = {11, 16, 15, 13};
-        int durabilityMultiplier = 15;
-        return BASE_DURABILITY[type.ordinal()] * durabilityMultiplier;
-    }
-
     public static <T extends Item, P> NonNullUnaryOperator<ItemBuilder<T, P>> setArmorDurability(Type type, int factor) {
         return b -> b.properties(p -> p.durability(type.getDurability(factor)));
     }

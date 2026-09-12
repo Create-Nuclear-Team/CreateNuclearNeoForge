@@ -280,17 +280,6 @@ public class IrradiatedCat extends TamableAnimal {
         }
     }
 
-    @SuppressWarnings("null")
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
-        boolean bl = level.getMoonBrightness() > 0.9F;
-        ServerLevel serverLevel = level.getLevel();
-        if (serverLevel.structureManager().getStructureWithPieceAt(this.blockPosition(), StructureTags.CATS_SPAWN_AS_BLACK).isValid()) {
-            this.setPersistenceRequired();
-        }
-
-        return spawnData;
-    }
 
     @SuppressWarnings("null")
     public InteractionResult mobInteract(Player player, InteractionHand hand) {

@@ -8,7 +8,7 @@ import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.nuclearteam.createnuclear.foundation.damagesTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
     private static final int CONTAGION_DURATION_TICKS = 300;
