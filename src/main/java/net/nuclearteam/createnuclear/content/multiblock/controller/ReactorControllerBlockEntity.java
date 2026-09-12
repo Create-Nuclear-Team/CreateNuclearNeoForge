@@ -50,7 +50,6 @@ import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
-@SuppressWarnings({ "unused" })
 public class ReactorControllerBlockEntity extends SmartBlockEntity
         implements IInteractionChecker, IHaveGoggleInformation, IMultiblockController {
 
@@ -154,10 +153,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.bigFluidStack;
     }
 
-    public void setBigFluidStack(List<BigFluidStack> b) {
-        this.bigFluidStack = b;
-    }
-
     public int getMultiblockSize() {
         return this.reactorSize;
     }
@@ -180,7 +175,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.advancement;
     }
 
-    /** Main constructor allowing dependency injection for testability and DIP compliance. */
+    /** @return the assembled reactor's world-space bounding box, or {@code null} before assembly. */
     public BoundingBox getMultiblockPos() {
         return this.reactorPos;
     }
@@ -520,6 +515,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     public void removeIOAll() {
         allManagers().forEach(m -> m.clearInvalid(level, getBlockPos()));
+        clearTimers();
         this.setChanged();
     }
 

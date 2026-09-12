@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * Abstract base providing common implementation for managing
  * positions used by IO managers (inputs / outputs).
- *
+ * <p>
  * This class holds a collection of `BlockPos` instances and exposes
  * basic operations (add, remove, contains, iteration via `resolveBlock`).
  * Serialization (`read`/`write`) and validation (`clearInvalid`) are
@@ -56,6 +56,18 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
     @Override
     public List<BlockPos> getBlocksPosition() {
         return List.copyOf(positions);
+    }
+
+    @Override
+    public <T> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type) {
+        List<BlockPos> result = new ArrayList<>();
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
+            if (level.isLoaded(p) && type.isInstance(level.getBlockEntity(p))) {
+                result.add(p);
+            }
+        }
+        return List.copyOf(result);
     }
 
     @Override

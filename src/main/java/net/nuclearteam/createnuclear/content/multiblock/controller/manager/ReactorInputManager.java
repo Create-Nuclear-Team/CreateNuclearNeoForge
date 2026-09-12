@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Manager for reactor input positions (`ReactorInput`).
  *
- * Serializes positions as x/y/z triplets and provides utilities to
+ * Serializes positions as packed longs and provides utilities to
  * obtain valid `IItemHandler` instances present at those positions.
  */
 public class ReactorInputManager extends AbstractReactorIOManager implements ReactorInputManagerI {
@@ -32,9 +32,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         ListTag list = new ListTag();
         for (BlockPos pos : positions) {
             CompoundTag tag = new CompoundTag();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
+            tag.putLong("p", pos.asLong());
             list.add(tag);
         }
         compound.put(NBT_KEY, list);
@@ -46,8 +44,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         if (!compound.contains(NBT_KEY)) return;
         ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
+            positions.add(BlockPos.of(list.getCompound(i).getLong("p")));
         }
     }
 
@@ -189,12 +186,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
 
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        List<BlockPos> result = new ArrayList<>();
+        return filterByType(level, controllerPos, ReactorRodInputEntity.class);
 
-        for (BlockPos offset : positions) {
-            BlockPos p = controllerPos.offset(offset);
-            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) result.add(p);
-        }
-        return List.copyOf(result);
     }
 }

@@ -198,7 +198,7 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
     }
 
     private MutableComponent formatSize(int size) {
-        String key = size <= 5 ? "small" : size <= 7 ? "medium" : "large";
+        String key = ReactorDisplayConstants.sizeTierKey(ReactorDisplayConstants.sizeTier(size));
         return CreateNuclearLang.translateDirect("display_source.reactor.size." + key).withStyle(ChatFormatting.BLUE);
     }
 

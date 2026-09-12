@@ -1,17 +1,9 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package net.nuclearteam.createnuclear.foundation.utility;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 public class Maths {
-    public Maths() {
-    }
-
     private static final SimplexNoise NOISE = new SimplexNoise(RandomSource.create(0));
 
     public static float smin(float a, float b, float k) {

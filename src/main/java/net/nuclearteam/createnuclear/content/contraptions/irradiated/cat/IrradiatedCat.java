@@ -3,7 +3,6 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated.cat;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -50,7 +49,7 @@ import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings({"unused", "deprecation"})
+@SuppressWarnings({"unused"})
 public class IrradiatedCat extends TamableAnimal {
     public static final double TEMPT_SPEED_MOD = 0.6;
     public static final double WALK_SPEED_MOD = 0.8;

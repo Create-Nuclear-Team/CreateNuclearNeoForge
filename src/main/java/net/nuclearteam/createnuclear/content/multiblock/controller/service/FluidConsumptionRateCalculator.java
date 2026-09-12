@@ -40,10 +40,6 @@ public class FluidConsumptionRateCalculator implements IFluidConsumptionRateCalc
 
         if (fluidBuffer >= 1.0) {
             int toExtract = (int) Math.floor(fluidBuffer);
-            // Known limitation in ReactorInputFluidManager#extractFluids: fluidNeeded is not
-            // decremented across multiple tracked input handlers, so each handler may drain up
-            // to toExtract independently (possible over-extraction with several inputs).
-            // Intentionally left untouched here; out of scope for this calculator.
             if (inputFluidManager.extractFluids(level, controllerPos, toExtract)) {
                 fluidBuffer -= toExtract;
             }

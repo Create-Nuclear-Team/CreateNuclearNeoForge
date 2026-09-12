@@ -15,10 +15,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.RequiredFieldsValidator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -164,13 +163,11 @@ public record ReactorFluidType(Holder<Fluid> fluid, int maxHeat, int efficiency,
          * @throws IllegalStateException if required fields are missing
          */
         public ReactorFluidType build() {
-            List<String> missing = new ArrayList<>();
-            if (fluid == null) missing.add("fluid");
-            if (!maxHeatSet) missing.add("maxHeat");
-            if (!efficiencySet) missing.add("efficiency");
-
-            if (!missing.isEmpty())
-                throw new IllegalStateException("Missing required ReactorFluidType fields: " + String.join(", ", missing));
+            new RequiredFieldsValidator()
+                .require(fluid != null, "fluid")
+                .require(maxHeatSet, "maxHeat")
+                .require(efficiencySet, "efficiency")
+                .validate("ReactorFluidType");
 
             return new ReactorFluidType(fluid, maxHeat, efficiency);
         }

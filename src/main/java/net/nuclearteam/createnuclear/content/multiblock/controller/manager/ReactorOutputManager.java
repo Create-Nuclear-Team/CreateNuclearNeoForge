@@ -68,13 +68,8 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      */
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        List<BlockPos> result = new ArrayList<>();
+        return filterByType(level, controllerPos, ReactorOutputManager.class);
 
-        for (BlockPos offset : positions) {
-            BlockPos p = controllerPos.offset(offset);
-            if (level.getBlockEntity(p) instanceof ReactorOutputEntity) result.add(p);
-        }
-        return List.copyOf(result);
     }
 
     /**

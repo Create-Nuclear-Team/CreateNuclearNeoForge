@@ -19,9 +19,7 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
         ListTag list = new ListTag();
         for (BlockPos pos : positions) {
             CompoundTag tag = new CompoundTag();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
+            tag.putLong("p", pos.asLong());
             list.add(tag);
         }
         compound.put(NBT_KEY, list);
@@ -33,8 +31,7 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
         if (!compound.contains(NBT_KEY)) return;
         ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
+            positions.add(BlockPos.of(list.getCompound(i).getLong("p")));
         }
     }
 
@@ -57,15 +54,6 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
 
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        if (level == null) return List.of();
-
-        List<BlockPos> validPositions = new ArrayList<>();
-        for (BlockPos offset : positions) {
-            BlockPos p = controllerPos.offset(offset);
-            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof ReactorAlarmEntity) {
-                validPositions.add(p);
-            }
-        }
-        return List.copyOf(validPositions);
+        return filterByType(level, controllerPos, ReactorAlarmManager.class);
     }
 }

@@ -45,13 +45,13 @@ public class ItemRodTypesValue {
      * parameters and registers it for the item passed to the consumer.
      *
      * The {@code type} parameter controls whether the builder configures the
-     * rod as a cooler, fuel or keeps the default mixed behaviour. For MIXTE
+     * rod as a cooler, fuel or keeps the default mixed behaviour. For NONE
      * we keep the builder default and do not call any explicit setter.
      *
      * @param baseRodHeat base heat value
      * @param proximityRodHeat heat influenced by proximity
      * @param rodTimer rod life / timer value
-     * @param type enum controlling cooler/fuel/mixte behaviour (must not be null)
+     * @param type enum controlling cooler/fuel/none behaviour (must not be null)
      * @return a non-null consumer that registers the built RodType
      * @throws NullPointerException if {@code type} is null
      */
@@ -64,7 +64,7 @@ public class ItemRodTypesValue {
         switch (type) {
             case COOLER -> builder.coolerRodType();
             case FUEL -> builder.fuelRodType();
-            default -> throw new IllegalArgumentException("Unsupported TypeRod: " + type + ". This error occurred during rod stats initialization in the CreateNuclearForge mod.");
+            default -> throw new IllegalArgumentException("Unsupported TypeRod: " + type + ". This error occurred during rod stats initialization in the CreateNuclearNeoForge mod.");
         }
 
         return item -> {

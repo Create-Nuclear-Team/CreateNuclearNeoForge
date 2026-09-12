@@ -137,14 +137,10 @@ public class RadiationCapability {
     private static double computeItemRadiation(Player player) {
         double radiation = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof IRadiationSource source)
-                radiation += source.getRadiation(stack, player);
-            radiation += RadiationRegistry.getRadiation(stack, player);
+            radiation += getStackRadiation(stack, player);
         }
         for (ItemStack stack : player.getInventory().offhand) {
-            if (stack.getItem() instanceof IRadiationSource source)
-                radiation += source.getRadiation(stack, player);
-            radiation += RadiationRegistry.getRadiation(stack, player);
+            radiation += getStackRadiation(stack, player);
         }
         return radiation;
     }

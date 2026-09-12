@@ -28,15 +28,6 @@ public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
         );
     }
 
-    protected GeneratedRecipe itemApplication(String name, Item ingredient, ItemLike input, ItemLike output) {
-        return create(CreateNuclear.asResource(name), b ->
-            b.require(input)
-                .require(ingredient)
-                .output(output)
-        );
-    }
-
-
     public CNItemApplicationRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, CreateNuclear.MOD_ID);
     }

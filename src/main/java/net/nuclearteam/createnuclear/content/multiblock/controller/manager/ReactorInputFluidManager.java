@@ -33,9 +33,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         ListTag list = new ListTag();
         for (BlockPos pos : positions) {
             CompoundTag tag = new CompoundTag();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
+            tag.putLong("p", pos.asLong());
             list.add(tag);
         }
         compound.put(NBT_KEY, list);
@@ -51,8 +49,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         if (!compound.contains(NBT_KEY)) return;
         ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
+            positions.add(BlockPos.of(list.getCompound(i).getLong("p")));
         }
     }
 
@@ -88,13 +85,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
      */
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        List<BlockPos> result = new ArrayList<>();
-
-        for (BlockPos offset : positions) {
-            BlockPos p = controllerPos.offset(offset);
-            if (level.getBlockEntity(p) instanceof ReactorFluidInputEntity) result.add(p);
-        }
-        return List.copyOf(result);
+        return filterByType(level, controllerPos, ReactorFluidInputEntity.class);
     }
 
     /**

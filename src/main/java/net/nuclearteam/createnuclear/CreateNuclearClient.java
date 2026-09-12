@@ -10,7 +10,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 import net.nuclearteam.createnuclear.foundation.utility.ClothTagHelper;
@@ -24,8 +23,6 @@ public class CreateNuclearClient {
     }
 
     public static void onCtorClient(IEventBus modEventBus) {
-        IEventBus neoEventBus = NeoForge.EVENT_BUS;
-
         modEventBus.addListener(CreateNuclearClient::clientInit);
     }
 

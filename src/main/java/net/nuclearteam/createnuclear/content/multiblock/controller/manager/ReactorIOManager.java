@@ -40,6 +40,8 @@ public interface ReactorIOManager {
     /** Returns an immutable copy of the tracked relative offsets. */
     List<BlockPos> getBlocksPosition();
 
+    <T> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type);
+
     /**
      * Resolves every tracked offset to its current world position, given the
      * controller's current {@code controllerPos}.
