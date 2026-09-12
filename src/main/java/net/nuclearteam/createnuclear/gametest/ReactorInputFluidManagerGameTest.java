@@ -46,7 +46,7 @@ import java.util.List;
  * ({@code helper.absolutePos(BlockPos.ZERO)}) stands in for the controller's
  * position: the structure-relative {@code rel} positions used throughout are
  * added to the manager as-is (already relative offsets from that origin), and
- * every {@link Level}-touching call passes {@link #controllerPos(GameTestHelper)}.
+ * every {@link net.minecraft.world.level.Level}-touching call passes {@link #controllerPos(GameTestHelper)}.
  * <p>
  * Tests named "*_expectedContract" cover the two extractFluids defects fixed on both branches:
  * fluidNeeded was never decremented between handlers (so a request of 10 units drained 10 from

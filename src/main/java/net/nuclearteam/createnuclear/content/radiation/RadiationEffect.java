@@ -22,7 +22,7 @@ public class RadiationEffect extends VicinityEffect {
             amplifier -> 10,
             RadiationCapability::canBeIrradiated); // Custom color (hex value)
 
-        // Reduces movement speed by 20%
+
         this.addAttributeModifier(
             Attributes.MOVEMENT_SPEED,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_movement_speed"),
@@ -30,7 +30,6 @@ public class RadiationEffect extends VicinityEffect {
             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
 
-        // Reduces attack damage by 20%
         this.addAttributeModifier(
             Attributes.ATTACK_DAMAGE,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_attack_damage"),
@@ -38,7 +37,6 @@ public class RadiationEffect extends VicinityEffect {
             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
 
-        // Reduces attack speed by 20%
         this.addAttributeModifier(
             Attributes.ATTACK_SPEED,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_attack_speed"),

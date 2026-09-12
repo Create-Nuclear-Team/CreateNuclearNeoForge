@@ -17,34 +17,18 @@ import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReact
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manager that tracks fluid input blocks for a reactor.
+ * Responsible for serializing tracked positions, validating
+ * handlers, reporting aggregated inventory and extracting fluids.
+ */
 public class ReactorInputFluidManager extends AbstractReactorIOManager implements ReactorInputFluidManagerI {
     private static final String NBT_KEY = "ReactorInputFluid";
 
     /**
-     * Manager that tracks fluid input blocks for a reactor.
-     * Responsible for serializing tracked positions, validating
-     * handlers, reporting aggregated inventory and extracting fluids.
-     */
-
-    @Override
-    /**
-     * Read tracked positions from NBT data.
-     * Existing positions are cleared before reading.
-     */
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
-        }
-    }
-
-    @Override
-    /**
      * Write tracked positions to the provided NBT compound.
      */
+    @Override
     public void write(CompoundTag compound) {
         ListTag list = new ListTag();
         for (BlockPos pos : positions) {
@@ -57,10 +41,25 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         compound.put(NBT_KEY, list);
     }
 
+    /**
+     * Read tracked positions from NBT data.
+     * Existing positions are cleared before reading.
+     */
     @Override
+    public void read(CompoundTag compound) {
+        positions.clear();
+        if (!compound.contains(NBT_KEY)) return;
+        ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); ++i) {
+            CompoundTag tag = list.getCompound(i);
+            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
+        }
+    }
+
     /**
      * Remove any tracked positions that are no longer valid in the given level.
      */
+    @Override
     public void clearInvalid(Level level, BlockPos controllerPos) {
         List<BlockPos> toRemove = new ArrayList<>();
         for (BlockPos offset : positions) {
@@ -83,11 +82,11 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         positions.removeAll(toRemove);
     }
 
-    @Override
     /**
      * Return an immutable list of tracked block positions that correspond
      * to fluid input entities in the given level.
      */
+    @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
         List<BlockPos> result = new ArrayList<>();
 
@@ -98,10 +97,10 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         return List.copyOf(result);
     }
 
-    @Override
     /**
      * Collect and return fluid handler capabilities for all tracked positions.
      */
+    @Override
     public List<IFluidHandler> getFuildHandlers(Level level, BlockPos controllerPos) {
         List<IFluidHandler> handlers = new ArrayList<>();
         for (BlockPos offset : new ArrayList<>(positions)) {
@@ -118,10 +117,10 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         return handlers;
     }
 
-    @Override
     /**
      * Build and return a virtual aggregated inventory of all input fluids.
      */
+    @Override
     public VirtualReactorInputFluid getInventory(Level level, BlockPos controllerPos) {
         VirtualReactorInputFluid virtualReactorInputFluid = new VirtualReactorInputFluid();
         List<IFluidHandler> handlers = this.getFuildHandlers(level, controllerPos);

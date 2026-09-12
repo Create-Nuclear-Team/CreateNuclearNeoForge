@@ -26,10 +26,10 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
 
     /**
      * Returns the fluid currently held by the reactor, used by the frame
-     * renderer to draw the matching liquid in the window. On the client this
-     * reads the synced ; on the server it reads the
-     * aggregated . Returns {@link FluidStack#EMPTY} when
-     * the reactor holds no fluid.
+     * renderer to draw the matching liquid in the window. Aggregates the fluid
+     * input handlers' tanks (synced to the client via the controller's block
+     * entity data) and returns the first non-empty stack found. Returns
+     * {@link FluidStack#EMPTY} when the reactor holds no fluid.
      * <p>
      * Recomputes, at most once per game tick, the fluid shown in the frame
      * windows and how full the input is. Both values are read from the same live

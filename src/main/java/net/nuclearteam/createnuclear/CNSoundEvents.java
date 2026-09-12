@@ -35,17 +35,17 @@ public class CNSoundEvents {
 
     public static final SoundEntry
 
-        REACTOR_ACTIVATION = create("reacteur/activation")
+        REACTOR_ACTIVATION = create("reactor/activation")
             .subtitle("Reactor Activation")
             .category(SoundSource.BLOCKS)
             .build(),
 
-        REACTOR_RUNNING = create("reacteur/running")
+        REACTOR_RUNNING = create("reactor/running")
             .subtitle("Reactor Running")
             .category(SoundSource.BLOCKS)
             .build(),
 
-        REACTOR_SHUT_OFF = create("reacteur/shut_off")
+        REACTOR_SHUT_OFF = create("reactor/shut_off")
             .subtitle("Reactor Shut Off")
             .category(SoundSource.BLOCKS)
             .build(),
@@ -80,12 +80,12 @@ public class CNSoundEvents {
             .category(SoundSource.AMBIENT)
             .build(),
 
-        MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
+        MOTOR_ASSEMBLE = create("reactor/assembly_disassembly/motor_assemble")
             .subtitle("Motor Assemble")
             .category(SoundSource.BLOCKS)
             .build(),
 
-        MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
+        MOTOR_DISASSEMBLE = create("reactor/assembly_disassembly/motor_disassemble")
             .subtitle("Motor Disassemble")
             .category(SoundSource.BLOCKS)
             .build(),
@@ -426,7 +426,5 @@ public class CNSoundEvents {
 
         private record CompiledSoundEvent(DeferredHolder<SoundEvent, SoundEvent> event, float volume, float pitch) {
         }
-
     }
-
 }

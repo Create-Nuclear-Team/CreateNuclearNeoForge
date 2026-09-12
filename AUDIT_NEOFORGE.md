@@ -101,23 +101,13 @@ Le style du projet est très majoritairement en anglais.
 
 ### 2.2 Commentaires peu explicites ou ambigus
 
-| Fichier:ligne | Détail | Priorité |
-|---|---|---|
-| `foundation/events/CommentEvents.java` | Le nom de la classe ne correspond à rien de son contenu (elle enregistre des recettes de brassage, des capacités, des modificateurs d'attribut d'entité — rien à voir avec des « commentaires ») ; vraisemblablement une coquille pour `CommonEvents`. | 🟢 |
-| `infrastructure/config/CExplode.java:8` | Commentaire « Duration before exploration » (coquille pour « explosion »). | 🟢 |
+Aucune entrée ouverte pour le moment ; voir §8 pour l'historique (`CExplode.java` a été supprimé entièrement, cf. §8).
 
 *(Le commentaire `@goshante` de `CreateNuclearJEI`, listé ici précédemment, a disparu avec le bloc mort qu'il annotait, supprimé dans l'arbre de travail local ; voir §8.)*
 
 ### 2.3 Javadocs incomplètes ou non standard
 
-| Fichier:ligne | Détail | Priorité |
-|---|---|---|
-| `content/multiblock/controller/manager/ReactorInputFluidManager.java:30,45,61,87,102,122` | Javadoc placée **après** `@Override` au lieu d'avant, sur 6 méthodes (`read`, `write`, `clearInvalid`, `getBlocksPosition`, `getFuildHandlers`, `getInventory`) — non reconnue par l'outillage Javadoc standard. C'est le **seul fichier du projet** encore concerné. | 🟡 |
-| `content/multiblock/MultiblockHelpers.java:42-45` | Javadoc placée **à l'intérieur** du corps de `getControllerForPart` (l.41) au lieu d'être au-dessus de la signature. | 🟢 |
-| `content/multiblock/rod/CNRodTypes.java:12-33` | Javadoc utile mais mal placée : elle documente la classe et `RodType.Builder` en général, alors qu'elle est apposée sur la méthode `bootstrap()`. | 🟢 |
-| `content/radiation/RadiationEffect.java:26,34,42` | Commentaires inline répétant littéralement le code (`// Reduces movement speed by 20%` juste au-dessus de la ligne qui applique `-0.2D`). | 🟢 |
-| `content/multiblock/controller/manager/ReactorFrameDisplayManager.java:29-31` | Javadoc tronqué : *« On the client this reads the synced ; on the server it reads the aggregated. »* — les mots attendus après « synced » et « aggregated » manquent. | 🟡 |
-| `gametest/ReactorInputFluidManagerGameTest.java:49` | Javadoc de classe contenant `{@link Level}` sans import de `Level` dans le fichier — référence Javadoc non résolue. | 🟢 |
+Aucune entrée ouverte pour le moment ; voir §8 pour l'historique des corrections de cette section.
 
 ### 2.4 Commentaires devenus obsolètes
 
@@ -273,7 +263,7 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 - Paramètre `coverage` mort dans `RenderHelper.renderOverlay` (mis de côté, pas d'action prévue).
 - Commentaires français restants sans impact joueur (`ReactorInputManager`, `ReactorAlarmManager:47`, display sources, `CNDisplaySources`, `CNPonderIndex`, `ReactorBluePrintItemScreen`, `ReactorControllerBlockEntity:90`, `RadiationCapability.radiation_desactive`, `CRods`) et chemins de sons `"reacteur/..."`.
-- Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`, `ReactorInputFluidManagerGameTest`), commentaires paraphrasant le code (`RadiationEffect`), bandeau décompilateur obsolète (`Maths.java`), noms de classe trompeurs (`CommentEvents`), référence au nom pré-migration du projet dans `ItemRodTypesValue`.
+- Javadoc mal placée (`MultiblockHelpers`, `CNRodTypes`, `ReactorInputFluidManagerGameTest`), commentaires paraphrasant le code (`RadiationEffect`), bandeau décompilateur obsolète (`Maths.java`), noms de classe trompeurs (`CommonEvents`), référence au nom pré-migration du projet dans `ItemRodTypesValue`.
 - Duplications mineures : NBT des managers, verrous de fluide, builders `RodType`/`ReactorFluidType`, `isFood` poulet/loup, textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, variables `globalNotifyPos`/`globalExplosionPos` identiques dans `ReactorMeltdownExecutor`, générateurs de recettes `create(...)` (Crushing/Washing), trio ingot/nugget `CNItems`, `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput), surcharges jumelles dans `CNDeployingRecipeGen`/`CNItemApplicationRecipeGen`.
 - Dead code mineur : nombreuses méthodes/constructeurs sans appelant recensés en §1.2/§1.3/§1.4 (constantes `CNGuiTextures`, champs `PaletteBlockPattern`/`CNPaletteStoneTypes`, variables locales diverses), et les deux imports inutilisés restants en §1.5 (`ReactorFluidType`, `IrradiatedSurfaceRules`) — la quinzaine d'autres relevés lors de la deuxième passe complète a été nettoyée le 12/09/2026 (non commité, cf. §8).
 - Refactors cosmétiques : paramètres décompilés MCP non renommés (`CNAdvancedModelBox`, `CNTabulaModelRenderUtils`), variable masquant le nom de sa classe (`CNBasicModelPart`).
@@ -332,6 +322,13 @@ Points listés dans une version antérieure de cet audit, corrigés depuis et re
 | — | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java:45` | `//ici pour le titre`. | Traduit en anglais. | 12/09/2026 |
 | — | `foundation/ponder/CNPonderIndex.java:16` | « Reactor - Storyboards pour chaque taille ». | Traduit en anglais. | 12/09/2026 |
 | — | `infrastructure/config/CRods.java:14` | Commentaire mélangeant anglais et français : « the calcul will be... » (« calcul » au lieu de « calculation »). | Corrigé (« calculation »). | 12/09/2026 |
+| — | `content/multiblock/controller/manager/ReactorInputFluidManager.java:30,45,61,87,102,122` | Javadoc placée **après** `@Override` au lieu d'avant, sur 6 méthodes (`read`, `write`, `clearInvalid`, `getBlocksPosition`, `getFuildHandlers`, `getInventory`) — non reconnue par l'outillage Javadoc standard. | Déjà corrigée dans l'état actuel du code (Javadoc replacée avant `@Override` sur les 6 méthodes). | 12/09/2026 |
+| — | `content/multiblock/MultiblockHelpers.java:42-45` | Javadoc placée **à l'intérieur** du corps de `getControllerForPart` (l.41) au lieu d'être au-dessus de la signature. | Déjà corrigée pour `getControllerForPart`. En corrigeant, un problème similaire a été repéré : le Javadoc général (« Utility helpers... ») était apposé sur `handleOnPlace` au lieu de la classe — déplacé au-dessus de `MultiblockHelpers`, et `handleOnPlace`/`handleRemoval` ont chacune reçu leur propre Javadoc spécifique. | 12/09/2026 |
+| — | `content/multiblock/rod/CNRodTypes.java:12-33` | Javadoc utile mais mal placée : elle documente la classe et `RodType.Builder` en général, alors qu'elle est apposée sur la méthode `bootstrap()`. | Javadoc de classe courte ajoutée sur `CNRodTypes`, et la Javadoc de `bootstrap()` reformulée pour documenter la méthode (l'exemple d'usage `register(...)` + `RodType.Builder` reste sur `bootstrap()`, car il illustre bien comment l'étendre). | 12/09/2026 |
+| — | `content/radiation/RadiationEffect.java:26,34,42` | Commentaires inline répétant littéralement le code (`// Reduces movement speed by 20%` juste au-dessus de la ligne qui applique `-0.2D`). | Commentaires redondants supprimés (la Javadoc de classe déjà présente couvre l'intention). | 12/09/2026 |
+| — | `content/multiblock/controller/manager/ReactorFrameDisplayManager.java:29-31` | Javadoc tronqué : « On the client this reads the synced ; on the server it reads the aggregated. » — les mots attendus après « synced » et « aggregated » manquent, et le texte affirmait à tort une distinction client/serveur qui n'existe pas dans le code. | Javadoc réécrite pour décrire fidèlement le comportement réel (agrégation des tanks des handlers de fluide, synced au client via le block entity). | 12/09/2026 |
+| — | `gametest/ReactorInputFluidManagerGameTest.java:49` | Javadoc de classe contenant `{@link Level}` sans import de `Level` dans le fichier — référence Javadoc non résolue. | Déjà corrigée dans l'état actuel du code (référence pleinement qualifiée `{@link net.minecraft.world.level.Level}`). | 12/09/2026 |
+| — | `foundation/events/CommentEvents.java` | Le nom de la classe ne correspondait à rien de son contenu (elle enregistre des recettes de brassage, des capacités, des modificateurs d'attribut d'entité — rien à voir avec des « commentaires ») ; coquille pour `CommonEvents`. | Fichier et classe renommés en `CommonEvents`. | 12/09/2026 |
 | — | `net/nuclearteam/createnuclear/CNRecipeTypes.java:45,61,71,76` | Champ `isProcessingRecipe` assigné à 3 endroits mais jamais lu. | Supprimé. | 02/09/2026 |
 | — | `content/effects/VicinityEffect.java:22` | Paramètre constructeur `Consumer<Integer> timer` jamais stocké ni utilisé. | Paramètre supprimé du constructeur. | 02/09/2026 |
 | — | `content/multiblock/IHeat.java:28,37-41` | Champ `intColor` et son constructeur `HeatLevel(int, int)` jamais utilisés. | Supprimés. | 02/09/2026 |

@@ -18,7 +18,7 @@ import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInp
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID)
-public class CommentEvents {
+public class CommonEvents {
     @SubscribeEvent
     public static void onBrewingRecipeRegister(RegisterBrewingRecipesEvent event) {
         CNPotions.registerPotionsRecipes(event);
