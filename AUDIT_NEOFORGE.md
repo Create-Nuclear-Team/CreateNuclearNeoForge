@@ -64,7 +64,6 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 |---|---|---|
 | `content/multiblock/controller/ReactorControllerBlockEntity.java:60,372` | `countCoolerRod` est assigné en `tick()` mais jamais relu ensuite (champ « write-only »). **Confirmé pré-existant côté Forge** : `countCoolerRod` y est aussi write-only sur cette classe (`triggerExplosion` ne prend que `countFuelRod`), ce n'est donc pas un artefact de migration. Vu la symétrie avec `countFuelRod` (qui, lui, alimente `triggerExplosion`), il a probablement été prévu pour atténuer l'explosion via les cooler rods mais n'a jamais été branché. **Point mis de côté** : à discuter plus tard (câbler dans `triggerExplosion`, ou supprimer avec `getConfiguredPatternCoolerRodCount()`) — aucune décision prise pour l'instant. | 🟡 |
 | `content/decoration/palettes/PaletteBlockPattern.java:66-67` | Champ `private RenderType renderType;` (annoté `@OnlyIn(Dist.CLIENT)`) sans getter/setter, jamais assigné ni lu. | 🟢 |
-| `content/decoration/palettes/CNPaletteStoneTypes.java:45-47` | `getVariant()` et le champ `variant` qu'il expose : jamais appelé nulle part (état write-only). | 🟢 |
 
 ### 1.4 Constantes inutilisées
 
@@ -72,7 +71,6 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 |---|---|---|
 | `foundation/gui/CNGuiTextures.java:15-16,31-33` | Constantes d'enum `REACTOR_CONTROLLER`/`REACTOR_CONTROLLER_PROGRESS` jamais référencées par leur nom, et le constructeur raccourci `(int startX, int startY)` (l.31-33) jamais utilisé par aucune entrée. | 🟢 |
 | `infrastructure/config/CRods.java:33` | `Comments.maxFuelPerCooled` : constante de chaîne définie mais jamais passée à un appel `i()`/`f()`. | 🟢 |
-| `compat/Mods.java:16` | `ALEXS_CAVE` jamais référencée hors de sa propre déclaration (le seul consommateur de `Mods` est `SableCompat`/`ReactorMeltdownExecutor`, qui utilisent `SABLE`). À rapprocher du point déjà tracké sur `AlexscaveCompat` (§4) : cette classe n'est même pas instanciée nulle part dans le projet — pas seulement « gelée », mais entièrement orpheline. | 🟢 |
 | `content/decoration/palettes/PaletteBlockPattern.java:47` | `VANILLA_RANGE` jamais référencé nulle part, et strictement identique à `STANDARD_RANGE` (l.49), qui est le tableau réellement utilisé par `CNPaletteStoneTypes` — cf. duplication en §3. | 🟡 |
 
 *(La constante `CNTags.NameSpace.FORGE`, listée ici précédemment, a été retirée dans l'arbre de travail local ; voir §8.)*
@@ -269,7 +267,7 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 ### 🟠 Important
 
-- Débris de migration à finaliser : notes d'incertitude non tranchées dans `ReactorFluidInputEntity`, compat `AlexscaveCompat` entièrement gelée en code Forge commenté et confirmée totalement orpheline (avec `Mods.ALEXS_CAVE`).
+- Débris de migration à finaliser : notes d'incertitude non tranchées dans `ReactorFluidInputEntity`. (`AlexscaveCompat`/`Mods.ALEXS_CAVE` : compat volontairement gelée en attendant une version 1.21.1 d'Alex's Caves — pas un débris, cf. §1.4/§8.)
 - Commentaires français masquant une incertitude technique : `ReactorFluidInputEntity`.
 - Duplications significatives : `getBlocksPosition(Level)` ×4 managers, `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`, 13 classes `*Factory` de `SmallNuclearExplosionParticle`, triple duplication de verrou fluide dans `ReactorFluidInputEntity`, triple duplication de scan dans `ReactorPattern`.
 - Javadoc trompeur/obsolète : copier-coller mal placé dans `ReactorControllerBlockEntity` (constructeur), champs disparus documentés dans `ReactorInputSnapshot`, valeur d'enum `MIXTE` inexistante dans `ItemRodTypesValue`.

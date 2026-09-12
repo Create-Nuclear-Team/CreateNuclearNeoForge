@@ -8,7 +8,6 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -16,8 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.core.Direction.Axis;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
@@ -41,7 +38,6 @@ public class PaletteBlockPattern {
             .block(ConnectedPillarBlock::new)
             .textures("pillar", "cap")
             .connectedTextures(v -> new RotatedPillarCTBehaviour(ct(v, PaletteBlockPattern.CTs.PILLAR), ct(v, PaletteBlockPattern.CTs.CAP)))
-
         ;
 
     public static final PaletteBlockPattern[] VANILLA_RANGE = { CUT, POLISHED, BRICKS, SMALL_BRICKS, LAYERED, PILLAR };
@@ -62,9 +58,6 @@ public class PaletteBlockPattern {
     private NonNullFunction<Properties, ? extends Block> blockFactory;
     private NonNullFunction<NonNullSupplier<Block>, NonNullBiConsumer<DataGenContext<Block, ? extends Block>, RegistrateRecipeProvider>> additionalRecipes;
     private PaletteBlockPartial<? extends Block>[] partials;
-
-    @OnlyIn(Dist.CLIENT)
-    private RenderType renderType;
 
     private static PaletteBlockPattern create(String name, PaletteBlockPattern.PatternNameType nameType,
                                                                                               PaletteBlockPartial<?>... partials) {
@@ -231,11 +224,9 @@ public class PaletteBlockPattern {
     // Textures with connectability, used by Spriteshifter
 
     public enum CTs {
-
         PILLAR(AllCTTypes.RECTANGLE, s -> toLocation(s, "pillar")),
         CAP(AllCTTypes.OMNIDIRECTIONAL, s -> toLocation(s, "cap")),
         LAYERED(AllCTTypes.HORIZONTAL_KRYPPERS, s -> toLocation(s, "layered"))
-
         ;
 
         public CTType type;

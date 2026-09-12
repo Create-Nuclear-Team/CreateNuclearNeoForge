@@ -30,7 +30,6 @@ public class CRods extends ConfigBase {
     private static class Comments {
         static String hintTick = "20 ticks = 1 second";
         static String warning = "Changing these values may unbalance reactor behavior.";
-        static String maxFuelPerCooled = "Maximum fuel rods supported by a single cooled rod";
 
         static String uraniumRodLifetime = "Lifetime of uranium rods in ticks.";
         static String uraniumProximityBonus = "Heat bonus applied when uranium rods are adjacent.";
