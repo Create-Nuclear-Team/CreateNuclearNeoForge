@@ -95,9 +95,7 @@ Légende priorité : 🔴 Critique · 🟠 Important · 🟡 Moyen · 🟢 Faibl
 
 Le style du projet est très majoritairement en anglais.
 
-| Fichier:ligne | Extrait | Priorité |
-|---|---|---|
-| `net/nuclearteam/createnuclear/CNSoundEvents.java:40,45,50,85,90` | Chemins de ressources en français : `create("reacteur/activation")`, `"reacteur/running"`, `"reacteur/shut_off"`, `"reacteur/assemble_deassemble/..."`. Impacte l'arborescence des assets, donc plus coûteux à renommer. | 🟢 |
+Aucune entrée ouverte pour le moment ; voir §8 pour l'historique des corrections de cette section.
 
 ### 2.2 Commentaires peu explicites ou ambigus
 
@@ -245,7 +243,7 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 ### 🟠 Important
 
-- Débris de migration à finaliser : notes d'incertitude non tranchées dans `ReactorFluidInputEntity`. (`AlexscaveCompat`/`Mods.ALEXS_CAVE` : compat volontairement gelée en attendant une version 1.21.1 d'Alex's Caves — pas un débris, cf. §1.4/§8.)
+- Débris de migration à finaliser : notes d'incertitude non tranchées dans `ReactorFluidInputEntity`.
 - Commentaires français masquant une incertitude technique : `ReactorFluidInputEntity`.
 - Duplications significatives : `getBlocksPosition(Level)` ×4 managers, `HorizontalDirectionalReactorBlock`/`MultiDirectionalReactorBlock`, `CNItems` decompacting ×9, `RadiationCapability.computeItemRadiation(Player)`, 13 classes `*Factory` de `SmallNuclearExplosionParticle`, triple duplication de verrou fluide dans `ReactorFluidInputEntity`, triple duplication de scan dans `ReactorPattern`.
 - Javadoc trompeur/obsolète : copier-coller mal placé dans `ReactorControllerBlockEntity` (constructeur), champs disparus documentés dans `ReactorInputSnapshot`, valeur d'enum `MIXTE` inexistante dans `ItemRodTypesValue`.
@@ -329,6 +327,7 @@ Points listés dans une version antérieure de cet audit, corrigés depuis et re
 | — | `content/multiblock/controller/manager/ReactorFrameDisplayManager.java:29-31` | Javadoc tronqué : « On the client this reads the synced ; on the server it reads the aggregated. » — les mots attendus après « synced » et « aggregated » manquent, et le texte affirmait à tort une distinction client/serveur qui n'existe pas dans le code. | Javadoc réécrite pour décrire fidèlement le comportement réel (agrégation des tanks des handlers de fluide, synced au client via le block entity). | 12/09/2026 |
 | — | `gametest/ReactorInputFluidManagerGameTest.java:49` | Javadoc de classe contenant `{@link Level}` sans import de `Level` dans le fichier — référence Javadoc non résolue. | Déjà corrigée dans l'état actuel du code (référence pleinement qualifiée `{@link net.minecraft.world.level.Level}`). | 12/09/2026 |
 | — | `foundation/events/CommentEvents.java` | Le nom de la classe ne correspondait à rien de son contenu (elle enregistre des recettes de brassage, des capacités, des modificateurs d'attribut d'entité — rien à voir avec des « commentaires ») ; coquille pour `CommonEvents`. | Fichier et classe renommés en `CommonEvents`. | 12/09/2026 |
+| — | `net/nuclearteam/createnuclear/CNSoundEvents.java:38,43,48,83,88` | Chemins de ressources en français : `create("reacteur/activation")`, `"reacteur/running"`, `"reacteur/shut_off"`, `"reacteur/assemble_deassemble/..."`. | Chemins traduits en anglais (`reactor/activation`, `reactor/running`, `reactor/shut_off`, `reactor/assembly_disassembly/motor_assemble`, `reactor/assembly_disassembly/motor_disassemble` — au passage, correction de la coquille anglaise « deassemble » → « assembly_disassembly »), et les dossiers d'assets correspondants renommés via `git mv` (`sounds/reacteur` → `sounds/reactor`, `assemble_deassemble` → `assembly_disassembly`) pour rester synchronisés avec le code. Les fichiers générés (`src/generated/.../sounds.json`, lang) restent à resynchroniser via `gradle runData`. | 12/09/2026 |
 | — | `net/nuclearteam/createnuclear/CNRecipeTypes.java:45,61,71,76` | Champ `isProcessingRecipe` assigné à 3 endroits mais jamais lu. | Supprimé. | 02/09/2026 |
 | — | `content/effects/VicinityEffect.java:22` | Paramètre constructeur `Consumer<Integer> timer` jamais stocké ni utilisé. | Paramètre supprimé du constructeur. | 02/09/2026 |
 | — | `content/multiblock/IHeat.java:28,37-41` | Champ `intColor` et son constructeur `HeatLevel(int, int)` jamais utilisés. | Supprimés. | 02/09/2026 |

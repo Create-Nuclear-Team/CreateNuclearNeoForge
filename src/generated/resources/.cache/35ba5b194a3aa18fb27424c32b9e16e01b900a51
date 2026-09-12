@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-12T14:08:49.5893507	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-09-12T15:08:51.1643729	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -416,7 +416,7 @@ f3eb1e16f772ba433bbb6f87f4db3a35e82102ee data/createnuclear/advancement/recipes/
 608ba81e528f6e9bdb5e8ab007dcc743397a33f9 data/createnuclear/advancement/recipes/misc/crafting/steel_ingot_from_decompacting.json
 92f6a4abe3553b8c5958650d750f65907963015b data/createnuclear/advancement/recipes/misc/crafting/steel_nugget_from_decompacting.json
 2a7ad538107f56b60156b505f099c3715bdfdad0 data/createnuclear/advancement/recipes/misc/crafting/thorium_ingot_from_decompacting.json
-1ec3c3ffecca3ac43871e7d6c5a920034691d68e data/createnuclear/advancement/recipes/misc/crafting/thorium_nugget_from_decompacting.json
+ea56735d3034daaed5975ddfe92239458e335bff data/createnuclear/advancement/recipes/misc/crafting/thorium_nugget_from_decompacting.json
 e13e61b6ef24889f1d3d7948892b3e9e3799aa4f data/createnuclear/advancement/recipes/misc/shapeless/reactor_blueprint_item_clear.json
 a021646becb7b6411eddd86644e5b17c8365582c data/createnuclear/loot_table/blocks/autunite.json
 62b7087350b0a9af9007b848c7f619a730e90693 data/createnuclear/loot_table/blocks/autunite_pillar.json

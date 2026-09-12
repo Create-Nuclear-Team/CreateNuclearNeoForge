@@ -2,9 +2,13 @@ package net.nuclearteam.createnuclear.foundation.data;
 
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
+import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.DyeColor;
@@ -85,6 +89,17 @@ public class CNBuilderTransformers {
                     .end();
             }
         };
+    }
+
+    /**
+     * Shapeless "decompacting" recipe (storage block/ingot → 9 of this item), the pattern
+     * repeated for every raw material/ingot/nugget that has a coarser source to decompact.
+     */
+    public static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateRecipeProvider> decompactingRecipe(String unlockedByName, TagKey<Item> source) {
+        return (c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+            .unlockedBy(unlockedByName, RegistrateRecipeProvider.has(source))
+            .requires(source)
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"));
     }
 
     public static ItemEntry<DeferredSpawnEggItem> spawnEgg(String name, Supplier<? extends EntityType<? extends Mob>> entity, int backgroundColor, int highlightColor, String nameItems) {
