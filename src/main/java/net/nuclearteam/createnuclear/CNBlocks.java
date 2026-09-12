@@ -386,14 +386,11 @@ public class CNBlocks {
         .initialProperties(() -> Blocks.DIAMOND_ORE)
         .properties(UraniumOreBlock.litBlockEmission())
         .transform(pickaxeOnly())
-        .loot((lt, b) -> {
-            HolderLookup.RegistryLookup<Enchantment> enchantmentRegistryLookup = lt.getRegistries().lookupOrThrow(Registries.ENCHANTMENT);
-            lt.add(b,
-                lt.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
-                      .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 1)))));
-        })
+        .loot((lt, b) -> lt.add(b,
+            lt.createSilkTouchDispatchTable(b,
+                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
+                  .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 1))))))
         .tag(
             BlockTags.NEEDS_DIAMOND_TOOL,
             BlockTags.NEEDS_IRON_TOOL,
@@ -411,14 +408,11 @@ public class CNBlocks {
         .initialProperties(() -> Blocks.DIAMOND_ORE)
         .simpleItem()
         .transform(pickaxeOnly())
-        .loot((lt, b) -> {
-            HolderLookup.RegistryLookup<Enchantment> enchantmentRegistryLookup = lt.getRegistries().lookupOrThrow(Registries.ENCHANTMENT);
-            lt.add(b,
-                lt.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
-                      .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 4)))));
-        })
+        .loot((lt, b) -> lt.add(b,
+            lt.createSilkTouchDispatchTable(b,
+                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
+                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
+                  .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 4))))))
         .tag(
             BlockTags.NEEDS_IRON_TOOL,
             Tags.Blocks.ORES,

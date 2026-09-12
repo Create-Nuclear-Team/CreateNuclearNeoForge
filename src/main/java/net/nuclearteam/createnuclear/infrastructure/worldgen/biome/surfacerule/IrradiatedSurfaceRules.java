@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -10,7 +9,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNNoiseData;
 import org.jetbrains.annotations.NotNull;

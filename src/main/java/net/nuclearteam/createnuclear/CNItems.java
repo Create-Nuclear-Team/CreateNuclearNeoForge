@@ -1,7 +1,7 @@
 package net.nuclearteam.createnuclear;
 
 import static net.nuclearteam.createnuclear.CNTags.CNItemTags;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.*;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.setColorComponent;
 import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.biomeRestoreModel;
 import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.coloredArmorModel;
 
@@ -15,7 +15,11 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.Tags;
@@ -23,6 +27,10 @@ import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import net.nuclearteam.createnuclear.content.equipment.armor.CNArmorMaterials;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNMaterialTags;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -231,7 +239,7 @@ public class CNItems {
             CNItemTags.ANTI_RADIATION_HELMET.tag
         )
         .transform(setColorComponent(Cloths.DEFAULT))
-        .transform(CNArmorMaterials.setArmorDurability(Type.HELMET))
+        .transform(CNArmorMaterials.setArmorDurability(ArmorItem.Type.HELMET))
         .recipe((c, p) -> {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -270,7 +278,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
-            .transform(CNArmorMaterials.setArmorDurability(Type.CHESTPLATE))
+            .transform(CNArmorMaterials.setArmorDurability(ArmorItem.Type.CHESTPLATE))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -310,7 +318,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
-            .transform(CNArmorMaterials.setArmorDurability(Type.LEGGINGS))
+            .transform(CNArmorMaterials.setArmorDurability(ArmorItem.Type.LEGGINGS))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
@@ -350,7 +358,7 @@ public class CNItems {
                 CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
             )
             .transform(setColorComponent(Cloths.DEFAULT))
-            .transform(CNArmorMaterials.setArmorDurability(Type.BOOTS))
+            .transform(CNArmorMaterials.setArmorDurability(ArmorItem.Type.BOOTS))
             .recipe((c, p) -> {
                 ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))

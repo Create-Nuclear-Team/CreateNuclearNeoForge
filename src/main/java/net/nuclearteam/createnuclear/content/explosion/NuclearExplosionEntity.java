@@ -147,8 +147,6 @@ public class NuclearExplosionEntity extends Entity {
         BlockPos.MutableBlockPos carveBelow = new BlockPos.MutableBlockPos();
         carve.set(chunkCorner);
         carveBelow.set(chunkCorner);
-        float itemDropModifier = 0.025F / Math.min(1, this.getSize());
-
 
         Explosion dummyExplosion = new Explosion(level(), this, this.getX(), this.getY(), this.getZ(), 10.0F, false, Explosion.BlockInteraction.DESTROY);
 
@@ -167,8 +165,6 @@ public class NuclearExplosionEntity extends Entity {
                         if ((!state.isAir() || !state.getFluidState().isEmpty()) && isDestroyable(state)) {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
-
-
 
                             // 1. Create an immutable copy of the position
                             BlockPos immutablePos = carve.immutable();
@@ -221,11 +217,6 @@ public class NuclearExplosionEntity extends Entity {
     public boolean isIntentionalGameDesign() {
         return this.entityData.get(INTENTIONAL_GAME_DESIGN);
     }
-
-    public void setIntentionalGameDesign(boolean intentionalGameDesign) {
-        this.entityData.set(INTENTIONAL_GAME_DESIGN, intentionalGameDesign);
-    }
-
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compoundTag) {

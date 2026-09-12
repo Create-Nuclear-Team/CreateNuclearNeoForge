@@ -1,7 +1,3 @@
-/effect give Dev createnuclear:radiation infinite
-/effect give Dev createnuclear:radiation
-/playsound createnuclear:alarm/alarm
-/playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
 /playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
 /data get storage
@@ -56,3 +52,7 @@
 /playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 1
 /playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 2 1
 /playsound createnuclear:reacteur/running master Dev ~ ~ ~ 255 2 1
+/effect give Dev createnuclear:iodine infinite 255 true
+/gamerule keepInventory true
+/kill
+/effect give Dev createnuclear:iodine infinite 255 true

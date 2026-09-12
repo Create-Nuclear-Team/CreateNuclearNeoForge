@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen.biome;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

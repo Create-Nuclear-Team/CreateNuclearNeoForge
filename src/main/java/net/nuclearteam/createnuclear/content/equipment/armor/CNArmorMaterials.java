@@ -1,13 +1,11 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
 import com.tterrag.registrate.builders.ItemBuilder;
-import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.ArmorMaterial;
 
@@ -27,13 +25,13 @@ public class CNArmorMaterials {
     private static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, CreateNuclear.MOD_ID);
 
     public static final Holder<ArmorMaterial>  ANTI_RADIATION_SUIT = register(
-            "anti_radiation_suit",
-            new int[]{2, 4, 3, 1, 4 },
-            12,
-            SoundEvents.ARMOR_EQUIP_NETHERITE,
-            0.0f,
-            0.0f,
-            () -> Ingredient.of(CNItems.LEAD_INGOT)
+        "anti_radiation_suit",
+        new int[]{2, 4, 3, 1, 4 },
+        12,
+        SoundEvents.ARMOR_EQUIP_NETHERITE,
+        0.0f,
+        0.0f,
+        () -> Ingredient.of(CNItems.LEAD_INGOT)
     );
 
     private static Holder<ArmorMaterial> register(

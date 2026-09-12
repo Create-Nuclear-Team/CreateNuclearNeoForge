@@ -7,12 +7,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.nuclearteam.createnuclear.CNTags;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
-
 
 /**
  * The idea is to have the common ("c:") tags generated on the fly, without any typo/writing

@@ -24,7 +24,6 @@ public class EnrichingCampfireBlockEntity extends SmartBlockEntity {
                 EnrichingCampfireBlock.makeParticles(level, pos);
             }
         }
-        i = state.getValue(EnrichingCampfireBlock.FACING).get2DDataValue();
     }
 
     private void markUpdated() {

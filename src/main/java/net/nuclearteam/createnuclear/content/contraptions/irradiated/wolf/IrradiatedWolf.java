@@ -135,8 +135,6 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
 
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
-        Holder<Biome> holder = level.getBiome(this.blockPosition());
-
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
