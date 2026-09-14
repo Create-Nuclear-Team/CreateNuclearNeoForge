@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -59,7 +60,7 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
     }
 
     @Override
-    public <T> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type) {
+    public <T extends SmartBlockEntity> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type) {
         List<BlockPos> result = new ArrayList<>();
         for (BlockPos offset : positions) {
             BlockPos p = controllerPos.offset(offset);

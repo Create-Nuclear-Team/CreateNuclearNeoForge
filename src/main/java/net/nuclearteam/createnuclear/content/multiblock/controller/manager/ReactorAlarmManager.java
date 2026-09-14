@@ -54,6 +54,6 @@ public class ReactorAlarmManager extends AbstractReactorIOManager implements Rea
 
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        return filterByType(level, controllerPos, ReactorAlarmManager.class);
+        return filterByType(level, controllerPos, ReactorAlarmEntity.class);
     }
 }

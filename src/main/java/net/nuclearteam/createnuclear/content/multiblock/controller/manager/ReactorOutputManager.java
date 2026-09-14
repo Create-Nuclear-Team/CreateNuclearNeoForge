@@ -68,7 +68,7 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      */
     @Override
     public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
-        return filterByType(level, controllerPos, ReactorOutputManager.class);
+        return filterByType(level, controllerPos, ReactorOutputEntity.class);
 
     }
 

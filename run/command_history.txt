@@ -1,6 +1,3 @@
-/playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
-/playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
-/data get storage
 /data get entity Dev
 /data get block -459 63 531
 /effect give Dev createnuclear:radiation infinite 0 true
@@ -56,3 +53,6 @@
 /gamerule keepInventory true
 /kill
 /effect give Dev createnuclear:iodine infinite 255 true
+/time set day
+/effect give Dev createnuclear:iodine infinite 255 true
+/give Dev minecraft:debug_stick

@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -40,7 +41,7 @@ public interface ReactorIOManager {
     /** Returns an immutable copy of the tracked relative offsets. */
     List<BlockPos> getBlocksPosition();
 
-    <T> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type);
+    <T extends SmartBlockEntity> List<BlockPos> filterByType(Level level, BlockPos controllerPos, Class<T> type);
 
     /**
      * Resolves every tracked offset to its current world position, given the
