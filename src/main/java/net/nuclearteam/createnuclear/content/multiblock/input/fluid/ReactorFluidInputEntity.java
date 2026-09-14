@@ -88,7 +88,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(tag, registries, clientPacket);
-        CompoundTag tankTag = internalTank.writeToNBT(registries, new CompoundTag()); // Remember to pass registries if required by v1.20+ for tanks, or keep new CompoundTag() depending on your version
+        CompoundTag tankTag = internalTank.writeToNBT(registries, new CompoundTag());
         tag.put("tank", tankTag);
         tag.putInt("capacity", internalTank.getCapacity());
     }
@@ -98,7 +98,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         super.read(tag, registries, clientPacket);
         if (tag.contains("capacity"))
             internalTank.setCapacity(tag.getInt("capacity"));
-        internalTank.readFromNBT(registries, tag.getCompound("tank")); // Same here, depending on SmartFluidTank's implementation
+        internalTank.readFromNBT(registries, tag.getCompound("tank"));
 
         if (tag.contains("ForceFluidLevel") || fluidLevel == null)
             fluidLevel = LerpedFloat.linear()
