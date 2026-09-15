@@ -21,7 +21,7 @@ header = ""
 body = """
 Hey @Testers, here is a new update!
 
-Changelog - {{ version }}
+# Changelog - {{ version }}
 {% for group, commits in commits | group_by(attribute="group") %}
 {{ group | striptags | trim }}
 
@@ -43,14 +43,14 @@ sort_commits = "oldest"
 commit_parsers = [
   { message = "^chore\\(release\\)", skip = true },
   { message = "^Merge", skip = true },
-  { message = "^feat", group = "<!-- 0 -->New Features" },
-  { message = "^perf", group = "<!-- 1 -->Gameplay Changes" },
-  { message = "^fix", group = "<!-- 2 -->Fixes and Internal Cleanup" },
-  { message = "^refactor", group = "<!-- 2 -->Fixes and Internal Cleanup" },
-  { message = "^style", group = "<!-- 2 -->Fixes and Internal Cleanup" },
-  { message = "^build", group = "<!-- 2 -->Fixes and Internal Cleanup" },
-  { message = "^docs", group = "<!-- 3 -->Misc" },
-  { message = "^chore", group = "<!-- 3 -->Misc" },
-  { message = "^ci", group = "<!-- 3 -->Misc" },
-  { message = "^test", group = "<!-- 3 -->Misc" },
+  { message = "^feat", group = "<!-- 0 -->## New Features" },
+  { message = "^perf", group = "<!-- 1 -->## Gameplay Changes" },
+  { message = "^fix", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^refactor", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^style", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^build", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^docs", group = "<!-- 3 -->## Misc" },
+  { message = "^chore", group = "<!-- 3 -->## Misc" },
+  { message = "^ci", group = "<!-- 3 -->## Misc" },
+  { message = "^test", group = "<!-- 3 -->## Misc" },
 ]
