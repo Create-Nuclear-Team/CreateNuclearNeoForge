@@ -3,37 +3,23 @@ package net.nuclearteam.createnuclear.content.multiblock.pattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+import java.util.function.BiConsumer;
 
 public class ReactorPattern {
-
-    private static final Predicate<BlockInWorld> blockInWorldAPredicate = state ->
-        stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_ROD_INPUT.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_FLUID_INPUT.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_ALARM.get()).test(state)
-    ;
-
-    private static Predicate<BlockInWorld> stateIs(Block block) {
-        return a -> {
-            BlockState state = a.getState();
-            return state != null && state.is(block);
-        };
-    }
-
     @FunctionalInterface
     private interface ControllerVisitor {
         boolean visit(BlockPos controllerPos, ReactorControllerBlockEntity entity);
+    }
+
+
+    private boolean isInReactorRange(@Nullable BoundingBox reactorPos, BlockPos blockPos) {
+        return reactorPos != null && reactorPos.isInside(blockPos);
     }
 
     private void scanControllerCandidates(BlockPos blockPos, Level level, ControllerVisitor visitor) {
@@ -54,60 +40,41 @@ public class ReactorPattern {
         }
     }
 
-    public void findController(BlockPos blockPos, Level level, boolean first){
-        scanControllerCandidates(blockPos, level, ((controllerPos, entity) -> {
-            boolean inRange = isInReactorRange(entity.getMultiblockPos(), blockPos);
-            if (first) {
-                if (inRange || !entity.isAssembled()) {
-                    ReactorAssembler.assemble(controllerPos, level);
-                }
-            } else if (inRange) {
-                ReactorAssembler.disassemble(controllerPos, level);
-            }
+    private BlockPos findControllerPos(BlockPos pos, Level level, BiConsumer<BlockPos, ReactorControllerBlockEntity> onCandidate) {
+        BlockPos[] found = {null};
 
+        // Stops at the first in-range candidate: isInReactorRange can only be true for an already
+        // assembled controller (getMultiblockPos() is null before assembly), and two assembled
+        // reactors can't have overlapping bounding boxes (a block position belongs to at most one
+        // structure), so at most one candidate can ever match — stopping there is safe.
+        scanControllerCandidates(pos, level, ((controllerPos, entity) -> {
+            onCandidate.accept(controllerPos, entity);
+            if (isInReactorRange(entity.getMultiblockPos(), pos)) {
+                found[0] = controllerPos;
+                return true;
+            }
             return false;
         }));
+
+        return found[0];
+    }
+
+    public void findController(BlockPos blockPos, Level level, boolean first) {
+        findControllerPos(blockPos, level, first);
     }
 
     public BlockPos findControllerPos(BlockPos blockPos, Level level, boolean first){
-        BlockPos[] found = {null};
-        scanControllerCandidates(blockPos, level, ((controllerPos, entity) -> {
+        return findControllerPos(blockPos, level, (controllerPos, entity) -> {
             boolean inRange = isInReactorRange(entity.getMultiblockPos(), blockPos);
             if (first) {
-                if (inRange || !entity.isAssembled()) {
-                    ReactorAssembler.assemble(controllerPos, level);
-                }
+                if (inRange || !entity.isAssembled()) ReactorAssembler.assemble(controllerPos, level);
             } else if (inRange) {
                 ReactorAssembler.disassemble(controllerPos, level);
             }
-
-            if (isInReactorRange(entity.getMultiblockPos(), blockPos)) {
-                found[0] = controllerPos;
-                return true;
-            }
-
-            return false;
-        }));
-
-        return found[0];
+        });
     }
 
     public BlockPos findControllerPos(BlockPos blockPos, Level level){
-        BlockPos[] found = {null};
-        scanControllerCandidates(blockPos, level, ((controllerPos, entity) -> {
-            ReactorAssembler.assemble(controllerPos, level);
-            if (isInReactorRange(entity.getMultiblockPos(), blockPos)) {
-                found[0] = controllerPos;
-                return true;
-            }
-
-            return false;
-        }));
-
-        return found[0];
-    }
-
-    public boolean isInReactorRange(@Nullable BoundingBox reactorPos, BlockPos blockPos) {
-        return reactorPos != null && reactorPos.isInside(blockPos);
+        return findControllerPos(blockPos, level, (controllerPos, entity) -> ReactorAssembler.assemble(controllerPos, level));
     }
 }

@@ -116,49 +116,49 @@
     ],
     "subtitle": "createnuclear.subtitle.geiger/medium"
   },
-  "reacteur/activation": {
+  "reactor/activation": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reacteur/activation"
+        "name": "createnuclear:reactor/activation"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reacteur/activation"
+    "subtitle": "createnuclear.subtitle.reactor/activation"
   },
-  "reacteur/assemble_deassemble/motor_assemble": {
+  "reactor/assembly_disassembly/motor_assemble": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reacteur/assemble_deassemble/motor_assemble"
+        "name": "createnuclear:reactor/assembly_disassembly/motor_assemble"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reacteur/assemble_deassemble/motor_assemble"
+    "subtitle": "createnuclear.subtitle.reactor/assembly_disassembly/motor_assemble"
   },
-  "reacteur/assemble_deassemble/motor_disassemble": {
+  "reactor/assembly_disassembly/motor_disassemble": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reacteur/assemble_deassemble/motor_disassemble"
+        "name": "createnuclear:reactor/assembly_disassembly/motor_disassemble"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reacteur/assemble_deassemble/motor_disassemble"
+    "subtitle": "createnuclear.subtitle.reactor/assembly_disassembly/motor_disassemble"
   },
-  "reacteur/running": {
+  "reactor/running": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reacteur/running"
+        "name": "createnuclear:reactor/running"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reacteur/running"
+    "subtitle": "createnuclear.subtitle.reactor/running"
   },
-  "reacteur/shut_off": {
+  "reactor/shut_off": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reacteur/shut_off"
+        "name": "createnuclear:reactor/shut_off"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reacteur/shut_off"
+    "subtitle": "createnuclear.subtitle.reactor/shut_off"
   }
 }

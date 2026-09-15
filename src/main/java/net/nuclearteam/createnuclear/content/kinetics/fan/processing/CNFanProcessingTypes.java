@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.kinetics.fan.processing;
 
-import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.api.registry.CreateBuiltInRegistries;
 import com.simibubi.create.content.kinetics.fan.processing.FanProcessingType;
 import com.simibubi.create.foundation.recipe.RecipeApplier;
@@ -25,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
-import net.nuclearteam.createnuclear.foundation.damagesTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -37,34 +36,11 @@ public class CNFanProcessingTypes {
     public static final EnrichedType ENRICHED = register("enriched", new EnrichedType());
     public static final SnowPowderType SNOW_POWDER = register("snow_powder", new SnowPowderType());
 
-    private static final Map<String, FanProcessingType> LEGACY_NAME_MAP;
-
-    static {
-        Object2ReferenceOpenHashMap<String, FanProcessingType> map = new Object2ReferenceOpenHashMap<>();
-        map.put("ENRICHED", ENRICHED);
-        map.put("SNOW_POWDER", SNOW_POWDER);
-        map.trim();
-        LEGACY_NAME_MAP = map;
-    }
-
     private static <T extends FanProcessingType> T register(String id, T type) {
         return Registry.register(CreateBuiltInRegistries.FAN_PROCESSING_TYPE, CreateNuclear.asResource(id), type);
     }
 
-    @Nullable
-    public static FanProcessingType ofLegacyName(String name) {
-        return LEGACY_NAME_MAP.get(name);
-    }
-
     public static void register() {}
-
-    public static FanProcessingType parseLegacy(String str) {
-        FanProcessingType type = ofLegacyName(str);
-        if (type != null) {
-            return type;
-        }
-        return FanProcessingType.parse(str);
-    }
 
     public static class EnrichedType implements FanProcessingType {
         private static final double FAN_ENRICHING_DOSE = 5.0D;

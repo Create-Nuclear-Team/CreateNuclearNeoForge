@@ -27,10 +27,10 @@ public class ReactorAlarmCoordinator implements IReactorAlarmCoordinator {
     }
 
     @Override
-    public void update(Level level, ReactorAlarmManagerI alarmManager, boolean isDanger) {
+    public void update(Level level, ReactorAlarmManagerI alarmManager, BlockPos controllerPos, boolean isDanger) {
         if (alarmManager == null) return;
 
-        for (BlockPos pos : alarmManager.getBlocksPosition(level)) {
+        for (BlockPos pos : alarmManager.getBlocksPosition(level, controllerPos)) {
             if (!level.isLoaded(pos)) continue;
 
             BlockState state = level.getBlockState(pos);

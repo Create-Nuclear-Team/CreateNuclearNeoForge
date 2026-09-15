@@ -1,39 +1,3 @@
-/
-/time set day
-/gamemode survival
-/gamemode creative
-/gamemode survival
-/effect give Dev createnuclear:iodine
-/gamemode creative
-/gamemode survival
-/gamemode creative
-/locate biome createnuclear:irradiated_land
-/summon createnuclear:nuclear_explosion
-/fillbiome
-/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
-/gamemode survival
-/fillbiome ~-10 ~ ~-10 ~10 ~32 ~10 createnuclear:irradiated_land
-/time set day
-/gamemode spectator
-/gamemode creative
-/effect give Dev createnuclear:iodine
-/effect give Dev createnuclear:radiation
-/time set day
-/effect clear Dev
-/effect give Dev createnuclear:radiation
-/effect give Dev createnuclear:radiation 30000
-/effect give Dev minecraft:regeneration infinite 255 true
-/effect give Dev createnuclear:radiation
-/effect give Dev createnuclear:radiation infinite
-/effect give Dev minecraft:saturation infinite 255 true
-/effect give Dev createnuclear:radiation infinite
-/effect give Dev createnuclear:radiation
-/playsound createnuclear:alarm/alarm
-/playsound createnuclear:alarm/alarm block Dev ~ ~ ~ 300 2
-/playsound createnuclear:alarm/reactor_alarm block Dev ~ ~ ~ 300 2
-/playsound createnuclear:biomes/wasteland block Dev ~ ~ ~ 300 2
-/data get storage
-/data get entity Dev
 /data get block -459 63 531
 /effect give Dev createnuclear:radiation infinite 0 true
 /effect clear Dev
@@ -55,4 +19,40 @@
 /enchant Dev minecraft:fortune 3
 /advancement revoke Dev
 /advancement revoke Dev everything
+/time set day
+/effect give Dev createnuclear:iodine infinite 255 true
+/effect give Dev minecraft:resistance infinite 255 true
+/tp 121.53 37.00 413.49
+/tp 2048133 131 20481032
+/tp 121.53 37.00 413.49
+/weather clear
+/time set day
+/tp 2048133 131 20481032
+/tp 121.53 37.00 413.49
+/effect give Dev minecraft:night_vision infinite 255 false
+/weather clear
+/time set day
+/kill @e[type=!minecraft:player]d
+/kill @e[type=!minecraft:player]
+/tp 127 -53 419
+/data get block
+/data get block 20481028 129 20481029
+/data get block 111 -55 448
+/effect give Dev createnuclear:iodine infinite 255 true
+/time set day
+/weather clear
+/playsound createnuclear:reacteur/activation
+/playsound createnuclear:reacteur/activation block Dev -495.46 68.45 491.00 255
+/playsound createnuclear:reacteur/activation block Dev -495.46 68.45 491.00 255 1
+/playsound createnuclear:reacteur/activation master Dev -495.46 68.45 491.00 255 1
+/playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 1
+/playsound createnuclear:reacteur/activation master Dev ~ ~ ~ 255 2 1
+/playsound createnuclear:reacteur/running master Dev ~ ~ ~ 255 2 1
+/effect give Dev createnuclear:iodine infinite 255 true
+/gamerule keepInventory true
+/kill
+/effect give Dev createnuclear:iodine infinite 255 true
+/time set day
+/effect give Dev createnuclear:iodine infinite 255 true
+/give Dev minecraft:debug_stick
 /time set day

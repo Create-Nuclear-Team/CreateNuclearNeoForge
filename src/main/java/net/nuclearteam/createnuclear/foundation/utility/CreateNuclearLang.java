@@ -7,8 +7,6 @@ import net.createmod.catnip.lang.LangNumberFormat;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.ArrayList;
@@ -31,25 +29,13 @@ public class CreateNuclearLang extends Lang {
         return result;
     }
 
-    //
-
     public static LangBuilder builder() {
         return new LangBuilder(CreateNuclear.MOD_ID);
     }
 
-    public static LangBuilder blockName(BlockState state) {
-        return builder().add(state.getBlock()
-                .getName());
-    }
-
     public static LangBuilder itemName(ItemStack stack) {
         return builder().add(stack.getHoverName()
-                .copy());
-    }
-
-    public static LangBuilder fluidName(FluidStack stack) {
-        return builder().add(stack.getHoverName()
-                .copy());
+            .copy());
     }
 
     public static LangBuilder number(double d) {
@@ -59,14 +45,4 @@ public class CreateNuclearLang extends Lang {
     public static LangBuilder translate(String langKey, Object... args) {
         return builder().translate(langKey, args);
     }
-
-    public static LangBuilder text(String text) {
-        return builder().text(text);
-    }
-
-    @Deprecated // Use while implementing and replace all references with Lang.translate
-    public static LangBuilder temporaryText(String text) {
-        return builder().text(text);
-    }
-
 }

@@ -16,29 +16,11 @@ import java.util.List;
  * Handles serialization of output positions.
  */
 public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
-    private static final String NBT_KEY = "ReactorOutputs";
     public static final int RPM_DIVIDER = 32;
 
     @Override
-    public void write(CompoundTag compound) {
-        ListTag list = new ListTag();
-        for (BlockPos p : positions) {
-            CompoundTag t = new CompoundTag();
-            t.putLong("p", p.asLong());
-            list.add(t);
-        }
-        compound.put(NBT_KEY, list);
-    }
-
-    @Override
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, 10);
-        for (int i = 0; i < list.size(); i++) {
-            BlockPos p = BlockPos.of(list.getCompound(i).getLong("p"));
-            positions.add(p);
-        }
+    protected String nbtKey() {
+        return "ReactorOutputs";
     }
 
     /**
@@ -47,15 +29,16 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      * entity at that position is no longer a {@link ReactorOutputEntity}.
      */
     @Override
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         List<BlockPos> toRemove = new ArrayList<>();
-        for (BlockPos p : positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) {
-                toRemove.add(p);
+                toRemove.add(offset);
                 continue;
             }
             BlockEntity be = level.getBlockEntity(p);
-            if (!(be instanceof ReactorOutputEntity)) toRemove.add(p);
+            if (!(be instanceof ReactorOutputEntity)) toRemove.add(offset);
         }
         positions.removeAll(toRemove);
     }
@@ -66,13 +49,9 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      * loaded {@link ReactorOutputEntity}.
      */
     @Override
-    public List<BlockPos> getBlocksPosition(Level level) {
-        List<BlockPos> positions = new ArrayList<>();
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        return filterByType(level, controllerPos, ReactorOutputEntity.class);
 
-        for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorOutputEntity) positions.add(p);
-        }
-        return List.copyOf(positions);
     }
 
     /**
@@ -84,7 +63,7 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      * stopped.
      */
     @Override
-    public void rotateOutputs(Level level, boolean assembled, int rotation) {
+    public void rotateOutputs(Level level, BlockPos controllerPos, boolean assembled, int rotation) {
         if (positions.isEmpty()) return;
 
         int totalRpm = rotation / RPM_DIVIDER;
@@ -93,7 +72,7 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
 
         for (int i = 0; i < size; i++) {
             int dividedRotation = (totalRpm / size) + (i < remainingRotation ? 1 : 0);
-            BlockPos pos = positions.get(i);
+            BlockPos pos = controllerPos.offset(positions.get(i));
 
             if (!(level.getBlockState(pos).getBlock() instanceof ReactorOutput block)) continue;
             ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);

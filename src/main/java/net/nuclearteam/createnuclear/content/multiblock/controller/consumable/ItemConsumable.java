@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.consumable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
@@ -22,12 +23,12 @@ public class ItemConsumable implements IConsumable {
     @Override
     public int computeTimer(int count) {
         int base = Math.max(1, rodType.rodTimer().get());
-        return Math.max(1, (int) (base / Math.max(1, count)));
+        return Math.max(1, base / Math.max(1, count));
     }
 
     @Override
-    public boolean consume(ReactorInputManagerI manager, Level level) {
-        return manager.extractItemByName(level, itemName);
+    public boolean consume(ReactorInputManagerI manager, Level level, BlockPos controllerPos) {
+        return manager.extractItemByName(level, controllerPos, itemName);
     }
 
     @Override

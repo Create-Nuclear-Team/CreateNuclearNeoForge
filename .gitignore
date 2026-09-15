@@ -49,3 +49,5 @@ run/downloads/log.json
 run/command_history.txt
 run/world/
 run/world*/
+run/.sable/*
+run/ponders_watched.json

@@ -24,7 +24,6 @@ public class CNPonderReactorScenes {
     private static final int S_T3 = 9;
     private static final int H_T3 = 11;
 
-    private static final int PEDESTAL_Y = 0; // pedestal layer (snow/concrete)
     private static final int MULTIBLOCK_BASE_Y = 1; // multiblock starts at y=1
     private static final int MARGIN = 2; // Create margin
     private static int plateSizeFor(int multiblockSize) { return multiblockSize + MARGIN * 2; }
@@ -56,32 +55,32 @@ public class CNPonderReactorScenes {
         // Example for T1 (multiblockSize = 5)
         // plate = 5 + 4 = 9 => valid x/z: 0..8; inner multiblock: 2..6
         STATIC_POS.put(5, new Positions(
-                new BlockPos(4, 4, 6),  // controller
-                new BlockPos(3, 2, 6),  // input1
-                new BlockPos(3, 3, 6),  // input2
-                new BlockPos(3, 4, 6),  // liquidInput
-                new BlockPos(5, 4, 6),  // alarm
-                new BlockPos(5, 2, 6)   // output
+            new BlockPos(4, 4, 6),  // controller
+            new BlockPos(3, 2, 6),  // input1
+            new BlockPos(3, 3, 6),  // input2
+            new BlockPos(3, 4, 6),  // liquidInput
+            new BlockPos(5, 4, 6),  // alarm
+            new BlockPos(5, 2, 6)   // output
         ));
 
         // Example for T2 (multiblockSize = 7)
         STATIC_POS.put(7, new Positions(
-                new BlockPos(5, 5, 8),  // controller
-                new BlockPos(3, 3, 8),  // input1
-                new BlockPos(3, 4, 8),  // input2
-                new BlockPos(3, 5, 8),  // liquidInput
-                new BlockPos(7, 5, 8),  // alarm
-                new BlockPos(7, 3, 8)   // output
+            new BlockPos(5, 5, 8),  // controller
+            new BlockPos(3, 3, 8),  // input1
+            new BlockPos(3, 4, 8),  // input2
+            new BlockPos(3, 5, 8),  // liquidInput
+            new BlockPos(7, 5, 8),  // alarm
+            new BlockPos(7, 3, 8)   // output
         ));
 
         // Example for T3 (multiblockSize = 9)
         STATIC_POS.put(9, new Positions(
-                new BlockPos(6, 6, 10),  // controller
-                new BlockPos(5, 4, 10), // input1
-                new BlockPos(5, 5, 10), // input2
-                new BlockPos(5, 6, 10),  // liquidInput
-                new BlockPos(7, 6, 10),  // alarm
-                new BlockPos(7, 4, 10)   // output
+            new BlockPos(6, 6, 10),  // controller
+            new BlockPos(5, 4, 10), // input1
+            new BlockPos(5, 5, 10), // input2
+            new BlockPos(5, 6, 10),  // liquidInput
+            new BlockPos(7, 6, 10),  // alarm
+            new BlockPos(7, 4, 10)   // output
         ));
     }
 
@@ -92,10 +91,10 @@ public class CNPonderReactorScenes {
     private static Map<BlockPos, CalloutInfo> buildCallouts(Positions pos) {
         Map<BlockPos, CalloutInfo> callouts = new HashMap<>();
         callouts.put(pos.controller, new CalloutInfo(
-                "Controller: brain of the reactor, and the place where the blueprint goes to start it",
-                Direction.DOWN,
-                130, 110,
-                140, 120
+            "Controller: brain of the reactor, and the place where the blueprint goes to start it",
+            Direction.DOWN,
+            130, 110,
+            140, 120
         ));
 
         // Extend here if input1/input2/liquidInput/alarm/output ever need a callout
@@ -110,23 +109,18 @@ public class CNPonderReactorScenes {
         if (p != null) return p;
 
         // fallback: simple centered calculation (avoids an NPE)
-        int plate = plateSizeFor(multiblockSize);
         int offset = MARGIN;
         int cx = offset + (multiblockSize / 2);
         int cz = offset + (multiblockSize / 2);
         int cy = MULTIBLOCK_BASE_Y + (height / 2);
         return new Positions(
-                new BlockPos(cx, cy, cz),               // controller
-                new BlockPos(cx, MULTIBLOCK_BASE_Y+1, offset + multiblockSize - 1), // input1 front
-                new BlockPos(cx, Math.min(MULTIBLOCK_BASE_Y+height-1, MULTIBLOCK_BASE_Y+2), offset + multiblockSize - 1), // input2
-                new BlockPos(cx, cy, offset),          // liquidInput back
-                new BlockPos(Math.max(offset, cx-1), cy, cz), // alarm
-                new BlockPos(offset + multiblockSize - 1, cy, cz) // output right
+            new BlockPos(cx, cy, cz),               // controller
+            new BlockPos(cx, MULTIBLOCK_BASE_Y+1, offset + multiblockSize - 1), // input1 front
+            new BlockPos(cx, Math.min(MULTIBLOCK_BASE_Y+height-1, MULTIBLOCK_BASE_Y+2), offset + multiblockSize - 1), // input2
+            new BlockPos(cx, cy, offset),          // liquidInput back
+            new BlockPos(Math.max(offset, cx-1), cy, cz), // alarm
+            new BlockPos(offset + multiblockSize - 1, cy, cz) // output right
         );
-    }
-
-    private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate) {
-        showReactorStructure(scene, util, S, H, plate, false);
     }
 
     /**
@@ -138,13 +132,6 @@ public class CNPonderReactorScenes {
     private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate, boolean bySections) {
         Positions pos = positionsFor(S, H);
         Map<BlockPos, CalloutInfo> callouts = buildCallouts(pos);
-
-        int minX = MARGIN;
-        int maxX = MARGIN + S - 1;
-        int minZ = MARGIN;
-        int maxZ = MARGIN + S - 1;
-        int minY = 1;
-        int maxY = H;
 
         scene.idle(20);
 
@@ -183,30 +170,30 @@ public class CNPonderReactorScenes {
 
         scene.idle(20);
         scene.overlay()
-                .showText(110)
-                .text("To start the reactor you will need liquid and rods corresponding to the pattern, then right click the controller with the blueprint in hand");
+            .showText(110)
+            .text("To start the reactor you will need liquid and rods corresponding to the pattern, then right click the controller with the blueprint in hand");
         Vec3 topSide = util.vector().blockSurface(pos.controller, Direction.EAST);
         scene.overlay()
-                .showControls(topSide, Pointing.UP, 60)
-                .withItem(CNItems.REACTOR_BLUEPRINT.asStack())
-                .rightClick();
+            .showControls(topSide, Pointing.UP, 60)
+            .withItem(CNItems.REACTOR_BLUEPRINT.asStack())
+            .rightClick();
         scene.world().modifyBlock(pos.controller, s -> s.setValue(ReactorControllerBlock.ASSEMBLED, true), true);
 
         scene.idle(120);
         scene.overlay()
-                .showText(120)
-                .text("Note: Check page 4 for I/O and Alarm blocks (placement & function).")
-                .attachKeyFrame()
-                .placeNearTarget();
+            .showText(120)
+            .text("Note: Check page 4 for I/O and Alarm blocks (placement & function).")
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(130);
     }
 
     private static void showCallout(SceneBuilder scene, SceneBuildingUtil util, BlockPos at, CalloutInfo info, boolean reduced) {
         scene.overlay().showText(reduced ? info.reducedDuration() : info.fullDuration())
-                .text(info.text())
-                .pointAt(util.vector().blockSurface(at, info.pointDirection()))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text(info.text())
+            .pointAt(util.vector().blockSurface(at, info.pointDirection()))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(reduced ? info.reducedIdle() : info.fullIdle());
     }
 
@@ -272,49 +259,49 @@ public class CNPonderReactorScenes {
 
         // Show Input 1
         scene.overlay().showText(150)
-                .text("Rod Input: Stores Heating or Cooling Rods. We need one Heating Rod (fuel) to heat the reactor, and one Cooling Rod for stability.")
-                .pointAt(util.vector().blockSurface(pos.input1, Direction.SOUTH))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("Rod Input: Stores Heating or Cooling Rods. We need one Heating Rod (fuel) to heat the reactor, and one Cooling Rod for stability.")
+            .pointAt(util.vector().blockSurface(pos.input1, Direction.SOUTH))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(160);
 
         // Show Input 2
         scene.overlay().showText(150)
-                .text("Second Rod Input: This is why we need at least two inputs! One for the Heating Rod and one for the Cooling Rod to prevent explosions.")
-                .pointAt(util.vector().blockSurface(pos.input2, Direction.SOUTH))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("Second Rod Input: This is why we need at least two inputs! One for the Heating Rod and one for the Cooling Rod to prevent explosions.")
+            .pointAt(util.vector().blockSurface(pos.input2, Direction.SOUTH))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(160);
 
         // Show Fluid Input
         scene.overlay().showText(150)
-                .text("Fluid Input: Fluid is also required to cool the reactor and ensure it does not explode.")
-                .pointAt(util.vector().blockSurface(pos.liquidInput, Direction.SOUTH))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("Fluid Input: Fluid is also required to cool the reactor and ensure it does not explode.")
+            .pointAt(util.vector().blockSurface(pos.liquidInput, Direction.SOUTH))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(160);
 
         // Show Alarm
         scene.overlay().showText(150)
-                .text("Alarm (Optional): Emits a sound when the reactor becomes unstable and risks exploding.")
-                .pointAt(util.vector().blockSurface(pos.alarm, Direction.SOUTH))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("Alarm (Optional): Emits a sound when the reactor becomes unstable and risks exploding.")
+            .pointAt(util.vector().blockSurface(pos.alarm, Direction.SOUTH))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(160);
 
         // Show Output
         scene.overlay().showText(160)
-                .text("Output: Necessary to extract generated energy. You can place multiple outputs to dispatch the total energy between them.")
-                .pointAt(util.vector().blockSurface(pos.output, Direction.SOUTH))
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("Output: Necessary to extract generated energy. You can place multiple outputs to dispatch the total energy between them.")
+            .pointAt(util.vector().blockSurface(pos.output, Direction.SOUTH))
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(170);
 
         // --- Placement ---
         scene.overlay().showText(120)
-                .text("These blocks can replace ANY Reactor Casing, as long as it is not on an edge.")
-                .attachKeyFrame()
-                .placeNearTarget();
+            .text("These blocks can replace ANY Reactor Casing, as long as it is not on an edge.")
+            .attachKeyFrame()
+            .placeNearTarget();
         scene.idle(130);
 
         // Demonstrate moving the blocks to the roof (y=7 for T1)
@@ -340,9 +327,9 @@ public class CNPonderReactorScenes {
         scene.world().modifyBlock(newOut, s -> CNBlocks.REACTOR_OUTPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
 
         scene.overlay().showText(100)
-                .text("They can be grouped together on the roof or any other flat surface.")
-                .pointAt(util.vector().blockSurface(newIn2, Direction.UP))
-                .placeNearTarget();
+            .text("They can be grouped together on the roof or any other flat surface.")
+            .pointAt(util.vector().blockSurface(newIn2, Direction.UP))
+            .placeNearTarget();
         scene.idle(110);
     }
 }

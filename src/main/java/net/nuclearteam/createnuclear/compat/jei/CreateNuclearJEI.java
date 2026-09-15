@@ -129,38 +129,6 @@ public class CreateNuclearJEI implements IModPlugin {
         registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getFlowing(), interpreter);
     }
 
-    @Override
-    public void registerExtraIngredients(IExtraIngredientRegistration registration) {
-        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-        List<Holder.Reference<Potion>> potions = registryAccess.lookupOrThrow(Registries.POTION)
-                .listElements()
-                .toList();
-        Collection<FluidStack> potionFluids = new ArrayList<>(potions.size() * 3);
-        Set<Set<Holder<MobEffect>>> visitedEffects = new HashSet<>();
-        for (Holder.Reference<Potion> potion : potions) {
-            // @goshante: Ingame potion fluids always have Bottle tag that specifies
-            // to what bottle type this potion belongs
-            // Potion fluid without this tag wouldn't be recognized by other mods
-
-//			for (PotionFluid.BottleType bottleType : PotionFluid.BottleType.values()) {
-//				FluidStack potionFluid = PotionFluid.of(1000, new PotionContents(potion), bottleType);
-//				potionFluids.add(potionFluid);
-//			}
-
-            PotionContents potionContents = new PotionContents(potion);
-
-            if (potionContents.hasEffects()) {
-                Set<Holder<MobEffect>> effectSet = new HashSet<>();
-                potionContents.forEachEffect(mei -> effectSet.add(mei.getEffect()));
-                if (!visitedEffects.add(effectSet))
-                    continue;
-            }
-
-            potionFluids.add(PotionFluid.of(1000, potionContents, PotionFluid.BottleType.REGULAR));
-        }
-        registration.addExtraIngredients(NeoForgeTypes.FLUID_STACK, potionFluids);
-    }
-
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {

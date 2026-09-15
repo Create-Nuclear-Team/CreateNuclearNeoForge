@@ -8,11 +8,9 @@ import com.simibubi.create.content.trains.display.FlapDisplayLayout;
 import com.simibubi.create.content.trains.display.FlapDisplaySection;
 import com.simibubi.create.foundation.gui.ModularGuiLineBuilder;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -154,9 +152,9 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
         int mode = context.sourceConfig().getInt("display_mode");
 
-        // Divergence assumee vs Forge, qui lit getConfiguredPattern().getOrCreateTag().getDouble("heat") :
-        // en 1.21 la chaleur vit dans le data component CNDataComponents.HEAT, et relire le tag NBT de la
-        // stack renvoie une copie defensive ou la valeur est toujours absente (elle valait donc 0 ici).
+        // Assumed divergence vs Forge, which reads getConfiguredPattern().getOrCreateTag().getDouble("heat"):
+        // in 1.21 heat lives in the CNDataComponents.HEAT data component, and re-reading the stack's NBT
+        // tag returns a defensive copy where the value is always absent (so it was 0 here).
         int heat = controller.getConfiguredPatternHeat();
         int fuel = 0;
         int cooler = 0;
@@ -200,7 +198,7 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
     }
 
     private MutableComponent formatSize(int size) {
-        String key = size <= 5 ? "small" : size <= 7 ? "medium" : "large";
+        String key = ReactorDisplayConstants.sizeTierKey(ReactorDisplayConstants.sizeTier(size));
         return CreateNuclearLang.translateDirect("display_source.reactor.size." + key).withStyle(ChatFormatting.BLUE);
     }
 

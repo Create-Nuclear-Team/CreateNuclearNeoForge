@@ -137,14 +137,10 @@ public class RadiationCapability {
     private static double computeItemRadiation(Player player) {
         double radiation = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof IRadiationSource source)
-                radiation += source.getRadiation(stack, player);
-            radiation += RadiationRegistry.getRadiation(stack, player);
+            radiation += getStackRadiation(stack, player);
         }
         for (ItemStack stack : player.getInventory().offhand) {
-            if (stack.getItem() instanceof IRadiationSource source)
-                radiation += source.getRadiation(stack, player);
-            radiation += RadiationRegistry.getRadiation(stack, player);
+            radiation += getStackRadiation(stack, player);
         }
         return radiation;
     }
@@ -202,14 +198,11 @@ public class RadiationCapability {
     }
 
     private static void applyEffects(LivingEntity entity, double radiation) {
-        final double radiation_desactive = 0;
-        if (radiation <= radiation_desactive) return;
-
         int amp;
         if (radiation < CNConfigs.server().radiation.radiationLevel1.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel2.get()) amp = CNConfigs.server().radiation.amplifierLevel1.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel3.get()) amp = CNConfigs.server().radiation.amplifierLevel2.get();
-        else amp = CNConfigs.server().radiation.amplifierLevel2.get();
+        else amp = CNConfigs.server().radiation.amplifierLevel3.get();
 
         MobEffectInstance current = entity.getEffect(CNEffects.RADIATION);
 

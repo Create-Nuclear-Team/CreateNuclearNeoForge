@@ -10,13 +10,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
+/**
+ * Utility helpers for handling multiblock placement and removal events.
+ * These helpers locate the controller for a given part position and
+ * invoke provided callbacks to register or remove parts.
+ */
 public class MultiblockHelpers {
     private static final ReactorPattern pattern = new ReactorPattern();
 
     /**
-     * Utility helpers for handling multiblock placement and removal events.
-     * These helpers locate the controller for a given part position and
-     * invoke provided callbacks to register or remove parts.
+     * Locates the controller for {@code pos} and, if found, invokes {@code register}
+     * with the controller and the placed part's position.
      */
     public static void handleOnPlace(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> register) {
         BlockPos controllerPos = pattern.findControllerPos(pos, level, true);
@@ -28,6 +32,10 @@ public class MultiblockHelpers {
         }
     }
 
+    /**
+     * Locates the controller for {@code pos} and, if found, invokes {@code remover}
+     * with the controller and the removed part's position.
+     */
     public static void handleRemoval(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> remover) {
         BlockPos controllerPos = pattern.findControllerPos(pos, level, false);
         if (controllerPos != null) {
@@ -38,11 +46,11 @@ public class MultiblockHelpers {
         }
     }
 
+    /**
+     * Returns the controller entity for the given part position, or null
+     * if no valid controller is found.
+     */
     public static ReactorControllerBlockEntity getControllerForPart(Level level, BlockPos pos) {
-        /**
-         * Returns the controller entity for the given part position, or null
-         * if no valid controller is found.
-         */
         BlockPos controllerPos = pattern.findControllerPos(pos, level);
         if (controllerPos != null) {
             return  (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);

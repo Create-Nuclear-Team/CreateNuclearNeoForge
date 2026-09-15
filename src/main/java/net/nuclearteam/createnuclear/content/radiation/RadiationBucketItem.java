@@ -6,8 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 
-import java.util.function.Supplier;
-
 public class RadiationBucketItem extends BucketItem implements IRadiationSource {
     private final double radiation;
 

@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.consumable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -55,14 +56,14 @@ public class ConsumptionCycleManager {
         takeSnapshot(pattern, level);
     }
 
-    public boolean tick(ReactorInputManagerI manager, Level level) {
+    public boolean tick(ReactorInputManagerI manager, Level level, BlockPos controllerPos) {
         boolean consumed = false;
         Iterator<ConsumableTimer> it = timers.iterator();
 
         while (it.hasNext()) {
             ConsumableTimer timer = it.next();
             if (timer.tick()) {
-                timer.getConsumable().consume(manager, level);
+                timer.getConsumable().consume(manager, level, controllerPos);
                 consumed = true;
 
                 if (timer.getCountInPattern() > 1) {
@@ -147,7 +148,7 @@ public class ConsumptionCycleManager {
      * @param checkPatternChange if {@code false}, the pattern change isn't
      *                           checked this tick (used to throttle the check's frequency)
      */
-    public void update(ItemStack pattern, Level level, ReactorInputManagerI inputManager, boolean checkPatternChange) {
+    public void update(ItemStack pattern, Level level, ReactorInputManagerI inputManager, BlockPos controllerPos, boolean checkPatternChange) {
         boolean emptyPattern = pattern.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) == ReactorBluePrintData.EMPTY;
         if (isEmpty() && !emptyPattern) {
             startCycle(pattern, level);
@@ -157,7 +158,7 @@ public class ConsumptionCycleManager {
             if (checkPatternChange && hasPatternChanged(pattern, level)) {
                 resetCycle(pattern, level, inputManager);
             }
-            tick(inputManager, level);
+            tick(inputManager, level, controllerPos);
         }
     }
 }

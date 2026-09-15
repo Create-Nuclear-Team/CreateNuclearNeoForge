@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.consumable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
@@ -9,14 +10,14 @@ public interface IConsumable {
 
     int computeTimer(int countInPattern);
 
-    boolean consume(ReactorInputManagerI manager, Level level);
+    boolean consume(ReactorInputManagerI manager, Level level, BlockPos controllerPos);
 
     CompoundTag serializeNBT();
 
     static IConsumable deserializeNBT(CompoundTag tag) {
         return switch (tag.getString("type")) {
             case "item" -> ItemConsumable.deserializeNBT(tag);
-            case "fluid" -> FluidConsumable.deserializeNBT(tag);
+//            case "fluid" -> FluidConsumable.deserializeNBT(tag); // It has been removed; we will need to discuss it again later.
             default -> throw new IllegalArgumentException(
                     "Unknown consumable type: " + tag.getString("type"));
         };
