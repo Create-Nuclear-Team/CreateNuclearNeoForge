@@ -198,9 +198,6 @@ public class RadiationCapability {
     }
 
     private static void applyEffects(LivingEntity entity, double radiation) {
-        final double radiation_desactive = 0;
-        if (radiation <= radiation_desactive) return;
-
         int amp;
         if (radiation < CNConfigs.server().radiation.radiationLevel1.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel2.get()) amp = CNConfigs.server().radiation.amplifierLevel1.get();

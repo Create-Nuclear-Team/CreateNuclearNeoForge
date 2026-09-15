@@ -55,7 +55,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     private final ReactorControllerInventory inventory;
     private int countFuelRod;
-    private int countCoolerRod;
     private HeatBalance heatBalance;
     private int heat;
     private int lastAppliedOutputHeat;
@@ -66,7 +65,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private ReactorRunningSoundInstance runningSound;
 
     private final ConsumptionCycleManager cycleManager = new ConsumptionCycleManager();
-    private double liquidLife;
     private ItemStack configuredPattern;
 
     private List<BigFluidStack> bigFluidStack;
@@ -361,8 +359,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (!isEmptyConfiguredPattern()) {
             // Deliberately a local, shadowing the field, exactly as on Forge: the field `heat`
             // must keep the value handleAssembledState() computed, and is only refreshed there.
-            int heat = getConfiguredPatternHeat();
-            countCoolerRod = getConfiguredPatternCoolerRodCount();
+            getConfiguredPatternHeat();
             countFuelRod = getConfiguredPatternFuelRodCount();
             heatBalance = heatCoordinator.calculateHeatBalance(configuredPattern, displayState, level);
         }
@@ -383,10 +380,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      * on NeoForge they live in the {@code ReactorBluePrintData} component written by
      * {@code ReactorBluePrintMenu#saveData}.
      */
-    private int getConfiguredPatternCoolerRodCount() {
-        return getConfiguredPatternData().countCooledRod();
-    }
-
     private int getConfiguredPatternFuelRodCount() {
         return getConfiguredPatternData().countFuelRod();
     }

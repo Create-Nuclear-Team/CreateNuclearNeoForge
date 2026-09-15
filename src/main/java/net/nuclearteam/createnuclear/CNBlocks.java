@@ -10,8 +10,6 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -19,8 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -29,12 +25,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
-import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
+import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorIOGenerator;
@@ -381,21 +375,11 @@ public class CNBlocks {
 
     public static final BlockEntry<UraniumOreBlock> DEEPSLATE_URANIUM_ORE = CreateNuclear.REGISTRATE
         .block("deepslate_uranium_ore", UraniumOreBlock::new)
-        .initialProperties(() -> Blocks.DIAMOND_ORE)
-        .properties(UraniumOreBlock.litBlockEmission())
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
-                  .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 1))))))
-        .tag(
-            BlockTags.NEEDS_DIAMOND_TOOL,
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNMaterialTags.URANIUM.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocks(
+            () -> Blocks.DIAMOND_ORE, UraniumOreBlock.litBlockEmission(),
+            CNItems.RAW_URANIUM, 3.0F, 4.0F, 1,
+            true, true, CNMaterialTags.URANIUM
+        ))
         .item((b, p) -> new UraniumOreItem(b, p, 3))
         .tag(Tags.Items.ORES, CNMaterialTags.URANIUM.ores().items())
         .build()
@@ -403,20 +387,12 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> DEEPSLATE_LEAD_ORE = CreateNuclear.REGISTRATE
         .block("deepslate_lead_ore", Block::new)
-        .initialProperties(() -> Blocks.DIAMOND_ORE)
         .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
-                  .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 4))))))
-        .tag(
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNMaterialTags.LEAD.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocks(
+            () -> Blocks.DIAMOND_ORE, null,
+            CNItems.RAW_LEAD, 2.0F, 4.0F, 4,
+            false, true, CNMaterialTags.LEAD
+        ))
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.LEAD.ores().items())
         .build()
@@ -424,24 +400,12 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> DEEPSLATE_THORIUM_ORE = CreateNuclear.REGISTRATE
         .block("deepslate_thorium_ore", Block::new)
-        .initialProperties(() -> Blocks.DIAMOND_ORE)
         .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                  .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
-                  .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 5))
-                )
-            )
+        .transform(CNBuilderTransformers.oreBlocks(
+            () -> Blocks.DIAMOND_ORE, null,
+            CNItems.RAW_THORIUM, 2.0F, 5.0F, 5,
+            true, true, CNMaterialTags.THORIUM
         ))
-        .tag(
-            BlockTags.NEEDS_DIAMOND_TOOL,
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNMaterialTags.THORIUM.ores().blocks()
-        )
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.THORIUM.ores().items())
         .build()
@@ -449,25 +413,11 @@ public class CNBlocks {
 
     public static final BlockEntry<UraniumOreBlock> URANIUM_ORE = CreateNuclear.REGISTRATE
         .block("uranium_ore", UraniumOreBlock::new)
-        .initialProperties(SharedProperties::stone)
-        .properties(UraniumOreBlock.litBlockEmission())
-        .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> {
-            HolderLookup.RegistryLookup<Enchantment> enchantmentRegistryLookup = lt.getRegistries().lookupOrThrow(Registries.ENCHANTMENT);
-            lt.add(b,
-                lt.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
-                      .apply(ApplyBonusCount.addUniformBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE))))));
-        })
-        .tag(
-            BlockTags.NEEDS_DIAMOND_TOOL,
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNMaterialTags.URANIUM.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocks(
+            SharedProperties::stone, UraniumOreBlock.litBlockEmission(),
+            CNItems.RAW_URANIUM, 3.0F, 4.0F, 1,
+            true, false, CNMaterialTags.URANIUM
+        ))
         .item((b, p) -> new UraniumOreItem(b, p, 3))
         .tag(Tags.Items.ORES, CNMaterialTags.URANIUM.ores().items())
         .build()
@@ -475,23 +425,11 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> LEAD_ORE = CreateNuclear.REGISTRATE
         .block("lead_ore", Block::new)
-        .initialProperties(SharedProperties::stone)
-        .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> {
-            HolderLookup.RegistryLookup<Enchantment> enchantmentRegistryLookup = lt.getRegistries().lookupOrThrow(Registries.ENCHANTMENT);
-            lt.add(b,
-                lt.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                      .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
-                      .apply(ApplyBonusCount.addUniformBonusCount(enchantmentRegistryLookup.getOrThrow(Enchantments.FORTUNE), 4)))));
-        })
-        .tag(
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNMaterialTags.LEAD.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocks(
+            SharedProperties::stone, null,
+            CNItems.RAW_LEAD, 2.0F, 4.0F, 4,
+            false, false, CNMaterialTags.LEAD
+        ))
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.LEAD.ores().items())
         .build()
@@ -500,21 +438,12 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> THORIUM_ORE = CreateNuclear.REGISTRATE
         .block("thorium_ore", Block::new)
-        .initialProperties(SharedProperties::stone)
         .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                 .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
-                 .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), 5))))))
-        .tag(
-            BlockTags.NEEDS_DIAMOND_TOOL,
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNMaterialTags.THORIUM.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocks(
+            SharedProperties::stone, null,
+            CNItems.RAW_THORIUM, 2.0F, 5.0F, 5,
+            true, false, CNMaterialTags.THORIUM
+        ))
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.THORIUM.ores().items())
         .build()
@@ -522,19 +451,10 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> NITRATE_ORE = CreateNuclear.REGISTRATE
         .block("nitrate_ore", Block::new)
-        .initialProperties(SharedProperties::stone)
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
-                  .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))
-                ))))
-        .tag(
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_STONE,
-            CNMaterialTags.NITRATE.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocksSingleDrop(
+            SharedProperties::stone, CNItems.NITRATE,
+            false, false, CNMaterialTags.NITRATE
+        ))
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.NITRATE.ores().items())
         .build()
@@ -542,20 +462,11 @@ public class CNBlocks {
 
     public static final BlockEntry<Block> DEEPSLATE_NITRATE_ORE = CreateNuclear.REGISTRATE
         .block("deepslate_nitrate_ore", Block::new)
-        .initialProperties(SharedProperties::stone)
         .simpleItem()
-        .transform(pickaxeOnly())
-        .loot((lt, b) -> lt.add(b,
-            lt.createSilkTouchDispatchTable(b,
-                lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
-                  .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))
-                ))))
-        .tag(
-            BlockTags.NEEDS_IRON_TOOL,
-            Tags.Blocks.ORES,
-            Tags.Blocks.ORES_IN_GROUND_DEEPSLATE,
-            CNMaterialTags.NITRATE.ores().blocks()
-        )
+        .transform(CNBuilderTransformers.oreBlocksSingleDrop(
+            SharedProperties::stone, CNItems.NITRATE,
+            false, true, CNMaterialTags.NITRATE
+        ))
         .item()
         .tag(Tags.Items.ORES, CNMaterialTags.NITRATE.ores().items())
         .build()

@@ -36,16 +36,6 @@ public class CNFanProcessingTypes {
     public static final EnrichedType ENRICHED = register("enriched", new EnrichedType());
     public static final SnowPowderType SNOW_POWDER = register("snow_powder", new SnowPowderType());
 
-    private static final Map<String, FanProcessingType> LEGACY_NAME_MAP;
-
-    static {
-        Object2ReferenceOpenHashMap<String, FanProcessingType> map = new Object2ReferenceOpenHashMap<>();
-        map.put("ENRICHED", ENRICHED);
-        map.put("SNOW_POWDER", SNOW_POWDER);
-        map.trim();
-        LEGACY_NAME_MAP = map;
-    }
-
     private static <T extends FanProcessingType> T register(String id, T type) {
         return Registry.register(CreateBuiltInRegistries.FAN_PROCESSING_TYPE, CreateNuclear.asResource(id), type);
     }

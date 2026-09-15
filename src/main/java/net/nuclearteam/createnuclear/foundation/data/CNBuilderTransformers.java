@@ -1,25 +1,44 @@
 package net.nuclearteam.createnuclear.foundation.data;
 
+import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import com.tterrag.registrate.util.nullness.NonNullBiFunction;
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.common.Tags;
+import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
+import net.nuclearteam.createnuclear.foundation.data.recipe.CNMaterialTags;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
 public class CNBuilderTransformers {
 
@@ -108,5 +127,69 @@ public class CNBuilderTransformers {
                 .lang(nameItems)
                 .model((c, p) -> p.withExistingParent(c.getName(), ResourceLocation.parse("item/template_spawn_egg")))
                 .register();
+    }
+
+    /**
+     * Shared block-side setup (properties, pickaxe requirement, loot table, block tags) for an
+     * ore that drops a random count of an item scaled by a uniform Fortune bonus - i.e. every
+     * ore in the mod except nitrate (see {@link #oreBlocksSingleDrop}). {@code propsFunc} may be
+     * {@code null} when the block needs no extra {@code properties(...)} call (e.g. no light
+     * emission), matching blocks that previously skipped that call entirely.
+     */
+    public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> oreBlocks(
+            NonNullSupplier<? extends Block> initialProperties,
+            @Nullable NonNullUnaryOperator<BlockBehaviour.Properties> propsFunc,
+            ItemLike lootReturn,
+            float minItem, float maxItem,
+            int bonusMultiplier,
+            boolean needsDiamondTool,
+            boolean isDeepslate,
+            CNMaterialTags materialTags
+    ) {
+        return builder -> {
+            BlockBuilder<B, P> withProps = builder.initialProperties(initialProperties);
+            if (propsFunc != null) {
+                withProps = withProps.properties(propsFunc);
+            }
+            BlockBuilder<B, P> withLoot = withProps
+                .transform(pickaxeOnly())
+                .loot((lt, b) -> lt.add(b,
+                    lt.createSilkTouchDispatchTable(b,
+                        lt.applyExplosionDecay(b, LootItem.lootTableItem(lootReturn)
+                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(minItem, maxItem)))
+                            .apply(ApplyBonusCount.addUniformBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE), bonusMultiplier))))));
+            return applyOreTags(withLoot, needsDiamondTool, isDeepslate, materialTags);
+        };
+    }
+
+    /**
+     * Same as {@link #oreBlocks} but for an ore that always drops a single item, scaled only by
+     * {@link ApplyBonusCount#addOreBonusCount} (nitrate ore, both variants) rather than a random
+     * count range with a uniform Fortune bonus.
+     */
+    public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> oreBlocksSingleDrop(
+            NonNullSupplier<? extends Block> initialProperties,
+            ItemLike lootReturn,
+            boolean needsDiamondTool,
+            boolean isDeepslate,
+            CNMaterialTags materialTags
+    ) {
+        return builder -> {
+            BlockBuilder<B, P> withLoot = builder
+                .initialProperties(initialProperties)
+                .transform(pickaxeOnly())
+                .loot((lt, b) -> lt.add(b,
+                    lt.createSilkTouchDispatchTable(b,
+                        lt.applyExplosionDecay(b, LootItem.lootTableItem(lootReturn)
+                            .apply(ApplyBonusCount.addOreBonusCount(lt.getRegistries().holderOrThrow(Enchantments.FORTUNE)))))));
+            return applyOreTags(withLoot, needsDiamondTool, isDeepslate, materialTags);
+        };
+    }
+
+    private static <B extends Block, P> BlockBuilder<B, P> applyOreTags(BlockBuilder<B, P> builder, boolean needsDiamondTool, boolean isDeepslate, CNMaterialTags materialTags) {
+        TagKey<Block> tagGround = isDeepslate ? Tags.Blocks.ORES_IN_GROUND_DEEPSLATE : Tags.Blocks.ORES_IN_GROUND_STONE;
+        return needsDiamondTool
+            ? builder.tag(BlockTags.NEEDS_DIAMOND_TOOL, BlockTags.NEEDS_IRON_TOOL, Tags.Blocks.ORES, tagGround, materialTags.ores().blocks())
+            : builder.tag(BlockTags.NEEDS_IRON_TOOL, Tags.Blocks.ORES, tagGround, materialTags.ores().blocks());
     }
 }
