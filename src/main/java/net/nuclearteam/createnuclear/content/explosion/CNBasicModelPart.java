@@ -73,8 +73,8 @@ public class CNBasicModelPart {
             ObjectListIterator var9 = this.childModels.iterator();
 
             while(var9.hasNext()) {
-                CNBasicModelPart CNBasicModelPart = (CNBasicModelPart)var9.next();
-                CNBasicModelPart.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+                CNBasicModelPart child = (CNBasicModelPart)var9.next();
+                child.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             }
 
             matrixStackIn.popPose();
