@@ -121,7 +121,6 @@ Aucune entrée ouverte pour le moment ; voir §8 pour l'historique des correctio
 | `foundation/data/recipe/CNCrushingRecipeGen.java:84-88` et `CNWashingRecipeGen.java:36-40` | Même motif de surcharge `create(Supplier<ItemLike>, UnaryOperator<...>)` redirigeant vers `create(CreateNuclear.MOD_ID, ...)`, répété à l'identique dans deux générateurs distincts. | 🟢 |
 | `api/multiblock/fluid/ReactorFluidType.java:80-92` et `api/multiblock/rods/RodType.java:93-105` | `resolveReactorFluidType`/`resolveRodType` suivent le même patron à 3 étapes (lookup registre → fallback `*Value` → fallback registre `FALLBACK_*`), dupliqué terme à terme. | 🟢 |
 | `content/multiblock/controller/manager/ReactorOutputManager.java:104-113` | Dans `rotateOutputs`, les branches `if`/`else` dupliquent `entity.updateSpeed = true; entity.updateGeneratedRotation();`. | 🟢 |
-| `content/multiblock/controller/service/ReactorMeltdownExecutor.java:26-27` | `globalNotifyPos` et `globalExplosionPos` sont calculées avec exactement la même expression `SableCompat.toGlobal(level, explosionPos)` — deux variables distinctes portant la même valeur, utilisées respectivement par `NotifyUtil.sendTitle(...)` (l.30) et `BiomeIrradiationService.circularArea(...)` (l.47). | 🟢 |
 | `content/contraptions/irradiated/{cat,chicken,cow,wolf}/*` | Duplication de structure attendue pour un portage vanilla entre les 4 animaux. | 🟢 |
 
 ---
@@ -132,7 +131,7 @@ Rappel : uniquement les éléments clairement transitoires/résiduels de la migr
 
 | Fichier:ligne | Détail | Priorité |
 |---|---|---|
-| `content/multiblock/input/fluid/ReactorFluidInput.java:91` | « Convertit le vieux InteractionResult en ItemInteractionResult si nécessaire pour NeoForge » — le « si nécessaire » signale une incertitude non tranchée. | 🟡 |
+| — | _Aucun résidu de migration identifié actuellement (cf. §8)._ | — |
 
 ---
 
@@ -187,12 +186,11 @@ Uniquement des refactors pertinents **après** la fin de la migration — pas li
 
 - Duplications : blocs multiblock `onPlace`/`onRemove`, `CoolerDisplaySource`/`FuelDisplaySource`/`ReactorSummaryDisplaySource`, `EnrichedRecipe`/`SnowPowderRecipe` + catégories JEI, `CNFanProcessingTypes` (`EnrichedType`/`SnowPowderType`), `CNTags` (5 enums ~230 lignes).
 - Dead code : abstraction `IPatternBuilder` jamais exploitée, clusters de méthodes mortes dans `CreateNuclearJEI` et `CNStandardRecipeGen`.
-- Incertitude `ReactorFluidInput.java:91` (API post-migration non tranchée).
 
 ### 🟢 Faible
 
 - Paramètre `coverage` mort dans `RenderHelper.renderOverlay` (mis de côté, pas d'action prévue).
-- Duplications mineures : `read`/`write` des managers (même format, code dupliqué), textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, variables `globalNotifyPos`/`globalExplosionPos` identiques dans `ReactorMeltdownExecutor`, générateurs de recettes `create(...)` (Crushing/Washing), `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput).
+- Duplications mineures : `read`/`write` des managers (même format, code dupliqué), textures `WOLF_LOCATION`/`WOLF_TAME_LOCATION`, `rotateOutputs` if/else, générateurs de recettes `create(...)` (Crushing/Washing), `resolveReactorFluidType`/`resolveRodType`, menus `clicked()` (BluePrint/RodInput).
 - Dead code mineur : méthodes/constructeurs sans appelant recensés en §1.2 (`TextUtils.formatInt`, `CNConfigs.byType`, `CNDensityFunctions.registerAndWrap`, `IrradiatedWolf.checkWolfSpawnRules`, `PaletteBlockPattern.cubeBottomTop`, `CNAdvancedModelBox.getParent`, constructeurs/`render(...)` de `CNBasicModelPart`, `CNAdvancedEntityModel.movementScale`, constructeur `EnrichingCampfireBlock`).
 - Refactors cosmétiques : paramètres décompilés MCP non renommés (`CNAdvancedModelBox`, `CNTabulaModelRenderUtils`), variable masquant le nom de sa classe (`CNBasicModelPart`).
 - Refactors optionnels de plus grande ampleur, non urgents (§6) : unifier les deux mécanismes d'enregistrement de `CNRecipeProvider` ; faire passer la consommation de fluide par `IConsumable`/`ConsumableTimer` (chantier documenté en détail en §6, actuellement bloqué par l'absence d'équivalent de `PatternReader` côté fluide).
@@ -205,6 +203,8 @@ Points listés dans une version antérieure de cet audit, corrigés depuis et re
 
 | Ex-# | Fichier:ligne | Problème (tel qu'audité) | Correction | Date |
 |---|---|---|---|---|
+| — | `content/multiblock/controller/service/ReactorMeltdownExecutor.java:26-27` | `globalNotifyPos` et `globalExplosionPos` calculées avec exactement la même expression `SableCompat.toGlobal(level, explosionPos)` — deux variables distinctes portant la même valeur. | Fusionnées en une seule variable `globalPos`, réutilisée par `NotifyUtil.sendTitle(...)` et `BiomeIrradiationService.circularArea(...)`. Comportement inchangé (même valeur qu'avant, un seul calcul au lieu de deux identiques) ; ligne vide en trop retirée au passage. | 15/09/2026 |
+| — | `content/multiblock/input/fluid/ReactorFluidInput.java:91` | `result.consumesAction() ? ItemInteractionResult.SUCCESS : PASS_TO_DEFAULT_BLOCK_INTERACTION` fusionnait `InteractionResult.FAIL` et `PASS` dans le même résultat, alors que `ItemInteractionResult` a une valeur `FAIL` dédiée — le commentaire « si nécessaire » signalait cette ambiguïté jamais tranchée. | Remplacé par un `switch` explicite (`SUCCESS`→`SUCCESS`, `FAIL`→`FAIL`, tout le reste→`PASS_TO_DEFAULT_BLOCK_INTERACTION`), qui respecte la sémantique complète d'`InteractionResult` au lieu de la réduire à un booléen. Fait au passage d'un fix comportemental sans rapport avec l'audit : retrait du `!player.isCreative()` qui limitait l'interaction avec l'input fluide au mode créatif. | `8b9ce28`, 15/09/2026 |
 | — | `content/multiblock/frame/ReactorFrameRenderer.java:74-77` | Cataloguée en §4 (dette de migration) : `CatnipServices.FLUID_RENDERER` déclaré `FluidRenderHelper<?>`, obligeant un cast non vérifié (`@SuppressWarnings("unchecked")`) vers `FluidRenderHelper<FluidStack>`. | **Reclassée, pas corrigée** : `FLUID_RENDERER` est déclaré `FluidRenderHelper<?>` **dans Catnip lui-même** (`new FluidRenderHelper<>()`, type generic effacé volontairement pour rester agnostique entre le `FluidStack` de Forge et celui de NeoForge, deux classes distinctes). Ce n'est donc pas un reliquat temporaire de la migration : c'est la façon dont Catnip/Create est censé être consommé par tout mod tiers, y compris une fois la migration terminée. Rentre dans la règle de cadrage du document (« usages qui fonctionnent correctement et ne sont pas explicitement temporaires ») — retirée de §4/§7, code inchangé. | 15/09/2026 |
 | — | `compat/alexscave/AlexscaveCompat.java:14-66`, `compat/Mods.java:16` (`ALEXS_CAVE`) | Compat entièrement gelée/orpheline pour Alex's Caves, en attente d'une version 1.21.1 du mod tiers (cf. §5.1). | `AlexscaveCompat.java` supprimé. `Mods.ALEXS_CAVE` n'a en revanche pas été retiré : il reste dans le fichier, désormais totalement orphelin (plus aucune référence dans le projet), toujours suivi en §5.1. | `331e963`, 15/09/2026 |
 | — | `content/decoration/palettes/PaletteBlockPattern.java:66-67` | Champ `private RenderType renderType;` (annoté `@OnlyIn(Dist.CLIENT)`) sans getter/setter, jamais assigné ni lu. | Champ (et les imports `RenderType`/`Dist`/`OnlyIn` devenus inutiles) supprimé. Le commit correspondant listait déjà cette correction comme faite dans son message, mais la ligne §1.3 n'avait pas réellement été retirée du fichier à l'époque — erreur corrigée ici après re-vérification directe du code (le champ n'existe plus). | `9dfb029`, 12/09/2026 |

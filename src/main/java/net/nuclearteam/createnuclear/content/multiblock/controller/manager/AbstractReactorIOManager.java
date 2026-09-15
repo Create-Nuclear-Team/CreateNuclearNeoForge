@@ -3,6 +3,8 @@ package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.function.Function;
 public abstract class AbstractReactorIOManager implements ReactorIOManager {
     /** List of `BlockPos` instances tracked by this manager. */
     protected final List<BlockPos> positions = new ArrayList<>();
+
+    protected abstract String nbtKey();
 
     /**
      * Adds `pos` if non-null and not already present; returns true when added.
@@ -96,11 +100,26 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
 
     /** Serialization: implementation provided by subclasses. */
     @Override
-    public abstract void read(CompoundTag compound);
+    public final void read(CompoundTag compound) {
+        positions.clear();
+        if (!compound.contains(nbtKey())) return;
+        ListTag list = compound.getList(nbtKey(), Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); ++i) {
+            positions.add(BlockPos.of(list.getCompound(i).getLong("p")));
+        }
+    }
 
     /** Deserialization: implementation provided by subclasses. */
     @Override
-    public abstract void write(CompoundTag compound);
+    public final void write(CompoundTag compound){
+        ListTag list = new ListTag();
+        for (BlockPos pos : positions) {
+            CompoundTag tag = new CompoundTag();
+            tag.putLong("p", pos.asLong());
+            list.add(tag);
+        }
+        compound.put(nbtKey(), list);
+    }
 
     /**
      * Removes invalid positions (e.g. unloaded chunk, missing block entity).

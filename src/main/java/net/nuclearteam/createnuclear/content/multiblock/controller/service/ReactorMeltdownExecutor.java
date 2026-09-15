@@ -23,11 +23,9 @@ public class ReactorMeltdownExecutor implements IExplosionService {
     @Override
     public void triggerExplosion(ServerLevel level, BlockPos controllerPos, @Nullable BoundingBox multiblockBounds, int reactorSize, int countFuelRod, int notifyRadius, boolean notifyWarnAll) {
         BlockPos explosionPos = controllerPos.above(5);
-        BlockPos globalNotifyPos = SableCompat.toGlobal(level, explosionPos);
-        BlockPos globalExplosionPos = SableCompat.toGlobal(level, explosionPos);
+        BlockPos globalPos = SableCompat.toGlobal(level, explosionPos);
 
-
-        NotifyUtil.sendTitle(level, globalNotifyPos,
+        NotifyUtil.sendTitle(level, globalPos,
                 CreateNuclearLang.translate("notification.reactor.destroyed"),
                 CreateNuclearLang.translate("notification.reactor.meltdown_finished"),
                 ChatFormatting.DARK_RED, notifyRadius, notifyWarnAll, 10, 60, 20
@@ -44,7 +42,7 @@ public class ReactorMeltdownExecutor implements IExplosionService {
         level.destroyBlock(controllerPos, false);
         Mods.SABLE.executeIfInstalled(() -> () -> destroyMultiblockStructure(level, multiblockBounds));
 
-        BiomeIrradiationService.circularArea(level, globalExplosionPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
+        BiomeIrradiationService.circularArea(level, globalPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
 
     }
 

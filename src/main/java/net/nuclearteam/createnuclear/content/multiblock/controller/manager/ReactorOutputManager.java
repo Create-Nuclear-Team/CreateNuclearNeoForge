@@ -16,29 +16,11 @@ import java.util.List;
  * Handles serialization of output positions.
  */
 public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
-    private static final String NBT_KEY = "ReactorOutputs";
     public static final int RPM_DIVIDER = 32;
 
     @Override
-    public void write(CompoundTag compound) {
-        ListTag list = new ListTag();
-        for (BlockPos p : positions) {
-            CompoundTag t = new CompoundTag();
-            t.putLong("p", p.asLong());
-            list.add(t);
-        }
-        compound.put(NBT_KEY, list);
-    }
-
-    @Override
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, 10);
-        for (int i = 0; i < list.size(); i++) {
-            BlockPos p = BlockPos.of(list.getCompound(i).getLong("p"));
-            positions.add(p);
-        }
+    protected String nbtKey() {
+        return "ReactorOutputs";
     }
 
     /**

@@ -25,27 +25,9 @@ import java.util.List;
  * obtain valid `IItemHandler` instances present at those positions.
  */
 public class ReactorInputManager extends AbstractReactorIOManager implements ReactorInputManagerI {
-    private static final String NBT_KEY = "ReactorInput";
-
     @Override
-    public void write(CompoundTag compound) {
-        ListTag list = new ListTag();
-        for (BlockPos pos : positions) {
-            CompoundTag tag = new CompoundTag();
-            tag.putLong("p", pos.asLong());
-            list.add(tag);
-        }
-        compound.put(NBT_KEY, list);
-    }
-
-    @Override
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); ++i) {
-            positions.add(BlockPos.of(list.getCompound(i).getLong("p")));
-        }
+    protected String nbtKey() {
+        return "ReactorInput";
     }
 
     /**
