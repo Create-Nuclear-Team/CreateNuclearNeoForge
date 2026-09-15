@@ -1,6 +1,8 @@
 package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 import com.simibubi.create.foundation.gui.menu.MenuBase;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -13,9 +15,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
+import net.nuclearteam.createnuclear.foundation.utility.MenuClickUtil;
 
 public class ReactorRodInputMenu extends MenuBase<ReactorRodInputEntity> {
-
+    private static final IntSet THROW_REDIRECT_SLOTS = new IntOpenHashSet(new int[]{9, 18, 27, 0, 1, 28, 19, 10, 16, 17, 26, 25, 34, 35, 8, 7});
 
     public ReactorRodInputMenu(MenuType<?> type, int id, Inventory inv, RegistryFriendlyByteBuf extraData) {
         super(type, id, inv, extraData);
@@ -112,14 +115,9 @@ public class ReactorRodInputMenu extends MenuBase<ReactorRodInputEntity> {
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if (clickType == ClickType.THROW) {
-            int[] targetSlotIds = {9, 18, 27, 0, 1, 28, 19, 10, 16, 17, 26, 25, 34, 35, 8, 7};
-            for (int id : targetSlotIds) {
-                if (slotId == id) {
-                    clickType = ClickType.PICKUP;
-                    super.clicked(slotId, button, clickType, player);
-                }
+            if (MenuClickUtil.isThrowRedirectedToPickup(clickType, slotId, THROW_REDIRECT_SLOTS::contains)) {
+                super.clicked(slotId, button, ClickType.PICKUP, player);
             }
-            return;
         }
         super.clicked(slotId, button, clickType, player);
     }
