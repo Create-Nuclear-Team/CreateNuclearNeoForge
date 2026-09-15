@@ -19,16 +19,21 @@ public class CNDensityFunctions {
         return ResourceKey.create(Registries.DENSITY_FUNCTION, CreateNuclear.asResource(id));
     }
 
-    public static void bootstrapRegistries(BootstrapContext<DensityFunction> context) {
-        context.register(Irradiated.EROSION, DensityFunctions.add(
+    // Same expression for both slots: EROSION and FINAL_DENSITY play different roles in the
+    // noise router (vanilla's are never identical), but nothing in the codebase currently gives
+    // either one distinct shaping - CNNoiseData.EROSION (a separate NoiseParameters registration)
+    // is only consumed by IrradiatedSurfaceRules, not here. Kept as one shared expression until
+    // the worldgen is tuned to actually differentiate them.
+    private static DensityFunction irradiatedBaseDensity() {
+        return DensityFunctions.add(
                 DensityFunctions.yClampedGradient(0, 90, 1, -1),
                 BlendedNoise.createUnseeded(0.25, 0.375, 80.0, 160.0, 8.0)
-        ));
+        );
+    }
 
-        context.register(Irradiated.FINAL_DENSITY, DensityFunctions.add(
-                DensityFunctions.yClampedGradient(0, 90, 1, -1),
-                BlendedNoise.createUnseeded(0.25, 0.375, 80.0, 160.0, 8.0)
-        ));
+    public static void bootstrapRegistries(BootstrapContext<DensityFunction> context) {
+        context.register(Irradiated.EROSION, irradiatedBaseDensity());
+        context.register(Irradiated.FINAL_DENSITY, irradiatedBaseDensity());
     }
 
     private static DensityFunction registerAndWrap(BootstrapContext<DensityFunction> context, ResourceKey<DensityFunction> key, DensityFunction densityFunction) {

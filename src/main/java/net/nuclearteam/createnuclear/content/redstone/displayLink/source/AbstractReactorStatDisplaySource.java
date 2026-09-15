@@ -19,6 +19,14 @@ public abstract class AbstractReactorStatDisplaySource extends NumericSingleLine
     protected abstract int computeValue(ReactorControllerBlockEntity controller, DisplayLinkContext context);
     protected abstract ChatFormatting getColor(int value, ReactorControllerBlockEntity controller);
     protected MutableComponent getUnitSuffix() { return null; }
+    protected int getGaugeWidth() { return 6; }
+
+    protected MutableComponent getDefaultDisplay(int value, ReactorControllerBlockEntity controller) {
+        MutableComponent base = Component.literal(String.valueOf(value));
+        MutableComponent unit = getUnitSuffix();
+
+        return unit != null ? base.append(unit) : base;
+    }
 
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
@@ -33,12 +41,8 @@ public abstract class AbstractReactorStatDisplaySource extends NumericSingleLine
 
         return label.append(switch (mode) {
             case 1 -> Component.literal((value * 100 / max) + "%").withStyle(color);
-            case 2 -> ReactorGaugeRenderer.drawGauge(value, max, color, 6);
-            default -> {
-                MutableComponent base = Component.literal(String.valueOf(value));
-                MutableComponent unit = getUnitSuffix();
-                yield (unit != null ? base.append(unit) : base).withStyle(color);
-            }
+            case 2 -> ReactorGaugeRenderer.drawGauge(value, max, color, getGaugeWidth());
+            default -> getDefaultDisplay(value, controller).withStyle(color);
         });
     }
 

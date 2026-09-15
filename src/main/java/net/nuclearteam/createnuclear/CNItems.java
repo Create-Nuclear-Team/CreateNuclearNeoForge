@@ -17,13 +17,11 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.Tags;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
-import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
@@ -213,20 +211,7 @@ public class CNItems {
                 .pattern("XZX")
                 .showNotification(true)
                 .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
-
-            for (Cloths cloth : Cloths.values()) {
-                if (cloth == Cloths.DEFAULT) continue;
-                SmithingClothRecipeBuilder
-                    .smithingCloth(
-                        Ingredient.EMPTY,
-                        Ingredient.of(c.get()),
-                        Ingredient.of(cloth.getItem()),
-                        RecipeCategory.COMBAT,
-                        new ItemStack(c.get())
-                    )
-                    .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                    .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getSerializedName()));
-            }
+            CNArmorMaterials.registerClothSmithingVariants(c, p);
         })
         .lang("Anti Radiation Helmet")
         .model(coloredArmorModel("helmet", "layer0", "particle"))
@@ -253,20 +238,7 @@ public class CNItems {
                     .pattern("ZXZ")
                     .showNotification(true)
                     .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
-                for (Cloths cloth : Cloths.values()) {
-                    if (cloth == Cloths.DEFAULT) continue;
-
-                    SmithingClothRecipeBuilder
-                        .smithingCloth(
-                            Ingredient.EMPTY,
-                            Ingredient.of(c.get()),
-                            Ingredient.of(cloth.getItem()),
-                            RecipeCategory.COMBAT,
-                            new ItemStack(c.get())
-                        )
-                        .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getSerializedName()));
-                }
+                CNArmorMaterials.registerClothSmithingVariants(c, p);
             })
             .lang("Anti Radiation Chestplate")
             .model(coloredArmorModel("chestplate", "14"))
@@ -292,21 +264,7 @@ public class CNItems {
                     .pattern("Y Y")
                     .showNotification(true)
                     .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
-
-                for (Cloths cloth : Cloths.values()) {
-                    if (cloth == Cloths.DEFAULT) continue;
-
-                    SmithingClothRecipeBuilder
-                        .smithingCloth(
-                            Ingredient.EMPTY,
-                            Ingredient.of(c.get()),
-                            Ingredient.of(cloth.getItem()),
-                            RecipeCategory.COMBAT,
-                            new ItemStack(c.get())
-                        )
-                        .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getSerializedName()));
-                }
+                CNArmorMaterials.registerClothSmithingVariants(c, p);
             })
             .lang("Anti Radiation Leggings")
             .model(coloredArmorModel("leggings", "14"))
@@ -331,21 +289,7 @@ public class CNItems {
                     .pattern("X X")
                     .showNotification(true)
                     .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
-
-                for (Cloths cloth : Cloths.values()) {
-                    if (cloth == Cloths.DEFAULT) continue;
-
-                    SmithingClothRecipeBuilder
-                        .smithingCloth(
-                            Ingredient.EMPTY,
-                            Ingredient.of(c.get()),
-                            Ingredient.of(cloth.getItem()),
-                            RecipeCategory.COMBAT,
-                            new ItemStack(c.get())
-                        )
-                        .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getSerializedName()));
-                }
+                CNArmorMaterials.registerClothSmithingVariants(c, p);
             })
             .lang("Anti Radiation Boots")
             .model(coloredArmorModel("boots", "14"))
