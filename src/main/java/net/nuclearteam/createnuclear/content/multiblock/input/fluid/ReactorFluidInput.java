@@ -83,13 +83,14 @@ public class ReactorFluidInput extends MultiDirectionalReactorBlock implements I
 
 		if (heldItem.isEmpty())
 			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-		if (!player.isCreative())
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
 		InteractionResult result = PlayerInteractReactorFluidInput.interact(world, pos, player, hand, heldItem, onClient, ray);
 
-		// Converts the old InteractionResult to ItemInteractionResult where needed for NeoForge
-		return result.consumesAction() ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return switch (result) {
+            case InteractionResult.SUCCESS ->ItemInteractionResult.SUCCESS;
+            case InteractionResult.FAIL ->ItemInteractionResult.FAIL;
+            default -> ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        };
 	}
 
 	@Override
