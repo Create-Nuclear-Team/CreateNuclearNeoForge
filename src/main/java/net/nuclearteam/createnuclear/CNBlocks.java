@@ -37,6 +37,7 @@ import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
+import net.nuclearteam.createnuclear.content.multiblock.ReactorIOGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
@@ -47,11 +48,8 @@ import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
@@ -157,7 +155,7 @@ public class CNBlocks {
         )
         .transform(pickaxeOnly())
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-        .blockstate(new ReactorRodInputGenerator()::generate)
+        .blockstate(ReactorIOGenerator.reactorInputRods()::generate)
         .item()
         .transform(customItemModel("reactor", "rod_input", "item"))
         .register();
@@ -172,7 +170,7 @@ public class CNBlocks {
         )
         .transform(pickaxeOnly())
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-        .blockstate(new ReactorFluidInputGenerator()::generate)
+        .blockstate(ReactorIOGenerator.reactorInputFluid()::generate)
         .item()
         .transform(customItemModel("reactor", "fluid_input", "item"))
         .register();
@@ -188,7 +186,7 @@ public class CNBlocks {
         )
         .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
         .transform(pickaxeOnly())
-        .blockstate(new ReactorOutputGenerator()::generate)
+        .blockstate(ReactorIOGenerator.reactorOutputSU()::generate)
         .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 64000.0))
         .item()
         .transform(customItemModel("reactor", "output", "item"))

@@ -43,20 +43,11 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ReactorOutput extends DirectionalKineticBlock implements IWrenchable, IBE<ReactorOutputEntity> {
-    public static final IntegerProperty DIR = IntegerProperty.create("dir", 0, 2);
-
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
 
     public ReactorOutput(Properties properties) {
         super(properties);
     }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(DIR);
-        super.createBlockStateDefinition(builder);
-    }
-
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
@@ -87,7 +78,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         if ((context.getPlayer() != null && context.getPlayer()
                 .isShiftKeyDown()) || preferred == null)
             return super.getStateForPlacement(context);
-        return defaultBlockState().setValue(FACING, preferred).setValue(DIR, 0);
+        return defaultBlockState().setValue(FACING, preferred);
     }
 
     @Override
