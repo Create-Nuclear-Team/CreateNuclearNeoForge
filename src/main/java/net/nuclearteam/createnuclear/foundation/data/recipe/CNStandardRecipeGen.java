@@ -111,44 +111,8 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         return new GeneratedRecipeBuilder(currentFolder, result);
     }
 
-    GeneratedRecipeBuilder create(ResourceLocation result) {
-        return new GeneratedRecipeBuilder(currentFolder, result);
-    }
-
     GeneratedRecipeBuilder create(ItemProviderEntry<? extends ItemLike, ? extends ItemLike> result) {
         return create(result::get);
-    }
-
-    GeneratedRecipe createSpecial(Function<CraftingBookCategory, Recipe<?>> builder, String recipeType,
-                                  String path) {
-        ResourceLocation location = Create.asResource(recipeType + "/" + currentFolder + "/" + path);
-        return register(consumer -> {
-            SpecialRecipeBuilder b = SpecialRecipeBuilder.special(builder);
-            b.save(consumer, location.toString());
-        });
-    }
-
-    GeneratedRecipe blastCrushedMetal(Supplier<? extends ItemLike> result, Supplier<? extends ItemLike> ingredient) {
-        return create(result::get).withSuffix("_from_crushed")
-                .viaCooking(ingredient)
-                .rewardXP(.1f)
-                .inBlastFurnace();
-    }
-
-    GeneratedRecipe recycleGlass(BlockEntry<? extends Block> ingredient) {
-        return create(() -> Blocks.GLASS).withSuffix("_from_" + ingredient.getId()
-                        .getPath())
-                .viaCooking(ingredient::get)
-                .forDuration(50)
-                .inFurnace();
-    }
-
-    GeneratedRecipe recycleGlassPane(BlockEntry<? extends Block> ingredient) {
-        return create(() -> Blocks.GLASS_PANE).withSuffix("_from_" + ingredient.getId()
-                        .getPath())
-                .viaCooking(ingredient::get)
-                .forDuration(50)
-                .inFurnace();
     }
 
     GeneratedRecipe blastFurnaceRecipe(Supplier<? extends ItemLike> result, Supplier<? extends ItemLike> ingredient, String suffix, int count) {
@@ -191,24 +155,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         return result;
     }
 
-    GeneratedRecipe conversionCycle(List<ItemProviderEntry<? extends ItemLike, ? extends ItemLike>> cycle) {
-        GeneratedRecipe result = null;
-        for (int i = 0; i < cycle.size(); i++) {
-            ItemProviderEntry<? extends ItemLike, ? extends ItemLike> currentEntry = cycle.get(i);
-            ItemProviderEntry<? extends ItemLike, ? extends ItemLike> nextEntry = cycle.get((i + 1) % cycle.size());
-            result = create(nextEntry).withSuffix("_from_conversion")
-                    .unlockedBy(currentEntry::get)
-                    .viaShapeless(b -> b.requires(currentEntry.get()));
-        }
-        return result;
-    }
-
-    GeneratedRecipe clearData(ItemProviderEntry<? extends ItemLike, ? extends ItemLike> item) {
-        return create(item).withSuffix("_clear")
-                .unlockedBy(item::get)
-                .viaShapeless(b -> b.requires(item.get()));
-    }
-
     @Override
     protected void buildRecipes(RecipeOutput output, HolderLookup.Provider holderLookup) {
         all.forEach(c -> c.register(output));
@@ -243,11 +189,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             this.result = result;
         }
 
-        public GeneratedRecipeBuilder(String path, ResourceLocation result) {
-            this(path);
-            this.compatDatagenOutput = result;
-        }
-
         GeneratedRecipeBuilder returns(int amount) {
             this.amount = amount;
             return this;
@@ -267,25 +208,11 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             return this;
         }
 
-        GeneratedRecipeBuilder whenModLoaded(String mod) {
-            return withCondition(new ModLoadedCondition(mod));
-        }
-
-        GeneratedRecipeBuilder whenModMissing(String mod) {
-            return withCondition(new NotCondition(new ModLoadedCondition(mod)));
-        }
-
-        GeneratedRecipeBuilder withCondition(ICondition condition) {
-            recipeConditions.add(condition);
-            return this;
-        }
-
         GeneratedRecipeBuilder withSuffix(String suffix) {
             this.suffix = suffix;
             return this;
         }
 
-        // FIXME 5.1 refactor - recipe categories as markers instead of sections?
         GeneratedRecipe viaShaped(UnaryOperator<ShapedRecipeBuilder> builder) {
             return register(consumer -> {
                 ShapedRecipeBuilder b =
@@ -306,19 +233,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
                 RecipeOutput conditionalOutput = recipeOutput.withConditions(recipeConditions.toArray(new ICondition[0]));
 
                 b.save(conditionalOutput, createLocation("crafting"));
-            });
-        }
-
-        GeneratedRecipe viaNetheriteSmithing(Supplier<? extends Item> base, Supplier<Ingredient> upgradeMaterial) {
-            return register(consumer -> {
-                SmithingTransformRecipeBuilder b =
-                        SmithingTransformRecipeBuilder.smithing(Ingredient.of(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
-                                Ingredient.of(base.get()), upgradeMaterial.get(), RecipeCategory.COMBAT, result.get()
-                                        .asItem());
-                b.unlocks("has_item", inventoryTrigger(ItemPredicate.Builder.item()
-                        .of(base.get())
-                        .build()));
-                b.save(consumer, createLocation("crafting"));
             });
         }
 
@@ -359,32 +273,10 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
                 exp = 0;
             }
 
-            GeneratedRecipeBuilder.GeneratedCookingRecipeBuilder forDuration(int duration) {
-                cookingTime = duration;
-                return this;
-            }
 
             GeneratedRecipeBuilder.GeneratedCookingRecipeBuilder rewardXP(float xp) {
                 exp = xp;
                 return this;
-            }
-
-            GeneratedRecipe inFurnace() {
-                return inFurnace(b -> b);
-            }
-
-            GeneratedRecipe inFurnace(UnaryOperator<SimpleCookingRecipeBuilder> builder) {
-                return create(RecipeSerializer.SMELTING_RECIPE, builder, SmeltingRecipe::new, 1);
-            }
-
-            GeneratedRecipe inSmoker() {
-                return inSmoker(b -> b);
-            }
-
-            GeneratedRecipe inSmoker(UnaryOperator<SimpleCookingRecipeBuilder> builder) {
-                create(RecipeSerializer.SMELTING_RECIPE, builder, SmeltingRecipe::new, 1);
-                create(RecipeSerializer.CAMPFIRE_COOKING_RECIPE, builder, CampfireCookingRecipe::new, 3);
-                return create(RecipeSerializer.SMOKING_RECIPE, builder, SmokingRecipe::new, .5f);
             }
 
             GeneratedRecipe inBlastFurnace() {
@@ -417,8 +309,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             }
         }
     }
-
-
 
     public CNStandardRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, CreateNuclear.MOD_ID);

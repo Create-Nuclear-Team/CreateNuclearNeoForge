@@ -33,7 +33,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings({"unused"})
 public class UraniumOreBlock extends Block {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

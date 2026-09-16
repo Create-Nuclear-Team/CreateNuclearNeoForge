@@ -49,23 +49,14 @@ import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings({"unused"})
 public class IrradiatedCat extends TamableAnimal {
-    public static final double TEMPT_SPEED_MOD = 0.6;
-    public static final double WALK_SPEED_MOD = 0.8;
-    public static final double SPRINT_SPEED_MOD = 1.33;
     private static final Ingredient TEMPT_INGREDIENT;
     private static final EntityDataAccessor<Boolean> IS_LYING;
     private static final EntityDataAccessor<Boolean> RELAX_STATE_ONE;
-    private CatAvoidEntityGoal<Player> avoidPlayersGoal;
     @Nullable
     private TemptGoal temptGoal;
     private float lieDownAmount;
     private float lieDownAmountO;
-    private float lieDownAmountTail;
-    private float lieDownAmountOTail;
-    private float relaxStateOneAmount;
-    private float relaxStateOneAmountO;
 
     public IrradiatedCat(EntityType<? extends IrradiatedCat> entityType, Level level) {
         super(entityType, level);
@@ -150,10 +141,6 @@ public class IrradiatedCat extends TamableAnimal {
         return 120;
     }
 
-    public void hiss() {
-        this.playSound(SoundEvents.CAT_HISS, this.getSoundVolume(), this.getVoicePitch());
-    }
-
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvents.CAT_HURT;
     }
@@ -197,28 +184,14 @@ public class IrradiatedCat extends TamableAnimal {
         }
 
         this.updateLieDownAmount();
-        this.updateRelaxStateOneAmount();
     }
 
     private void updateLieDownAmount() {
         this.lieDownAmountO = this.lieDownAmount;
-        this.lieDownAmountOTail = this.lieDownAmountTail;
         if (this.isLying()) {
             this.lieDownAmount = Math.min(1.0F, this.lieDownAmount + 0.15F);
-            this.lieDownAmountTail = Math.min(1.0F, this.lieDownAmountTail + 0.08F);
         } else {
             this.lieDownAmount = Math.max(0.0F, this.lieDownAmount - 0.22F);
-            this.lieDownAmountTail = Math.max(0.0F, this.lieDownAmountTail - 0.13F);
-        }
-
-    }
-
-    private void updateRelaxStateOneAmount() {
-        this.relaxStateOneAmountO = this.relaxStateOneAmount;
-        if (this.isRelaxStateOne()) {
-            this.relaxStateOneAmount = Math.min(1.0F, this.relaxStateOneAmount + 0.1F);
-        } else {
-            this.relaxStateOneAmount = Math.max(0.0F, this.relaxStateOneAmount - 0.13F);
         }
 
     }
@@ -227,19 +200,11 @@ public class IrradiatedCat extends TamableAnimal {
         return Mth.lerp(partialTicks, this.lieDownAmountO, this.lieDownAmount);
     }
 
-    public float getLieDownAmountTail(float partialTicks) {
-        return Mth.lerp(partialTicks, this.lieDownAmountOTail, this.lieDownAmountTail);
-    }
-
-    public float getRelaxStateOneAmount(float partialTicks) {
-        return Mth.lerp(partialTicks, this.relaxStateOneAmountO, this.relaxStateOneAmount);
-    }
-
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
         Cat cat = EntityType.CAT.create(level);
-        if (cat != null && otherParent instanceof Cat cat2) {
+        if (cat != null && otherParent instanceof Cat) {
 
             if (this.isTame()) {
                 cat.setOwnerUUID(this.getOwnerUUID());
@@ -278,7 +243,7 @@ public class IrradiatedCat extends TamableAnimal {
                 if (this.isOwnedBy(player)) {
                     if (this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
                         this.usePlayerItem(player, hand, itemStack);
-                        this.heal((float)item.getFoodProperties(new ItemStack(item), null).saturation());
+                        this.heal(item.getFoodProperties(new ItemStack(item), null).saturation());
                         return InteractionResult.CONSUME;
                     }
 
@@ -306,24 +271,9 @@ public class IrradiatedCat extends TamableAnimal {
         return TEMPT_INGREDIENT.test(stack);
     }
 
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
-        return dimensions.height() * 0.5F;
-    }
 
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {
         return !this.isTame() && this.tickCount > 2400;
-    }
-
-    protected void reassessTameGoals() {
-        if (this.avoidPlayersGoal == null) {
-            this.avoidPlayersGoal = new CatAvoidEntityGoal<>(this, Player.class, 16.0F, 0.8, 1.33);
-        }
-
-        this.goalSelector.removeGoal(this.avoidPlayersGoal);
-        if (!this.isTame()) {
-            this.goalSelector.addGoal(4, this.avoidPlayersGoal);
-        }
-
     }
 
     public boolean isSteppingCarefully() {
@@ -484,23 +434,6 @@ public class IrradiatedCat extends TamableAnimal {
 
         public boolean canUse() {
             return super.canUse() && !this.cat.isTame();
-        }
-    }
-
-    static class CatAvoidEntityGoal<T extends LivingEntity> extends AvoidEntityGoal<T> {
-        private final IrradiatedCat cat;
-
-        public CatAvoidEntityGoal(IrradiatedCat cat, Class<T> entityClassToAvoid, float maxDist, double walkSpeedModifier, double sprintSpeedModifier) {
-            super(cat, entityClassToAvoid, maxDist, walkSpeedModifier, sprintSpeedModifier);
-            this.cat = cat;
-        }
-
-        public boolean canUse() {
-            return !this.cat.isTame() && super.canUse();
-        }
-
-        public boolean canContinueToUse() {
-            return !this.cat.isTame() && super.canContinueToUse();
         }
     }
 }

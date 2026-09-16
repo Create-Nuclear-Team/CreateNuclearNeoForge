@@ -62,7 +62,6 @@ public class CreateNuclearJEI implements IModPlugin {
     private static final ResourceLocation ID = CreateNuclear.asResource("jei_plugin");
 
     private final List<CreateRecipeCategory<?>> allCategories = new ArrayList<>();
-    private IIngredientManager ingredientManager;
 
     public static IJeiRuntime runtime;
 
@@ -90,7 +89,6 @@ public class CreateNuclearJEI implements IModPlugin {
     }
 
     @Override
-    @Nonnull
     public ResourceLocation getPluginUid() {
         return ID;
     }
@@ -103,8 +101,6 @@ public class CreateNuclearJEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        ingredientManager = registration.getIngredientManager();
-
         allCategories.forEach(c -> c.registerRecipes(registration));
 
         registration.addRecipes(RecipeTypes.CRAFTING, ToolboxColoringRecipeMaker.createRecipes().toList());
@@ -155,14 +151,6 @@ public class CreateNuclearJEI implements IModPlugin {
         }
     }
 
-    public static void consumeAllRecipes(Consumer<? super RecipeHolder<?>> consumer) {
-        Minecraft.getInstance()
-                .getConnection()
-                .getRecipeManager()
-                .getRecipes()
-                .forEach(consumer);
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T extends Recipe<?>> void consumeTypedRecipes(Consumer<RecipeHolder<?>> consumer, RecipeType<?> type) {
         List<? extends RecipeHolder<?>> map = Minecraft.getInstance()
@@ -176,35 +164,6 @@ public class CreateNuclearJEI implements IModPlugin {
         List<RecipeHolder<?>> recipes = new ArrayList<>();
         consumeTypedRecipes(recipes::add, type);
         return recipes;
-    }
-
-    public static List<RecipeHolder<?>> getTypedRecipesExcluding(RecipeType<?> type, Predicate<RecipeHolder<?>> exclusionPred) {
-        List<RecipeHolder<?>> recipes = getTypedRecipes(type);
-        recipes.removeIf(exclusionPred);
-        return recipes;
-    }
-
-    public static boolean doInputsMatch(Recipe<?> recipe1, Recipe<?> recipe2) {
-        if (recipe1.getIngredients()
-                .isEmpty()
-                || recipe2.getIngredients()
-                .isEmpty()) {
-            return false;
-        }
-        ItemStack[] matchingStacks = recipe1.getIngredients()
-                .getFirst()
-                .getItems();
-        if (matchingStacks.length == 0) {
-            return false;
-        }
-        return recipe2.getIngredients()
-                .getFirst()
-                .test(matchingStacks[0]);
-    }
-
-    public static boolean doOutputsMatch(Recipe<?> recipe1, Recipe<?> recipe2) {
-        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-        return ItemHelper.sameItem(recipe1.getResultItem(registryAccess), recipe2.getResultItem(registryAccess));
     }
 
     @Override
