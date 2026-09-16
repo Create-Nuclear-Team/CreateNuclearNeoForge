@@ -1,8 +1,6 @@
 package net.nuclearteam.createnuclear;
 
 import com.mojang.serialization.Codec;
-import com.simibubi.create.AllTags;
-
 import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 import net.createmod.catnip.lang.Lang;
@@ -26,18 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings("unchecked")
 public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
         ENRICHED(EnrichedRecipe::new),
         SNOW_POWDER(SnowPowderRecipe::new)
     ;
-
-    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id()
-        .getPath()
-        .endsWith("_manual_only");
 
     public final ResourceLocation id;
     public final Supplier<RecipeSerializer<?>> serializerSupplier;
@@ -47,20 +40,6 @@ public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
     private final Supplier<RecipeType<?>> type;
 
     public static final Codec<CNRecipeTypes> CODEC = StringRepresentable.fromEnum(CNRecipeTypes::values);
-
-    CNRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier, Supplier<RecipeType<?>> typeSupplier, boolean registerType) {
-        String name = Lang.asId(name());
-        id = CreateNuclear.asResource(name);
-        this.serializerSupplier = serializerSupplier;
-        serializerObject = Registers.SERIALIZER_REGISTER.register(name, serializerSupplier);
-        if (registerType) {
-            typeObject = Registers.TYPE_REGISTER.register(name, typeSupplier);
-            type = typeObject;
-        } else {
-            typeObject = null;
-            type = typeSupplier;
-        }
-    }
 
     CNRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier) {
         String name = Lang.asId(name());
@@ -100,13 +79,6 @@ public enum CNRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
     public <I extends RecipeInput, R extends Recipe<I>> Optional<RecipeHolder<R>> find(I inv, Level world) {
         return world.getRecipeManager()
                 .getRecipeFor(getType(), inv, world);
-    }
-
-    public static boolean shouldIgnoreInAutomation(RecipeHolder<?> recipe) {
-        RecipeSerializer<?> serializer = recipe.value().getSerializer();
-        if (serializer != null && AllTags.AllRecipeSerializerTags.AUTOMATION_IGNORE.matches(serializer))
-            return true;
-        return !CAN_BE_AUTOMATED.test(recipe);
     }
 
     @Override

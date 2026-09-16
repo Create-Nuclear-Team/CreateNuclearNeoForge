@@ -34,7 +34,6 @@ import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclear
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings("unused")
 public class CNAdvancement implements DataProvider {
 
     public static final EntityEquipmentPredicate FULL_ARMOR = new EntityEquipmentPredicate.Builder()

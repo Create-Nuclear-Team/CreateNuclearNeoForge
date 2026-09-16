@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@SuppressWarnings("unused")
 public class CNFanProcessingTypes {
     public static final EnrichedType ENRICHED = register("enriched", new EnrichedType());
     public static final SnowPowderType SNOW_POWDER = register("snow_powder", new SnowPowderType());

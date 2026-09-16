@@ -19,13 +19,15 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
+import net.nuclearteam.createnuclear.content.multiblock.AbstractReactorMultiblockPart;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrameEntity> {
+public class ReactorFrame extends AbstractReactorMultiblockPart implements IWrenchable, IBE<ReactorFrameEntity> {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorFrame(Properties properties) {
@@ -105,26 +107,8 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        super.onPlace(state, level, pos, oldState, movedByPiston);
-        pattern.findController(pos, level, true);
-    }
-
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable LivingEntity pPlacer, ItemStack stack) {
-        super.setPlacedBy(level, pos, state, pPlacer, stack);
-        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        super.onRemove(state, level, pos, newState, movedByPiston);
-        // playerDestroy is NOT called in creative mode, so the structure must also be
-        // re-evaluated here. Only react to an actual block removal/replacement (different
-        // block type), not to a simple PART property change (same block, via setBlock).
-        if (!state.is(newState.getBlock())) {
-            pattern.findController(pos, level, false);
-        }
+    protected boolean shouldRescanOnRemove(BlockState state, BlockState newState) {
+        return !state.is(newState.getBlock());
     }
 
     @Override

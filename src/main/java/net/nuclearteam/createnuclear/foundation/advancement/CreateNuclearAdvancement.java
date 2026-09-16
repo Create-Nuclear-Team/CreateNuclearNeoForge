@@ -15,17 +15,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.minecraft.core.HolderLookup.Provider;
-
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@SuppressWarnings("unused")
 public class CreateNuclearAdvancement {
 
     static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/gui/advancements/backgrounds/background_advancement.png");
@@ -94,9 +89,6 @@ public class CreateNuclearAdvancement {
         if (parent != null)
             builder.parent(parent.datagenResult);
 
-        if (createNuclearBuilder.func != null)
-            createNuclearBuilder.icon(createNuclearBuilder.func.apply(registries));
-
         builder.display(
                 createNuclearBuilder.icon,
                 Component.translatable(titleKey()),
@@ -144,7 +136,6 @@ public class CreateNuclearAdvancement {
         private boolean externalTrigger;
         private int keyIndex;
         private ItemStack icon;
-        private Function<Provider, ItemStack> func;
 
         Builder special(TaskType type) {
             this.type = type;
@@ -169,11 +160,6 @@ public class CreateNuclearAdvancement {
             return this;
         }
 
-        Builder icon(Function<Provider, ItemStack> func) {
-            this.func = func;
-            return this;
-        }
-
         Builder title(String title) {
             CreateNuclearAdvancement.this.title = title;
             return this;
@@ -182,10 +168,6 @@ public class CreateNuclearAdvancement {
         Builder description(String description) {
             CreateNuclearAdvancement.this.description = description;
             return this;
-        }
-
-        Builder whenBlockPlaced(Block block) {
-            return externalTrigger(ItemUsedOnLocationTrigger.TriggerInstance.placedBlock(block));
         }
 
         Builder whenIconCollected() {

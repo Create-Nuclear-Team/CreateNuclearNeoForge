@@ -17,7 +17,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import static com.simibubi.create.foundation.gui.AllGuiTextures.PLAYER_INVENTORY;
 
 @ParametersAreNonnullByDefault
-@SuppressWarnings({"unused"})
 public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<ReactorBluePrintMenu> {
     protected static final CNGuiTextures BG = CNGuiTextures.CONFIGURED_PATTERN_GUI;
 

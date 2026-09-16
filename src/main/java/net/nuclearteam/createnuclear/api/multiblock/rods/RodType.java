@@ -18,6 +18,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.RegistryTypeResolver;
 import net.nuclearteam.createnuclear.api.multiblock.RequiredFieldsValidator;
 
 import java.util.Objects;
@@ -90,17 +91,11 @@ public record RodType(Holder<Item> item,
      * @return the resolved {@code RodType} (never {@code null})
      */
     public static RodType resolveRodType(Item item, Level world) {
-        return RodType.getTypeForItem(world.registryAccess(), item)
-            .map(Holder.Reference::value)
-            .orElseGet(() -> {
-                RodType fromItem = ItemRodTypesValue.getRodType(item);
-                return fromItem.isNotEmptyItem()
-                    ? fromItem
-                    : world.registryAccess()
-                        .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
-                        .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_ROD)
-                        .value();
-            });
+        return RegistryTypeResolver.resolve(
+            RodType.getTypeForItem(world.registryAccess(), item), () ->  ItemRodTypesValue.getRodType(item),
+            RodType::isNotEmptyItem, world.registryAccess(),
+            CreateNuclearRegistries.ROD_TYPE, CreateNuclearRegistries.FALLBACK_ROD
+        );
     }
 
     /**

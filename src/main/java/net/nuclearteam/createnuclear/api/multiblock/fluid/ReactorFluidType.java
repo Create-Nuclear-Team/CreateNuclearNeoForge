@@ -15,6 +15,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.RegistryTypeResolver;
 import net.nuclearteam.createnuclear.api.multiblock.RequiredFieldsValidator;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,17 +74,14 @@ public record ReactorFluidType(Holder<Fluid> fluid, int maxHeat, int efficiency,
      * @return the resolved {@code ReactorFluidType} (never {@code null})
      */
     public static ReactorFluidType resolveReactorFluidType(Fluid fluid, Level world) {
-        return ReactorFluidType.getTypeForFluid(world.registryAccess(), fluid)
-            .map(Reference::value)
-            .orElseGet(() -> {
-                ReactorFluidType fromFluid = ReactorFluidTypesValue.getReactorFluidType(fluid);
-                return fromFluid.isNotEmptyFluid()
-                    ? fromFluid
-                    : world.registryAccess()
-                        .registryOrThrow(CreateNuclearRegistries.FLUID_TYPE)
-                        .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_FLUID)
-                        .value();
-            });
+        return RegistryTypeResolver.resolve(
+            ReactorFluidType.getTypeForFluid(world.registryAccess(), fluid),
+            () -> ReactorFluidTypesValue.getReactorFluidType(fluid),
+            ReactorFluidType::isNotEmptyFluid,
+            world.registryAccess(),
+            CreateNuclearRegistries.FLUID_TYPE,
+            CreateNuclearRegistries.FALLBACK_FLUID
+        );
     }
 
 

@@ -36,7 +36,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings("unused")
 public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     private static final EntityDimensions BABY_DIMENSIONS;
     private static final EntityDataAccessor<Boolean> DATA_CONVERTING_ID = SynchedEntityData.defineId(IrradiatedChicken.class, EntityDataSerializers.BOOLEAN);

@@ -14,7 +14,6 @@ import com.simibubi.create.content.logistics.redstoneRequester.RedstoneRequester
 import com.simibubi.create.content.redstone.link.controller.LinkedControllerScreen;
 import com.simibubi.create.content.trains.schedule.ScheduleScreen;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
-import com.simibubi.create.foundation.item.ItemHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -22,23 +21,13 @@ import mezz.jei.api.helpers.IPlatformFluidHelper;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.*;
-import mezz.jei.api.runtime.IIngredientManager;
-import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNRecipeTypes;
@@ -48,22 +37,16 @@ import net.nuclearteam.createnuclear.compat.jei.category.FanSnowPowderCategory;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 @JeiPlugin
-@SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CreateNuclearJEI implements IModPlugin {
     private static final ResourceLocation ID = CreateNuclear.asResource("jei_plugin");
 
     private final List<CreateRecipeCategory<?>> allCategories = new ArrayList<>();
-
-    public static IJeiRuntime runtime;
 
     private void loadCategories() {
         allCategories.clear();
@@ -149,26 +132,6 @@ public class CreateNuclearJEI implements IModPlugin {
             allCategories.add(category);
             return category;
         }
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends Recipe<?>> void consumeTypedRecipes(Consumer<RecipeHolder<?>> consumer, RecipeType<?> type) {
-        List<? extends RecipeHolder<?>> map = Minecraft.getInstance()
-                .getConnection()
-                .getRecipeManager().getAllRecipesFor((RecipeType) type);
-        if (!map.isEmpty())
-            map.forEach(consumer);
-    }
-
-    public static List<RecipeHolder<?>> getTypedRecipes(RecipeType<?> type) {
-        List<RecipeHolder<?>> recipes = new ArrayList<>();
-        consumeTypedRecipes(recipes::add, type);
-        return recipes;
-    }
-
-    @Override
-    public void onRuntimeAvailable(IJeiRuntime runtime) {
-        CreateNuclearJEI.runtime = runtime;
     }
 
 }
