@@ -5,8 +5,6 @@ import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -20,16 +18,13 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.content.multiblock.AbstractReactorMultiblockPart;
-import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ReactorFrame extends AbstractReactorMultiblockPart implements IWrenchable, IBE<ReactorFrameEntity> {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
-    protected ReactorPattern pattern =  new ReactorPattern();
+
     public ReactorFrame(Properties properties) {
         super(properties);
     }
