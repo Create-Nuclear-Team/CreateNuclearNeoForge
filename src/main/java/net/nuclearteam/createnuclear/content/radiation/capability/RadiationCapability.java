@@ -198,6 +198,11 @@ public class RadiationCapability {
     }
 
     private static void applyEffects(LivingEntity entity, double radiation) {
+        if (radiation <= 0) {
+            entity.removeEffect(CNEffects.RADIATION);
+            return;
+        }
+
         int amp;
         if (radiation < CNConfigs.server().radiation.radiationLevel1.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
         else if (radiation < CNConfigs.server().radiation.radiationLevel2.get()) amp = CNConfigs.server().radiation.amplifierLevel1.get();
@@ -214,5 +219,16 @@ public class RadiationCapability {
         if (current == null || current.getDuration() <= 40) {
             entity.addEffect(new MobEffectInstance(CNEffects.RADIATION, 100, amp, true, true));
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Radiation Capability: [" +
+                "radiation: " + getRadiation() +
+                " hash: " + getInventoryHash() +
+                " lastBiome: " + getLastBiomeLocation() +
+                " contagionDose: " + getContagionDose() +
+                " contagionTicks: " + getContagionTicks() +
+        "]";
     }
 }

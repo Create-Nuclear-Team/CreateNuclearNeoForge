@@ -7,6 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
@@ -16,12 +17,18 @@ import net.nuclearteam.createnuclear.CNPotions;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.infrastructure.command.CNCommands;
 
 @EventBusSubscriber(modid = CreateNuclear.MOD_ID)
 public class CommonEvents {
     @SubscribeEvent
     public static void onBrewingRecipeRegister(RegisterBrewingRecipesEvent event) {
         CNPotions.registerPotionsRecipes(event);
+    }
+
+    @SubscribeEvent
+    public static void registerCommands(RegisterCommandsEvent event) {
+        CNCommands.register(event.getDispatcher());
     }
 
     @EventBusSubscriber()
