@@ -3,7 +3,12 @@ package net.nuclearteam.createnuclear;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.RegistryEntry;
-import net.nuclearteam.createnuclear.content.redstone.displayLink.source.*;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.CoolerDisplaySource;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.FuelDisplaySource;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.HeatDisplaySource;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.LiquidLevelDisplaySource;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.ReactorSizeDisplaySource;
+import net.nuclearteam.createnuclear.content.redstone.displayLink.source.ReactorSummaryDisplaySource;
 
 import java.util.function.Supplier;
 
@@ -18,9 +23,9 @@ public class CNDisplaySources {
     public static final RegistryEntry<DisplaySource, ReactorSizeDisplaySource> REACTOR_SIZE = simple("reactor_size", ReactorSizeDisplaySource::new);
 
     /**
-     * Divergence assumee vs Forge : en 1.21 Registrate type ses entrees
-     * {@code RegistryEntry<R, T>} (type du registre + type de l'entree) la ou 1.20.1
-     * n'avait que {@code RegistryEntry<T>}.
+     * Assumed divergence vs Forge: in 1.21 Registrate types its entries as
+     * {@code RegistryEntry<R, T>} (registry type + entry type), whereas 1.20.1
+     * only had {@code RegistryEntry<T>}.
      */
     private static <T extends DisplaySource> RegistryEntry<DisplaySource, T> simple(String name, Supplier<T> supplier) {
         return REGISTRATE.displaySource(name, supplier).register();

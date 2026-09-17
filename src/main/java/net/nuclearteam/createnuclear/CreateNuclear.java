@@ -67,7 +67,7 @@ public class CreateNuclear {
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
 
-        IEventBus forgeEventBus = NeoForge.EVENT_BUS;
+        IEventBus neoForgeEventBus = NeoForge.EVENT_BUS;
 
         REGISTRATE.registerEventListeners(modEventBus);
 
@@ -103,11 +103,9 @@ public class CreateNuclear {
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
-        forgeEventBus.addListener(CNFluids::handleFluidEffect);
+        neoForgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         modEventBus.addListener(EventPriority.HIGHEST, CreateNuclearDatagen::gatherDataHighPriority);
-
-        //DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {

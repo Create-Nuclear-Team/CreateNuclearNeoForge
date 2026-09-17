@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-15T15:38:30.2163806	CreateNuclear's Processing Recipes
+// 1.21.1	2026-09-14T17:59:47.5601997	CreateNuclear's Processing Recipes
 dda7e53d7d3c598bf66ec80b0b16f3c21ee18951 data/createnuclear/recipe/compacting/thorium_fluid_to_thorium_ingot.json
 22d57898717d1a4dcca1b5be4e4cd6a23ac340c3 data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
 a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal.json
@@ -6,9 +6,8 @@ a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal
 c1e0e107502e875ee5befc176335cbd1cef7e04d data/createnuclear/recipe/crushing/granite.json
 2fbb42160178800bdce2bb0c4d5af85313475b26 data/createnuclear/recipe/crushing/nitrate.json
 724e99e5db2392644021999b8a694a9b20d8ea0e data/createnuclear/recipe/crushing/raw_copper.json
-ede5a70a121245622455815c9ebba7a22e569b55 data/createnuclear/recipe/crushing/raw_thorium.json
-27ae6cb3938a98d3aa990318050ec7d0161ae71d data/createnuclear/recipe/crushing/raw_thorium_block.json
-9fbd393caf0c74349e1afffe27a9b594de657e91 data/createnuclear/recipe/crushing/raw_uranium_block.json
+c50104addd4a6892045acf1d9462107c46cbdbc2 data/createnuclear/recipe/crushing/raw_thorium.json
+65c55f245d7e30a58884bcfdca24afd9ddc92176 data/createnuclear/recipe/crushing/raw_thorium_block.json
 efc52853cb5199a32131c8eccb6d42adff342365 data/createnuclear/recipe/crushing/raw_zinc.json
 f972ded24a5cf2597fa14c4f604743d7e97d23e6 data/createnuclear/recipe/deploying/reactor_fluid_input_from_fluid_pipe_and_reactor_casing.json
 f02f00a8c9503a8fdb2472064a279c98db670be7 data/createnuclear/recipe/deploying/reactor_output_from_shaft_and_reactor_casing.json

@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.compat.aeronotics.sable.SableCompat;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -24,12 +25,13 @@ public class ReactorMeltdownMonitor implements IReactorMeltdownMonitor {
     public MeltdownState tick(Level level, BlockPos pos, boolean isDanger) {
         int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+        BlockPos globalNotifyPos = SableCompat.toGlobal(level, pos);
 
         if (!isDanger) {
             boolean wasCountingDown = explosionCountDown > 0;
             explosionCountDown = 0;
             if (wasCountingDown) {
-                NotifyUtil.sendActionBar(level, pos,
+                NotifyUtil.sendActionBar(level, globalNotifyPos,
                     CreateNuclearLang.translate("notification.reactor.stabilized"),
                     ChatFormatting.GREEN, configRadius, configWarnAll);
             }
@@ -43,19 +45,19 @@ public class ReactorMeltdownMonitor implements IReactorMeltdownMonitor {
             boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
             ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
 
-            NotifyUtil.sendActionBar(level, pos,
+            NotifyUtil.sendActionBar(level, globalNotifyPos,
                     CreateNuclearLang.translate("notification.reactor.meltdown_in")
                             .add(CreateNuclearLang.number(secondsLeft))
                             .add(CreateNuclearLang.translate("generic.unit.seconds")),
                     flashColor, configRadius, configWarnAll);
         } else if (secondsLeft > CRITICAL_WINDOW_SECONDS && explosionCountDown % 20 == 0) {
-            NotifyUtil.sendActionBar(level, pos,
+            NotifyUtil.sendActionBar(level, globalNotifyPos,
                     CreateNuclearLang.translate("notification.reactor.overheating"),
                     ChatFormatting.DARK_RED, configRadius, configWarnAll);
         }
 
         if (explosionCountDown >= EXPLOSION_THRESHOLD_TICKS) {
-            NotifyUtil.sendTitle(level, pos,
+            NotifyUtil.sendTitle(level, globalNotifyPos,
                     CreateNuclearLang.translate("notification.reactor.critical_failure"),
                     CreateNuclearLang.translate("notification.reactor.imminent_explosion"),
                     ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);

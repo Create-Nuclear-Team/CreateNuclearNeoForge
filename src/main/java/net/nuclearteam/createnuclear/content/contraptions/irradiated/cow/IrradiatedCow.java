@@ -41,7 +41,6 @@ public class IrradiatedCow extends Animal {
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
     }
 
-    // Define the base food of the animal (e.g., Wheat for Cows)
     private static final Ingredient FOOD_ITEMS = Ingredient.of(CNItems.YELLOWCAKE);
 
     @Override

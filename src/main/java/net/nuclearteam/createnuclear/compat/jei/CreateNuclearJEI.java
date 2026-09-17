@@ -14,7 +14,6 @@ import com.simibubi.create.content.logistics.redstoneRequester.RedstoneRequester
 import com.simibubi.create.content.redstone.link.controller.LinkedControllerScreen;
 import com.simibubi.create.content.trains.schedule.ScheduleScreen;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
-import com.simibubi.create.foundation.item.ItemHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -22,23 +21,13 @@ import mezz.jei.api.helpers.IPlatformFluidHelper;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.*;
-import mezz.jei.api.runtime.IIngredientManager;
-import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNRecipeTypes;
@@ -48,23 +37,16 @@ import net.nuclearteam.createnuclear.compat.jei.category.FanSnowPowderCategory;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 @JeiPlugin
-@SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CreateNuclearJEI implements IModPlugin {
     private static final ResourceLocation ID = CreateNuclear.asResource("jei_plugin");
 
     private final List<CreateRecipeCategory<?>> allCategories = new ArrayList<>();
-    private IIngredientManager ingredientManager;
-
-    public static IJeiRuntime runtime;
 
     private void loadCategories() {
         allCategories.clear();
@@ -90,7 +72,6 @@ public class CreateNuclearJEI implements IModPlugin {
     }
 
     @Override
-    @Nonnull
     public ResourceLocation getPluginUid() {
         return ID;
     }
@@ -103,8 +84,6 @@ public class CreateNuclearJEI implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        ingredientManager = registration.getIngredientManager();
-
         allCategories.forEach(c -> c.registerRecipes(registration));
 
         registration.addRecipes(RecipeTypes.CRAFTING, ToolboxColoringRecipeMaker.createRecipes().toList());
@@ -127,38 +106,6 @@ public class CreateNuclearJEI implements IModPlugin {
         PotionFluid potionFluid = AllFluids.POTION.get();
         registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getSource(), interpreter);
         registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getFlowing(), interpreter);
-    }
-
-    @Override
-    public void registerExtraIngredients(IExtraIngredientRegistration registration) {
-        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-        List<Holder.Reference<Potion>> potions = registryAccess.lookupOrThrow(Registries.POTION)
-                .listElements()
-                .toList();
-        Collection<FluidStack> potionFluids = new ArrayList<>(potions.size() * 3);
-        Set<Set<Holder<MobEffect>>> visitedEffects = new HashSet<>();
-        for (Holder.Reference<Potion> potion : potions) {
-            // @goshante: Ingame potion fluids always have Bottle tag that specifies
-            // to what bottle type this potion belongs
-            // Potion fluid without this tag wouldn't be recognized by other mods
-
-//			for (PotionFluid.BottleType bottleType : PotionFluid.BottleType.values()) {
-//				FluidStack potionFluid = PotionFluid.of(1000, new PotionContents(potion), bottleType);
-//				potionFluids.add(potionFluid);
-//			}
-
-            PotionContents potionContents = new PotionContents(potion);
-
-            if (potionContents.hasEffects()) {
-                Set<Holder<MobEffect>> effectSet = new HashSet<>();
-                potionContents.forEachEffect(mei -> effectSet.add(mei.getEffect()));
-                if (!visitedEffects.add(effectSet))
-                    continue;
-            }
-
-            potionFluids.add(PotionFluid.of(1000, potionContents, PotionFluid.BottleType.REGULAR));
-        }
-        registration.addExtraIngredients(NeoForgeTypes.FLUID_STACK, potionFluids);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -185,63 +132,6 @@ public class CreateNuclearJEI implements IModPlugin {
             allCategories.add(category);
             return category;
         }
-    }
-
-    public static void consumeAllRecipes(Consumer<? super RecipeHolder<?>> consumer) {
-        Minecraft.getInstance()
-                .getConnection()
-                .getRecipeManager()
-                .getRecipes()
-                .forEach(consumer);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends Recipe<?>> void consumeTypedRecipes(Consumer<RecipeHolder<?>> consumer, RecipeType<?> type) {
-        List<? extends RecipeHolder<?>> map = Minecraft.getInstance()
-                .getConnection()
-                .getRecipeManager().getAllRecipesFor((RecipeType) type);
-        if (!map.isEmpty())
-            map.forEach(consumer);
-    }
-
-    public static List<RecipeHolder<?>> getTypedRecipes(RecipeType<?> type) {
-        List<RecipeHolder<?>> recipes = new ArrayList<>();
-        consumeTypedRecipes(recipes::add, type);
-        return recipes;
-    }
-
-    public static List<RecipeHolder<?>> getTypedRecipesExcluding(RecipeType<?> type, Predicate<RecipeHolder<?>> exclusionPred) {
-        List<RecipeHolder<?>> recipes = getTypedRecipes(type);
-        recipes.removeIf(exclusionPred);
-        return recipes;
-    }
-
-    public static boolean doInputsMatch(Recipe<?> recipe1, Recipe<?> recipe2) {
-        if (recipe1.getIngredients()
-                .isEmpty()
-                || recipe2.getIngredients()
-                .isEmpty()) {
-            return false;
-        }
-        ItemStack[] matchingStacks = recipe1.getIngredients()
-                .getFirst()
-                .getItems();
-        if (matchingStacks.length == 0) {
-            return false;
-        }
-        return recipe2.getIngredients()
-                .getFirst()
-                .test(matchingStacks[0]);
-    }
-
-    public static boolean doOutputsMatch(Recipe<?> recipe1, Recipe<?> recipe2) {
-        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-        return ItemHelper.sameItem(recipe1.getResultItem(registryAccess), recipe2.getResultItem(registryAccess));
-    }
-
-    @Override
-    public void onRuntimeAvailable(IJeiRuntime runtime) {
-        CreateNuclearJEI.runtime = runtime;
     }
 
 }

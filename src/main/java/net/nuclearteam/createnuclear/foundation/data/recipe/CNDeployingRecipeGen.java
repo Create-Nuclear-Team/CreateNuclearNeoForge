@@ -16,36 +16,28 @@ import java.util.concurrent.CompletableFuture;
 public class CNDeployingRecipeGen extends DeployingRecipeGen {
 
     GeneratedRecipe REACTOR_ROD_INPUT = deploying("reactor_rod_input_from_hopper_and_reactor_casing",
-            Items.HOPPER,
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_ROD_INPUT.get()
+        Items.HOPPER,
+        CNBlocks.REACTOR_CASING.get(),
+        CNBlocks.REACTOR_ROD_INPUT.get()
     );
 
     GeneratedRecipe REACTOR_FLUID_INPUT = deploying("reactor_fluid_input_from_fluid_pipe_and_reactor_casing",
-            AllBlocks.FLUID_PIPE.asItem(),
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_FLUID_INPUT.get()
+        AllBlocks.FLUID_PIPE.asItem(),
+        CNBlocks.REACTOR_CASING.get(),
+        CNBlocks.REACTOR_FLUID_INPUT.get()
     );
 
     GeneratedRecipe REACTOR_OUTPUT = deploying("reactor_output_from_shaft_and_reactor_casing",
-            AllBlocks.SHAFT.asItem(),
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_OUTPUT.get()
+        AllBlocks.SHAFT.asItem(),
+        CNBlocks.REACTOR_CASING.get(),
+        CNBlocks.REACTOR_OUTPUT.get()
     );
-
-    protected GeneratedRecipe deploying(String name, Ingredient ingredient, ItemLike input, ItemLike output) {
-        return create(CreateNuclear.asResource(name), b ->
-                b.require(input)
-                        .require(ingredient)
-                        .output(output)
-        );
-    }
 
     protected GeneratedRecipe deploying(String name, Item ingredient, ItemLike input, ItemLike output) {
         return create(CreateNuclear.asResource(name), b ->
-                b.require(input)
-                        .require(ingredient)
-                        .output(output)
+            b.require(input)
+            .require(ingredient)
+            .output(output)
         );
     }
 

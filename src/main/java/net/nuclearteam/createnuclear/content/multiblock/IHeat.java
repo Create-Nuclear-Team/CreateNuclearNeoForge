@@ -17,44 +17,21 @@ import net.nuclearteam.createnuclear.infrastructure.config.CReactorHeat;
 
 public interface IHeat extends IWrenchable {
     enum HeatLevel {
-        NONE(ChatFormatting.DARK_GRAY, 0x000000),
-        SAFETY(ChatFormatting.GREEN, 0x68CC03),
-        CAUTION(ChatFormatting.YELLOW, 0xC9CC03),
-        WARNING(ChatFormatting.GOLD, 0xFF6A00),
-        DANGER(ChatFormatting.RED, 0xFF6A00),
+        NONE(ChatFormatting.DARK_GRAY),
+        SAFETY(ChatFormatting.GREEN),
+        CAUTION(ChatFormatting.YELLOW),
+        WARNING(ChatFormatting.GOLD),
+        DANGER(ChatFormatting.RED),
         ;
 
         private final ChatFormatting color;
-        private final Integer intColor;
-        private final int colorCode;
 
-        HeatLevel(ChatFormatting textColor, int colorCode) {
+        HeatLevel(ChatFormatting textColor) {
             this.color = textColor;
-            this.intColor = null;
-            this.colorCode = colorCode;
-        }
-
-        HeatLevel(int intColor, int colorCode) {
-            this.color = null;
-            this.intColor = intColor;
-            this.colorCode = colorCode;
         }
 
         public ChatFormatting getTextColor() {
             return color;
-        }
-
-        public int getColorCode() {
-            return colorCode;
-        }
-
-        public int getHeatValue() {
-            return switch (this) {
-                case CAUTION -> 1;
-                case WARNING -> 2;
-                case DANGER -> 3;
-                default -> 0;
-            };
         }
 
         public static HeatLevel of(int heat, int reactorSize) {
@@ -66,7 +43,6 @@ public interface IHeat extends IWrenchable {
             int danger;
 
             switch (reactorSize) {
-                case 5 -> danger = config.size5Danger.get();
                 case 7 -> danger = config.size7Danger.get();
                 case 9 -> danger = config.size9Danger.get();
                 default -> danger = config.size5Danger.get();
@@ -104,24 +80,6 @@ public interface IHeat extends IWrenchable {
             else builder.style(heatLevel.getTextColor());
 
             return builder;
-        }
-
-        public static LangBuilder getFormattedItemText(ItemStack itemRod, Boolean isEmpty, Level level) {
-            LangBuilder builder = Lang.builder(CreateNuclear.MOD_ID);
-
-            String tooltip = TypeRodPredicate.tooltipKey(itemRod, level);
-
-            builder.translate("tooltip.item." + tooltip + ".rod")
-                // when it's empty, we show the number minus one to display zero because we fake the item count as 1
-                .add(CreateNuclearLang.number(Math.abs((isEmpty ? itemRod.getCount() - 1 : itemRod.getCount()))))
-                .style(ChatFormatting.BLUE)
-            ;
-
-            return builder;
-        }
-
-        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean isEmpty, Level level) {
-            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), isEmpty, level);
         }
 
         public static LangBuilder getName(String name) {

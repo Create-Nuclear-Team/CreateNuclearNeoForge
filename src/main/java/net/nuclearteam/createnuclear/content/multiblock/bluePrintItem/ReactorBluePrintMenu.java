@@ -13,8 +13,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
-import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.CNDataComponents;
+import net.nuclearteam.createnuclear.CNMenus;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
+import net.nuclearteam.createnuclear.foundation.utility.MenuClickUtil;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
 
@@ -165,7 +167,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     @Override
     public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
         if (clickTypeIn == ClickType.THROW) {
-            if (slotId >= 0 && slotId < 9) {
+            if (MenuClickUtil.isThrowRedirectedToPickup(clickTypeIn, slotId, id -> id >= 0 && id < 9)) {
                 clickTypeIn = ClickType.PICKUP;
                 super.clicked(slotId, dragType, clickTypeIn, player);
             }

@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 
 import net.createmod.catnip.config.ConfigBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.nuclearteam.createnuclear.CNParticleTypes;
 
 @MethodsReturnNonnullByDefault
 public class CBiomeRestore extends ConfigBase {

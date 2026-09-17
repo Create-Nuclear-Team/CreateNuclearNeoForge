@@ -34,7 +34,7 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
 
         ReactorFrameDisplayManagerI frameDisplay = controller.getFrameDisplayManager();
 
-        FluidStack fluid = frameDisplay.getDisplayedFluid(controller.getLevel(), controller.getInputFluidManager());
+        FluidStack fluid = frameDisplay.getDisplayedFluid(controller.getLevel(), controller.getBlockPos(), controller.getInputFluidManager());
         if (fluid == null || fluid.isEmpty()) return;
 
         // Local vertical bounds of the liquid volume inside this block, matching
@@ -56,7 +56,7 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         // (frameMaxY + 9/16), so even a nearly-empty reactor still shows a sliver.
         float yMax = boxYMax;
         if (frameDisplay.hasFrameColumn()) {
-            float ratio = frameDisplay.getDisplayedFluidFillRatio(controller.getLevel(), controller.getInputFluidManager());
+            float ratio = frameDisplay.getDisplayedFluidFillRatio(controller.getLevel(), controller.getBlockPos(), controller.getInputFluidManager());
             double liquidBottomWorldY = frameDisplay.getFrameColumnMinY() + 4.0 / 16.0;
             double liquidTopWorldY = frameDisplay.getFrameColumnMaxY() + 9.0 / 16.0;
             double surfaceWorldY = liquidBottomWorldY + ratio * (liquidTopWorldY - liquidBottomWorldY);

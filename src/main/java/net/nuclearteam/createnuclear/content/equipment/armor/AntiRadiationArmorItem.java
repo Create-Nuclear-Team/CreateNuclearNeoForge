@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 
 
-@SuppressWarnings("unused")
 @MethodsReturnNonnullByDefault
 public class AntiRadiationArmorItem extends ArmorItem {
     public static final double RADIATION_VALUE = 0.25;

@@ -10,11 +10,11 @@ import java.util.List;
  */
 public interface ReactorOutputManagerI extends ReactorIOManager {
     /** Returns an immutable copy of tracked positions. */
-    List<BlockPos> getBlocksPosition(Level level);
+    List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos);
 
     /**
      * Distributes the total rotation across the tracked outputs and applies
      * the corresponding speed/stop to each {@code ReactorOutputEntity}.
      */
-    void rotateOutputs(Level level, boolean assembled, int rotation);
+    void rotateOutputs(Level level, BlockPos controllerPos, boolean assembled, int rotation);
 }

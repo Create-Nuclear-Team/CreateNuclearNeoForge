@@ -91,5 +91,12 @@
   "createnuclear.notification.reactor.assembled": "Reactor has been assembled",
 
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
-  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"
+  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
+
+  "createnuclear.command.radiation.info.entity":  "Selected entity: %s",
+  "createnuclear.command.radiation.info.radiation": "- Radiation: %d",
+  "createnuclear.command.radiation.info.last.biome": "- Last Biome: %s",
+  "createnuclear.command.radiation.info.last.biome.unknown": "Unknown Biome",
+  "createnuclear.command.radiation.info.contagion.dose": "- Contagion Dose: %d",
+  "createnuclear.command.radiation.info.contagion.ticks": "- Contagion Ticks: %d"
 }

@@ -18,9 +18,9 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.RegistryTypeResolver;
+import net.nuclearteam.createnuclear.api.multiblock.RequiredFieldsValidator;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -91,17 +91,11 @@ public record RodType(Holder<Item> item,
      * @return the resolved {@code RodType} (never {@code null})
      */
     public static RodType resolveRodType(Item item, Level world) {
-        return RodType.getTypeForItem(world.registryAccess(), item)
-            .map(Holder.Reference::value)
-            .orElseGet(() -> {
-                RodType fromItem = ItemRodTypesValue.getRodType(item);
-                return fromItem.isNotEmptyItem()
-                    ? fromItem
-                    : world.registryAccess()
-                        .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
-                        .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_ROD)
-                        .value();
-            });
+        return RegistryTypeResolver.resolve(
+            RodType.getTypeForItem(world.registryAccess(), item), () ->  ItemRodTypesValue.getRodType(item),
+            RodType::isNotEmptyItem, world.registryAccess(),
+            CreateNuclearRegistries.ROD_TYPE, CreateNuclearRegistries.FALLBACK_ROD
+        );
     }
 
     /**
@@ -295,15 +289,13 @@ public record RodType(Holder<Item> item,
          * @return the created instance
          */
         public RodType build() {
-            List<String> missing = new ArrayList<>();
-            if (item == null) missing.add("item");
-            if (type == null) missing.add("type");
-            if (baseRodHeat == null) missing.add("baseRodHeat");
-            if (proximityRodHeat == null) missing.add("proximityRodHeat");
-            if (rodTimer == null) missing.add("rodTimer");
-
-            if (!missing.isEmpty())
-                throw new IllegalStateException("Missing required RodType fields: " + String.join(", ", missing));
+            new RequiredFieldsValidator()
+                .require(item != null, "item")
+                .require(type != null, "type")
+                .require(baseRodHeat != null, "baseRodHeat")
+                .require(proximityRodHeat != null, "proximityRodHeat")
+                .require(rodTimer != null, "rodTimer")
+                .validate("RodType");
 
             return new RodType(item, baseRodHeat, proximityRodHeat, rodTimer, ratio, type);
         }

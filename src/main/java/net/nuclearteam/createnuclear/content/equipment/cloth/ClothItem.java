@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class ClothItem extends Item {
     private final DyeColor color;
 

@@ -50,31 +50,19 @@ public class PlayerInteractReactorFluidInput {
         FluidStack fluidInInput = fluidInput.getFluidInTank(0);
 
         if (exchange == FluidExchange.ITEM_TO_TANK) {
-            if (player.isCreative() && !onClient) {
-                FluidStack fluidInItem = GenericItemEmptying.emptyItem(level, stack, true).getFirst();
-//                if (!fluidInItem.isEmpty() && fluidInInput instanceof ReactorLiquidInput) {
-//                    fluidInInput.set
-//                }
-            }
-
             Fluid fluid = fluidInInput.getFluid();
             fluidState = fluid.defaultFluidState().createLegacyBlock();
             soundEvent = FluidHelper.getEmptySound(fluidInInput);
         }
 
         if (exchange == FluidExchange.TANK_TO_ITEM) {
-            if ( player.isCreative() && !onClient) {
-
-            }
-
             Fluid fluid = prevFluidInInput.getFluid();
             fluidState = fluid.defaultFluidState().createLegacyBlock();
             soundEvent = FluidHelper.getFillSound(prevFluidInInput);
         }
 
         if (soundEvent != null && !onClient) {
-            float pitch = Mth
-                    .clamp(1 - (1f * fluidInInput.getAmount() / (FluidTankBlockEntity.getCapacityMultiplier() * 16)), 0, 1);
+            float pitch = Mth.clamp(1 - (1f * fluidInInput.getAmount() / (FluidTankBlockEntity.getCapacityMultiplier() * 16)), 0, 1);
             pitch /= 1.5f;
             pitch += .5f;
             pitch += (level.random.nextFloat() - .5f) / 4f;

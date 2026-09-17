@@ -18,7 +18,6 @@ import java.util.List;
 
 public class ReactorAlarmEntity extends SmartBlockEntity {
 
-    public ReactorControllerBlockEntity controller = null;
     private CNAdvancementBehaviour advancement;
     private boolean advancementAwarded = false; // Prevents repeatedly awarding the advancement on every tick
 
@@ -93,9 +92,5 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.SILENCE_THE_CORE));
-    }
-
-    public void setController(ReactorControllerBlockEntity controller) {
-        this.controller = controller;
     }
 }

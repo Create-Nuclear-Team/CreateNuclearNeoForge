@@ -148,6 +148,7 @@ public class NotifyUtil {
         if (warnAll) return new ArrayList<>(allPlayers);
 
         AABB area = new AABB(pos).inflate(radius);
+
         return allPlayers.stream()
                 .filter(p -> area.contains(p.getX(), p.getY(), p.getZ()))
                 .collect(Collectors.toList());
