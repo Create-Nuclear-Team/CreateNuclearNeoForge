@@ -90,8 +90,8 @@
   "createnuclear.notification.reactor.disassembled": "Reactor has been disassembled",
   "createnuclear.notification.reactor.assembled": "Reactor has been assembled",
 
-  "death.attack.createnuclear.radiation": "%1$s died from radiation",
-  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
+  "death.attack.radiation": "%1$s died from radiation",
+  "death.attack.fan_radiation": "%1$s died from radiation blast",
 
   "createnuclear.command.radiation.info.entity":  "Selected entity: %s",
   "createnuclear.command.radiation.info.radiation": "- Radiation: %d",
