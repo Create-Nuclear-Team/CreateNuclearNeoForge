@@ -32,6 +32,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNRecipeTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.compat.Mods;
 import net.nuclearteam.createnuclear.compat.jei.category.FanEnrichedCategory;
 import net.nuclearteam.createnuclear.compat.jei.category.FanSnowPowderCategory;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe;
@@ -57,14 +58,18 @@ public class CreateNuclearJEI implements IModPlugin {
                 .catalystStack(ProcessingViaFanCategory.getFan("fan_enriched"))
                 .doubleItemIcon(AllItems.PROPELLER.get(), CNBlocks.ENRICHING_CAMPFIRE.get())
                 .emptyBackground(178, 72)
-                .build("fan_enriched", FanEnrichedCategory::new),
-            snow_powder = builder(SnowPowderRecipe.class)
+                .build("fan_enriched", FanEnrichedCategory::new)
+            ;
+
+        if (!Mods.CREATE_DRAGONS_PLUS.isLoaded()) {
+            CreateRecipeCategory<?> snow_powder = builder(SnowPowderRecipe.class)
                 .addTypedRecipes(CNRecipeTypes.SNOW_POWDER::getType)
                 .catalystStack(ProcessingViaFanCategory.getFan("fan_snow_powder"))
                 .doubleItemIcon(AllItems.PROPELLER.get(), Items.POWDER_SNOW_BUCKET)
                 .emptyBackground(178, 72)
                 .build("fan_snow_powder", FanSnowPowderCategory::new)
-        ;
+            ;
+        }
     }
 
     private <T extends Recipe<? extends RecipeInput>> CategoryBuilder<T> builder(Class<T> recipeClass) {

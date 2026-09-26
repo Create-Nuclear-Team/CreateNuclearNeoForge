@@ -183,6 +183,9 @@ repositories {
             includeGroup("dev.ryanhcode.sable-companion")
         }
     }
+
+    maven { url "https://maven.dragons.plus/releases" } // DragonsPlusMinecraft Maven
+    maven { url "https://maven.fallenbreath.me/releases" } // Conditional Mixin
 }
 
 dependencies {
@@ -207,6 +210,11 @@ dependencies {
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
     //compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     //implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
+
+    compileOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    if (project.enable_create_dragons_plus.toBoolean()) {
+        runtimeOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    }
 
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case 'jei': runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"); break

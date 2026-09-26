@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 public enum Mods {
     ALEXS_CAVE("alexscaves"),
+    CREATE_DRAGONS_PLUS,
     SABLE
     ;
 
