@@ -23,7 +23,7 @@ public class ReactorDebugDiagnostics {
 
     private ReactorDebugDiagnostics() {}
 
-    public static void sendReactorConnectionsTo(Player player, Level level,
+    public static void sendReactorConnectionsTo(Player player, Level level, BlockPos controllerPos,
             ReactorInputManagerI inputManager, ReactorInputFluidManagerI inputFluidManager,
             ReactorOutputManagerI outputManager,
             ReactorAlarmManagerI alarmManager
@@ -31,16 +31,16 @@ public class ReactorDebugDiagnostics {
         player.sendSystemMessage(CreateNuclearLang.translate(TITLE).style(ChatFormatting.GOLD).component());
 
         sendManagerSummary(player, CreateNuclearLang.translate(INPUT).component(),
-                inputManager.size(), inputManager.getBlocksPosition(), inputManager.getBlocksPosition(level));
+                inputManager.size(), inputManager.getBlocksPosition(), inputManager.getBlocksPosition(level, controllerPos));
 
         sendManagerSummary(player, CreateNuclearLang.translate(INPUT_FLUID).component(),
-                inputFluidManager.size(), inputFluidManager.getBlocksPosition(), inputFluidManager.getBlocksPosition(level));
+                inputFluidManager.size(), inputFluidManager.getBlocksPosition(), inputFluidManager.getBlocksPosition(level, controllerPos));
 
         sendManagerSummary(player, CreateNuclearLang.translate(OUTPUT).component(),
-                outputManager.size(), outputManager.getBlocksPosition(), outputManager.getBlocksPosition(level));
+                outputManager.size(), outputManager.getBlocksPosition(), outputManager.getBlocksPosition(level, controllerPos));
 
         sendManagerSummary(player, CreateNuclearLang.translate(ALARM).component(),
-                alarmManager.size(), alarmManager.getBlocksPosition(), alarmManager.getBlocksPosition(level));
+                alarmManager.size(), alarmManager.getBlocksPosition(), alarmManager.getBlocksPosition(level, controllerPos));
     }
 
     private static void sendManagerSummary(Player player, Component label, int registeredCount,

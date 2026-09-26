@@ -23,11 +23,11 @@ public class HeatDisplaySource extends AbstractReactorStatDisplaySource {
     }
 
     /**
-     * Divergence assumee vs Forge : Forge lit
+     * Assumed divergence vs Forge: Forge reads
      * {@code controller.getConfiguredPattern().getOrCreateTag().getDouble("heat")}.
-     * En 1.21 la chaleur vit dans le data component {@code CNDataComponents.HEAT} ;
-     * relire le tag NBT de la stack renvoie une copie defensive, donc la valeur y est
-     * toujours absente. On passe par l'accesseur dedie du controleur.
+     * In 1.21 heat lives in the {@code CNDataComponents.HEAT} data component;
+     * re-reading the stack's NBT tag returns a defensive copy, so the value is
+     * always absent there. We go through the controller's dedicated accessor instead.
      */
     @Override
     protected int computeValue(ReactorControllerBlockEntity controller, DisplayLinkContext context) {

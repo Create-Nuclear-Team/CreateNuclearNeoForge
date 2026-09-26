@@ -1,7 +1,5 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
-import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
-import com.simibubi.create.foundation.advancement.CreateAdvancement;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -11,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -103,12 +100,6 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
 
         if (nbt.contains("Owner"))
             playerId = nbt.getUUID("Owner");
-    }
-
-    public static void tryAward(BlockGetter reader, BlockPos pos, CreateAdvancement advancement) {
-        AdvancementBehaviour behaviour = BlockEntityBehaviour.get(reader, pos, AdvancementBehaviour.TYPE);
-        if (behaviour != null)
-            behaviour.awardPlayer(advancement);
     }
 
     @Override

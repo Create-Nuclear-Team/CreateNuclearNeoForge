@@ -16,13 +16,13 @@ public interface ReactorInputManagerI extends ReactorIOManager {
      * Retrieves valid item handlers for the given `level`.
      * May return an empty list if no valid positions exist.
      */
-    List<IItemHandler> getItemHandlers(Level level);
+    List<IItemHandler> getItemHandlers(Level level, BlockPos controllerPos);
 
     /** Returns an immutable copy of tracked positions. */
-    List<BlockPos> getBlocksPosition(Level level);
+    List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos);
 
-    VirtualReactorInputsItem getInventory(Level level);
+    VirtualReactorInputsItem getInventory(Level level, BlockPos controllerPos);
 
-    boolean extractItems(Level level, int fuelNeeded, int coolerNeeded);
-    boolean extractItemByName(Level level, String itemName);
+    boolean extractItems(Level level, BlockPos controllerPos, int fuelNeeded, int coolerNeeded);
+    boolean extractItemByName(Level level, BlockPos controllerPos, String itemName);
 }

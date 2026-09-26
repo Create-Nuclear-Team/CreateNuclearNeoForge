@@ -10,10 +10,9 @@ import java.util.Map;
  * Snapshot of the reactor's inputs, collected once per tick.
  * <p>
  * {@code items} reflects the items actually present (for tooltip display).
- * {@code bigFuelItem}/{@code bigCoolerItem} are derived from
- * {@link net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem} and always represent, respectively,
- * Uranium Rod / Graphite Rod (generic tag-based count, fixed identity) —
- * do not use these fields to infer the actual item type loaded.
+ * {@code fluids} holds one entry per distinct fluid type present, aggregated
+ * across every fluid input, and {@code maxFluidCapacity} is the summed tank
+ * capacity across every fluid input.
  * <p>
  * The elements of {@code fluids} ({@link BigFluidStack}) remain mutable
  * (public fields); this snapshot only guarantees immutability of the

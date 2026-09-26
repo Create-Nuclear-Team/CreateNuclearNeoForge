@@ -1,8 +1,10 @@
 package net.nuclearteam.createnuclear.content.contraptions.irradiated;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -23,6 +25,11 @@ public class AnimalUtil {
         }
 
         return foodItems.test(stack) || extraTest.test(stack);
+    }
+
+    /** @return whether {@code stack} belongs to {@code tag}. */
+    public static boolean isFood(ItemStack stack, TagKey<Item> tag) {
+        return stack.is(tag);
     }
 
     /**

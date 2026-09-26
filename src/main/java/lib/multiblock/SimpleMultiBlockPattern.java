@@ -29,14 +29,7 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
     }
 
     public boolean matches(Level level, BlockPos blockPos, Rotation rotation) {
-        for (MultiBlockOffsetPos multiBlockOffsetPos : multiBlockOffsetPosList) {
-            char character = multiBlockOffsetPos.character();
-            Predicate<BlockInWorld> predicate = predicateHashMap.get(character);
-
-            BlockInWorld block = new BlockInWorld(level, blockPos.offset(multiBlockOffsetPos.pos().rotate(rotation)), false);
-            if (predicate == null || !predicate.test(block)) return false;
-        }
-        return true;
+        return matchesWithResult(level, blockPos, rotation) != null;
     }
 
     public MultiblockMatchResult matchesWithResult(Level level, BlockPos blockPos, Rotation rotation) {

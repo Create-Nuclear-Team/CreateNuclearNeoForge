@@ -28,6 +28,7 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 
 import javax.annotation.Nullable;
@@ -35,7 +36,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@SuppressWarnings("unused")
 public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     private static final EntityDimensions BABY_DIMENSIONS;
     private static final EntityDataAccessor<Boolean> DATA_CONVERTING_ID = SynchedEntityData.defineId(IrradiatedChicken.class, EntityDataSerializers.BOOLEAN);
@@ -137,7 +137,7 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     }
 
     public boolean isFood(ItemStack stack) {
-        return stack.is(CNTags.CNItemTags.FUEL.tag);
+        return AnimalUtil.isFood(stack, CNTags.CNItemTags.FUEL.tag);
     }
 
     protected int getBaseExperienceReward() {

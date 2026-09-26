@@ -13,42 +13,38 @@ import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
-public class ReactorSizeDisplaySource extends NumericSingleLineDisplaySource {
+public class ReactorSizeDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
-    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
-        if (controller == null || controller.isRemoved()) return ZERO.copy();
+    protected String getLabelKey() {
+        return "display_source.reactor.size";
+    }
 
-        // Label + trailing space
-        MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.size").append(" ");
+    @Override
+    protected int getMax() {
+        return 3;
+    }
 
-        int mode = context.sourceConfig().getInt("display_mode");
-        int size = controller.getMultiblockSize();
-        int tier = size <= 5 ? 1 : size <= 7 ? 2 : 3;
+    @Override
+    protected int getGaugeWidth() {
+        return 3;
+    }
 
-        return label.append(switch (mode) {
-            case 1 -> Component.literal((tier * 100 / 3) + "%").withStyle(ChatFormatting.BLUE);
-            case 2 -> {
-                // Short 3-segment gauge representing the tier
-                yield Component.literal("█".repeat(tier) + "▒".repeat(3 - tier)).withStyle(ChatFormatting.BLUE);
-            }
-            default -> {
-                String key = tier == 1 ? "small" : tier == 2 ? "medium" : "large";
-                yield CreateNuclearLang.translateDirect("display_source.reactor.size." + key).withStyle(ChatFormatting.BLUE);
-            }
-        });
+    @Override
+    protected ChatFormatting getColor(int value, ReactorControllerBlockEntity controller) {
+        return ChatFormatting.BLUE;
+    }
+
+    @Override
+    protected int computeValue(ReactorControllerBlockEntity controller, DisplayLinkContext context) {
+        return ReactorDisplayConstants.sizeTier(controller.getMultiblockSize());
+    }
+
+    @Override
+    protected MutableComponent getDefaultDisplay(int value, ReactorControllerBlockEntity controller) {
+        return CreateNuclearLang.translateDirect(String.join(".", getLabelKey(), ReactorDisplayConstants.sizeTierKey(value)));
     }
 
     @Override protected String getTranslationKey() { return "size"; }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void initConfigurationWidgets(DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
-        if (isFirstLine) return;
-        builder.addSelectionScrollInput(0, 100, (selectionScrollInput, l) -> selectionScrollInput
-                .forOptions(CreateNuclearLang.translatedOptions("display_source.reactor.mode", "value", "percent", "gauge")), "display_mode");
-    }
-
-    @Override protected boolean allowsLabeling(DisplayLinkContext context) { return true; }
 }

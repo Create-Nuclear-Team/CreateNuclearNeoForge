@@ -1,5 +1,6 @@
 {
   "values": [
-    "#createnuclear:uranium"
+    "createnuclear:flowing_uranium",
+    "createnuclear:uranium"
   ]
 }

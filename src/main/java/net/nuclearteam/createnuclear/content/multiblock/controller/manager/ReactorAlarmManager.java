@@ -12,58 +12,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReactorAlarmManager extends AbstractReactorIOManager implements ReactorAlarmManagerI {
-    private static final String NBT_KEY = "ReactorAlarms";
-
     @Override
-    public void write(CompoundTag compound) {
-        ListTag list = new ListTag();
-        for (BlockPos pos : positions) {
-            CompoundTag tag = new CompoundTag();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
-            list.add(tag);
-        }
-        compound.put(NBT_KEY, list);
+    protected String nbtKey() {
+        return "ReactorAlarms";
     }
 
     @Override
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
-        }
-    }
-
-    @Override
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         if (level == null) return;
         List<BlockPos> toRemove = new ArrayList<>();
 
-        for (BlockPos p : positions) {
-            if (!level.isLoaded(p)) continue; // On ne supprime pas si le chunk est juste déchargé
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
+            if (!level.isLoaded(p)) continue; // Don't remove if the chunk is just unloaded
 
             BlockEntity be = level.getBlockEntity(p);
             if (be == null || !(be instanceof ReactorAlarmEntity)) {
-                toRemove.add(p);
+                toRemove.add(offset);
             }
         }
         positions.removeAll(toRemove);
     }
 
     @Override
-    public List<BlockPos> getBlocksPosition(Level level) {
-        if (level == null) return List.of();
-
-        List<BlockPos> validPositions = new ArrayList<>();
-        for (BlockPos p : this.positions) {
-            if (level.isLoaded(p) && level.getBlockEntity(p) instanceof ReactorAlarmEntity) {
-                validPositions.add(p);
-            }
-        }
-        return List.copyOf(validPositions);
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        return filterByType(level, controllerPos, ReactorAlarmEntity.class);
     }
 }

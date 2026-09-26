@@ -1,8 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import com.mojang.serialization.Codec;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.neoforged.neoforge.registries.DeferredRegister;

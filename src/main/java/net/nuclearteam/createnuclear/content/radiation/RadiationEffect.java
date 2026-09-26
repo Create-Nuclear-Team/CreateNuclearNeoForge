@@ -8,7 +8,7 @@ import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.nuclearteam.createnuclear.foundation.damagesTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
     private static final int CONTAGION_DURATION_TICKS = 300;
@@ -19,11 +19,10 @@ public class RadiationEffect extends VicinityEffect {
      */
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
-                amplifier -> 10,
-                RadiationCapability::canBeIrradiated,
-                timer -> {}); // Custom color (hex value)
+            amplifier -> 10,
+            RadiationCapability::canBeIrradiated); // Custom color (hex value)
 
-        // Reduces movement speed by 20%
+
         this.addAttributeModifier(
             Attributes.MOVEMENT_SPEED,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_movement_speed"),
@@ -31,7 +30,6 @@ public class RadiationEffect extends VicinityEffect {
             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
 
-        // Reduces attack damage by 20%
         this.addAttributeModifier(
             Attributes.ATTACK_DAMAGE,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_attack_damage"),
@@ -39,7 +37,6 @@ public class RadiationEffect extends VicinityEffect {
             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
 
-        // Reduces attack speed by 20%
         this.addAttributeModifier(
             Attributes.ATTACK_SPEED,
             ResourceLocation.fromNamespaceAndPath(CreateNuclear.MOD_ID, "radiation_attack_speed"),

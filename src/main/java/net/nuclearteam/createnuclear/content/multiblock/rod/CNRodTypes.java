@@ -8,14 +8,17 @@ import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 
 import static net.nuclearteam.createnuclear.api.ItemRodTypesValue.DEFAULT_ROD_TYPE;
 
+/**
+ * Static registry of rod types ({@code RodType}) for the CreateNuclear mod.
+ *
+ * @see RodType
+ * @see CreateNuclearRegistries
+ */
 public class CNRodTypes {
     /**
-     * Static registry of rod types ({@code RodType}) for the CreateNuclear mod.
-     *
-     * <p>This class exposes the {@link ResourceKey}s and the {@code bootstrap}
-     * method invoked by the datapack system to register rod types used by the
-     * multiblock (for example, fuel rods and cooler rods). The examples below
-     * show how to create a {@code RodType} via its {@code RodType.Builder}.</p>
+     * Bootstrap method invoked by the datapack system to register the rod types
+     * ({@link ResourceKey}s) used by the multiblock (for example, fuel rods and
+     * cooler rods). Add more entries here following the pattern below.
      *
      * <p>Example — Custom Rod:</p>
      * <pre>{@code
@@ -27,9 +30,6 @@ public class CNRodTypes {
      *     .fuelRodType()
      *     .build());
      * }</pre>
-     *
-     * @see RodType
-     * @see CreateNuclearRegistries
      */
     public static void bootstrap(BootstrapContext<RodType> ctx) {
         register(ctx, "fallback", DEFAULT_ROD_TYPE);

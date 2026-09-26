@@ -29,7 +29,6 @@ public class IrradiatedCatModel<T extends IrradiatedCat> extends AgeableListMode
     private final ModelPart rightHindLeg;
     private final ModelPart tail1;
     private final ModelPart tail2;
-    protected int state = 1;
 
     public IrradiatedCatModel(ModelPart root) {
         this.pustule = root.getChild("pustule");
@@ -61,26 +60,6 @@ public class IrradiatedCatModel<T extends IrradiatedCat> extends AgeableListMode
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.head.xRot = headPitch * 0.017453292F;
         this.head.yRot = netHeadYaw * 0.017453292F;
-        if (this.state != 3) {
-            this.body.xRot = 1.5707964F;
-            if (this.state == 2) {
-                this.leftHindLeg.xRot = Mth.cos(limbSwing * 0.6662F) * limbSwingAmount;
-                this.rightHindLeg.xRot = Mth.cos(limbSwing * 0.6662F + 0.3F) * limbSwingAmount;
-                this.leftFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F + 3.1415927F + 0.3F) * limbSwingAmount;
-                this.rightFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F + 3.1415927F) * limbSwingAmount;
-                this.tail2.xRot = 1.7278761F + 0.31415927F * Mth.cos(limbSwing) * limbSwingAmount;
-            } else {
-                this.leftHindLeg.xRot = Mth.cos(limbSwing * 0.6662F) * limbSwingAmount;
-                this.rightHindLeg.xRot = Mth.cos(limbSwing * 0.6662F + 3.1415927F) * limbSwingAmount;
-                this.leftFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F + 3.1415927F) * limbSwingAmount;
-                this.rightFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F) * limbSwingAmount;
-                if (this.state == 1) {
-                    this.tail2.xRot = 1.7278761F + 0.7853982F * Mth.cos(limbSwing) * limbSwingAmount;
-                } else {
-                    this.tail2.xRot = 1.7278761F + 0.47123894F * Mth.cos(limbSwing) * limbSwingAmount;
-                }
-            }
-        }
     }
 
     @Override

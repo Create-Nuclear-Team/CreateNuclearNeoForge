@@ -58,36 +58,36 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         this.childModels = new ObjectArrayList();
     }
 
-    public CNBasicModelPart addBox(String p_217178_1_, float p_217178_2_, float p_217178_3_, float p_217178_4_, int p_217178_5_, int p_217178_6_, int p_217178_7_, float p_217178_8_, int p_217178_9_, int p_217178_10_) {
-        this.setTextureOffset(p_217178_9_, p_217178_10_);
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_217178_2_, p_217178_3_, p_217178_4_, (float)p_217178_5_, (float)p_217178_6_, (float)p_217178_7_, p_217178_8_, p_217178_8_, p_217178_8_, this.mirror, false);
+    public CNBasicModelPart addBox(String partName, float x, float y, float z, int width, int height, int depth, float grow, int texOffX, int texOffY) {
+        this.setTextureOffset(texOffX, texOffY);
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, (float)width, (float)height, (float)depth, grow, grow, grow, this.mirror, false);
         return this;
     }
 
-    public CNBasicModelPart addBox(float p_228300_1_, float p_228300_2_, float p_228300_3_, float p_228300_4_, float p_228300_5_, float p_228300_6_) {
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_228300_1_, p_228300_2_, p_228300_3_, p_228300_4_, p_228300_5_, p_228300_6_, 0.0F, 0.0F, 0.0F, this.mirror, false);
+    public CNBasicModelPart addBox(float x, float y, float z, float width, float height, float depth) {
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, width, height, depth, 0.0F, 0.0F, 0.0F, this.mirror, false);
         return this;
     }
 
-    public CNBasicModelPart addBox(float p_228304_1_, float p_228304_2_, float p_228304_3_, float p_228304_4_, float p_228304_5_, float p_228304_6_, boolean p_228304_7_) {
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_228304_1_, p_228304_2_, p_228304_3_, p_228304_4_, p_228304_5_, p_228304_6_, 0.0F, 0.0F, 0.0F, p_228304_7_, false);
+    public CNBasicModelPart addBox(float x, float y, float z, float width, float height, float depth, boolean mirror) {
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, width, height, depth, 0.0F, 0.0F, 0.0F, mirror, false);
         return this;
     }
 
-    public void addBox(float p_228301_1_, float p_228301_2_, float p_228301_3_, float p_228301_4_, float p_228301_5_, float p_228301_6_, float p_228301_7_) {
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_228301_1_, p_228301_2_, p_228301_3_, p_228301_4_, p_228301_5_, p_228301_6_, p_228301_7_, p_228301_7_, p_228301_7_, this.mirror, false);
+    public void addBox(float x, float y, float z, float width, float height, float depth, float grow) {
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, width, height, depth, grow, grow, grow, this.mirror, false);
     }
 
-    public void addBox(float p_228302_1_, float p_228302_2_, float p_228302_3_, float p_228302_4_, float p_228302_5_, float p_228302_6_, float p_228302_7_, float p_228302_8_, float p_228302_9_) {
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_228302_1_, p_228302_2_, p_228302_3_, p_228302_4_, p_228302_5_, p_228302_6_, p_228302_7_, p_228302_8_, p_228302_9_, this.mirror, false);
+    public void addBox(float x, float y, float z, float width, float height, float depth, float growX, float growY, float growZ) {
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, width, height, depth, growX, growY, growZ, this.mirror, false);
     }
 
-    public void addBox(float p_228303_1_, float p_228303_2_, float p_228303_3_, float p_228303_4_, float p_228303_5_, float p_228303_6_, float p_228303_7_, boolean p_228303_8_) {
-        this.addBox(this.textureOffsetX, this.textureOffsetY, p_228303_1_, p_228303_2_, p_228303_3_, p_228303_4_, p_228303_5_, p_228303_6_, p_228303_7_, p_228303_7_, p_228303_7_, p_228303_8_, false);
+    public void addBox(float x, float y, float z, float width, float height, float depth, float grow, boolean mirror) {
+        this.addBox(this.textureOffsetX, this.textureOffsetY, x, y, z, width, height, depth, grow, grow, grow, mirror, false);
     }
 
-    private void addBox(int p_228305_1_, int p_228305_2_, float p_228305_3_, float p_228305_4_, float p_228305_5_, float p_228305_6_, float p_228305_7_, float p_228305_8_, float p_228305_9_, float p_228305_10_, float p_228305_11_, boolean p_228305_12_, boolean p_228305_13_) {
-        this.cubeList.add(new CNTabulaModelRenderUtils.ModelBox(p_228305_1_, p_228305_2_, p_228305_3_, p_228305_4_, p_228305_5_, p_228305_6_, p_228305_7_, p_228305_8_, p_228305_9_, p_228305_10_, p_228305_11_, p_228305_12_, this.textureWidth, this.textureHeight));
+    private void addBox(int texOffX, int texOffY, float x, float y, float z, float width, float height, float depth, float growX, float growY, float growZ, boolean mirror, boolean unusedFlag) {
+        this.cubeList.add(new CNTabulaModelRenderUtils.ModelBox(texOffX, texOffY, x, y, z, width, height, depth, growX, growY, growZ, mirror, this.textureWidth, this.textureHeight));
     }
 
     public void setScale(float scaleX, float scaleY, float scaleZ) {
@@ -147,49 +147,49 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         matrixStackIn.scale(this.scaleX, this.scaleY, this.scaleZ);
     }
 
-    public void render(PoseStack p_228309_1_, VertexConsumer p_228309_2_, int p_228309_3_, int p_228309_4_, float p_228309_5_, float p_228309_6_, float p_228309_7_, float p_228309_8_) {
+    public void render(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         if (this.showModel && (!this.cubeList.isEmpty() || !this.childModels.isEmpty())) {
-            p_228309_1_.pushPose();
-            this.translateAndRotate(p_228309_1_);
-            this.doRender(p_228309_1_.last(), p_228309_2_, p_228309_3_, p_228309_4_, p_228309_5_, p_228309_6_, p_228309_7_, p_228309_8_);
+            matrixStackIn.pushPose();
+            this.translateAndRotate(matrixStackIn);
+            this.doRender(matrixStackIn.last(), bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             ObjectListIterator var9 = this.childModels.iterator();
             if (!this.scaleChildren) {
-                p_228309_1_.scale(1.0F / Math.max(this.scaleX, 1.0E-4F), 1.0F / Math.max(this.scaleY, 1.0E-4F), 1.0F / Math.max(this.scaleZ, 1.0E-4F));
+                matrixStackIn.scale(1.0F / Math.max(this.scaleX, 1.0E-4F), 1.0F / Math.max(this.scaleY, 1.0E-4F), 1.0F / Math.max(this.scaleZ, 1.0E-4F));
             }
 
             while(var9.hasNext()) {
-                CNBasicModelPart lvt_10_1_ = (CNBasicModelPart)var9.next();
-                lvt_10_1_.render(p_228309_1_, p_228309_2_, p_228309_3_, p_228309_4_, p_228309_5_, p_228309_6_, p_228309_7_, p_228309_8_);
+                CNBasicModelPart child = (CNBasicModelPart)var9.next();
+                child.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             }
 
-            p_228309_1_.popPose();
+            matrixStackIn.popPose();
         }
 
     }
 
-    private void doRender(PoseStack.Pose p_228306_1_, VertexConsumer p_228306_2_, int p_228306_3_, int p_228306_4_, float p_228306_5_, float p_228306_6_, float p_228306_7_, float p_228306_8_) {
-        Matrix4f lvt_9_1_ = p_228306_1_.pose();
-        Matrix3f lvt_10_1_ = p_228306_1_.normal();
+    private void doRender(PoseStack.Pose pose, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+        Matrix4f poseMatrix = pose.pose();
+        Matrix3f normalMatrix = pose.normal();
         ObjectListIterator var11 = this.cubeList.iterator();
 
         while(var11.hasNext()) {
-            CNTabulaModelRenderUtils.ModelBox lvt_12_1_ = (CNTabulaModelRenderUtils.ModelBox)var11.next();
+            CNTabulaModelRenderUtils.ModelBox box = (CNTabulaModelRenderUtils.ModelBox)var11.next();
 
-            for(CNTabulaModelRenderUtils.TexturedQuad lvt_16_1_ : lvt_12_1_.quads) {
-                Vector3f lvt_17_1_ = new Vector3f(lvt_16_1_.normal);
-                lvt_17_1_.mul(lvt_10_1_);
-                float lvt_18_1_ = lvt_17_1_.x();
-                float lvt_19_1_ = lvt_17_1_.y();
-                float lvt_20_1_ = lvt_17_1_.z();
+            for(CNTabulaModelRenderUtils.TexturedQuad quad : box.quads) {
+                Vector3f normal = new Vector3f(quad.normal);
+                normal.mul(normalMatrix);
+                float normalX = normal.x();
+                float normalY = normal.y();
+                float normalZ = normal.z();
 
-                for(int lvt_21_1_ = 0; lvt_21_1_ < 4; ++lvt_21_1_) {
-                    CNTabulaModelRenderUtils.PositionTextureVertex lvt_22_1_ = lvt_16_1_.vertexPositions[lvt_21_1_];
-                    float lvt_23_1_ = lvt_22_1_.position.x() / 16.0F;
-                    float lvt_24_1_ = lvt_22_1_.position.y() / 16.0F;
-                    float lvt_25_1_ = lvt_22_1_.position.z() / 16.0F;
-                    Vector4f lvt_26_1_ = new Vector4f(lvt_23_1_, lvt_24_1_, lvt_25_1_, 1.0F);
-                    lvt_26_1_.mul(lvt_9_1_);
-                    p_228306_2_.addVertex(lvt_26_1_.x(), lvt_26_1_.y(), lvt_26_1_.z()).setColor(p_228306_5_, p_228306_6_, p_228306_7_, p_228306_8_).setUv(lvt_22_1_.textureU, lvt_22_1_.textureV).setOverlay(p_228306_4_).setLight(p_228306_3_).setNormal(lvt_18_1_, lvt_19_1_, lvt_20_1_);
+                for(int i = 0; i < 4; ++i) {
+                    CNTabulaModelRenderUtils.PositionTextureVertex vertex = quad.vertexPositions[i];
+                    float x = vertex.position.x() / 16.0F;
+                    float y = vertex.position.y() / 16.0F;
+                    float z = vertex.position.z() / 16.0F;
+                    Vector4f transformed = new Vector4f(x, y, z, 1.0F);
+                    transformed.mul(poseMatrix);
+                    bufferIn.addVertex(transformed.x(), transformed.y(), transformed.z()).setColor(red, green, blue, alpha).setUv(vertex.textureU, vertex.textureV).setOverlay(packedOverlayIn).setLight(packedLightIn).setNormal(normalX, normalY, normalZ);
                 }
             }
         }

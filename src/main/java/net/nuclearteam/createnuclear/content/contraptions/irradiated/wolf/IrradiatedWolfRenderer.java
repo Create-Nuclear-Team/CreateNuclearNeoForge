@@ -14,7 +14,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class IrradiatedWolfRenderer extends MobRenderer<IrradiatedWolf, IrradiatedWolfModel<IrradiatedWolf>> {
     private static final ResourceLocation WOLF_LOCATION = CreateNuclear.asResource("textures/entity/irradiated_wolf.png");
-    private static final ResourceLocation WOLF_TAME_LOCATION = CreateNuclear.asResource("textures/entity/irradiated_wolf.png");
     private static final ResourceLocation WOLF_ANGRY_LOCATION = CreateNuclear.asResource("textures/entity/irradiated_wolf_angry.png");
 
     public IrradiatedWolfRenderer(EntityRendererProvider.Context context) {
@@ -35,14 +34,9 @@ public class IrradiatedWolfRenderer extends MobRenderer<IrradiatedWolf, Irradiat
         if (entity.isWet()) {
             this.model.setColor(1);
         }
-
     }
 
     public @NotNull ResourceLocation getTextureLocation(IrradiatedWolf entity) {
-        if (entity.isTame()) {
-            return WOLF_TAME_LOCATION;
-        } else {
-            return entity.isAngry() ? WOLF_ANGRY_LOCATION : WOLF_LOCATION;
-        }
+        return entity.isAngry() ? WOLF_ANGRY_LOCATION : WOLF_LOCATION;
     }
 }

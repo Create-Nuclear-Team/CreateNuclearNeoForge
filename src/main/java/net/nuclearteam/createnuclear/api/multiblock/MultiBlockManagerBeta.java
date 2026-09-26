@@ -13,8 +13,6 @@ import java.util.List;
 public class MultiBlockManagerBeta <T> {
     private final ArrayList<BlockPattern<T>> structures = new ArrayList<>();
 
-    public MultiBlockManagerBeta() {}
-
     public void register(String id, T data, IMultiBlockPattern blockPattern) {
         structures.add(new BlockPattern<>(id, data, blockPattern));
     }

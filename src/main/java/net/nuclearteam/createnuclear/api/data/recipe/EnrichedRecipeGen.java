@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
- * The base class for Haunting recipe generation.
+ * The base class for Enriched recipe generation.
  * Addons should extend this and use the {@link ProcessingRecipeGen#create} methods
  * or the helper methods contained in this class to make recipes.
  * For an example of how you might do this, see {@link net.nuclearteam.createnuclear.foundation.data.recipe.CNEnrichedRecipeGen}.

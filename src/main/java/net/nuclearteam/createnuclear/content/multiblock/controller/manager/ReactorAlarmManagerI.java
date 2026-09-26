@@ -6,7 +6,8 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 public interface ReactorAlarmManagerI extends ReactorIOManager {
-    /** * Retourne une copie immuable des positions d'alarmes valides dans le monde actuel.
+    /**
+     * Returns an immutable copy of the valid alarm positions in the current world.
      */
-    List<BlockPos> getBlocksPosition(Level level);
+    List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos);
 }

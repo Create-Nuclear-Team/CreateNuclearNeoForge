@@ -2,12 +2,9 @@ package net.nuclearteam.createnuclear.api;
 
 import com.simibubi.create.api.registry.SimpleRegistry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
-import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
-
-import java.util.Collections;
 
 /**
  * Registry-backed accessors for {@link ReactorFluidType} mappings.

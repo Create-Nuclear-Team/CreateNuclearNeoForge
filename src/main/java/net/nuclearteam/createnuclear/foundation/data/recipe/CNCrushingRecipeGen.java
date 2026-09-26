@@ -34,26 +34,20 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
         ),
 
         CRUSHED_URANIUM_POWDER = create(CreateNuclear.MOD_ID, () -> AllItems.CRUSHED_URANIUM::get, b -> b
-                .duration(255)
-                .output(1, CNItems.URANIUM_POWDER, 9)
-        ),
-
-
-        RAW_URANIUM_BLOCK = create(() -> CNBlocks.RAW_URANIUM_BLOCK, b -> b
-            .duration(250)
-            .output(1, CNItems.URANIUM_POWDER,81)
+            .duration(255)
+            .output(1, CNItems.URANIUM_POWDER, 9)
         ),
 
         RAW_THORIUM_BLOCK = create(() -> CNBlocks.RAW_THORIUM_BLOCK, b -> b
-                .duration(250)
-                .output(1, CNItems.THORIUM_DUST, 9)
-                .output(0.5f, CNItems.THORIUM_DUST, 72)
+            .duration(250)
+            .output(1, CNItems.THORIUM_DUST, 9)
+            .output(0.75f, AllItems.EXP_NUGGET, 9)
         ),
 
         RAW_THORIUM_ITEM = create(() -> CNItems.RAW_THORIUM, b -> b
-                .duration(125)
-                .output(1, CNItems.THORIUM_DUST, 1)
-                .output(0.5f, CNItems.THORIUM_DUST, 8)
+            .duration(125)
+            .output(1, CNItems.THORIUM_DUST, 1)
+            .output(0.75f, AllItems.EXP_NUGGET, 1)
         ),
 
         RAW_ZINC = create(() -> AllItems.RAW_ZINC, b -> b.duration(250)
@@ -72,8 +66,8 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
          NITRATE = create("nitrate", b -> b
             .require(AllPaletteStoneTypes.LIMESTONE.materialTag)
             .duration(250)
-                .output(.6f, CNItems.NITRATE, 1)
-                .output(.4f, CNItems.LEAD_NUGGET, 1)
+            .output(.6f, CNItems.NITRATE, 1)
+            .output(.4f, CNItems.LEAD_NUGGET, 1)
         )
     ;
 

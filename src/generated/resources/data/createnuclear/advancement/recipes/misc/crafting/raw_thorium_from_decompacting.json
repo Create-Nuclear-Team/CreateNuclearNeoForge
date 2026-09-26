@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#c:storage_blocks/raw_thorium"
+            "items": "#c:raw_storage_blocks/thorium"
           }
         ]
       },

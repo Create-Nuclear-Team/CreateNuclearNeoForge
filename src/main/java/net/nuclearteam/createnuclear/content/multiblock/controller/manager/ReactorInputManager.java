@@ -21,44 +21,25 @@ import java.util.List;
 /**
  * Manager for reactor input positions (`ReactorInput`).
  *
- * Serializes positions as x/y/z triplets and provides utilities to
+ * Serializes positions as packed longs and provides utilities to
  * obtain valid `IItemHandler` instances present at those positions.
  */
 public class ReactorInputManager extends AbstractReactorIOManager implements ReactorInputManagerI {
-    private static final String NBT_KEY = "ReactorInput";
-
     @Override
-    public void write(CompoundTag compound) {
-        ListTag list = new ListTag();
-        for (BlockPos pos : positions) {
-            CompoundTag tag = new CompoundTag();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
-            list.add(tag);
-        }
-        compound.put(NBT_KEY, list);
-    }
-
-    @Override
-    public void read(CompoundTag compound) {
-        positions.clear();
-        if (!compound.contains(NBT_KEY)) return;
-        ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); ++i) {
-            CompoundTag tag = list.getCompound(i);
-            positions.add(new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
-        }
+    protected String nbtKey() {
+        return "ReactorInput";
     }
 
     /**
-     * Retrieves all `IItemHandler` instances located at the input positions.
+     * Retrieves all `IItemHandler` instances located at the input positions,
+     * resolved from the controller's current position.
      * Returns an empty list when no handlers are found.
      */
     @Override
-    public List<IItemHandler> getItemHandlers(Level level) {
+    public List<IItemHandler> getItemHandlers(Level level, BlockPos controllerPos) {
         List<IItemHandler> handlers = new ArrayList<>();
-        for (BlockPos p: new ArrayList<>(positions)) {
+        for (BlockPos offset : new ArrayList<>(positions)) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) continue;
             BlockEntity be = level.getBlockEntity(p);
             if (be == null) continue;
@@ -72,8 +53,8 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public VirtualReactorInputsItem getInventory(Level level) {
-        List<IItemHandler> handlers = this.getItemHandlers(level);
+    public VirtualReactorInputsItem getInventory(Level level, BlockPos controllerPos) {
+        List<IItemHandler> handlers = this.getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return new VirtualReactorInputsItem();
 
         int totalFuel = 0;
@@ -92,9 +73,9 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public boolean extractItems(Level level, int fuelNeeded, int coolerNeeded) {
+    public boolean extractItems(Level level, BlockPos controllerPos, int fuelNeeded, int coolerNeeded) {
         if (level == null) return false;
-        List<IItemHandler> handlers = getItemHandlers(level);
+        List<IItemHandler> handlers = getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return false;
 
         int fuelRemaining = fuelNeeded;
@@ -123,10 +104,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         return fuelRemaining <= 0 && coolerRemaining <= 0;
     }
 
-    public boolean extractItemByName(Level level, String itemName) {
+    @Override
+    public boolean extractItemByName(Level level, BlockPos controllerPos, String itemName) {
         if (level == null || itemName == null) return false;
 
-        List<IItemHandler> handlers = getItemHandlers(level);
+        List<IItemHandler> handlers = getItemHandlers(level, controllerPos);
         if (handlers.isEmpty()) return false;
 
         for (IItemHandler handler : handlers) {
@@ -135,15 +117,15 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 ItemStack stack = handler.getStackInSlot(s);
                 if (stack.isEmpty()) continue;
 
-                // On récupère le nom de l'item (ex: "uranium_rod")
+                // Get the item's name (e.g. "uranium_rod")
                 String registryPath = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-                // Comparaison intelligente : on ignore la casse et les underscores (_)
+                // Smart comparison: ignore case and underscores (_)
                 if (isMatching(registryPath, itemName)) {
-                    // On tente d'extraire 1 unité
+                    // Try to extract 1 unit
                     ItemStack extracted = handler.extractItem(s, 1, false);
 
-                    // Si l'extraction a réussi, on s'arrête là et on renvoie true
+                    // If the extraction succeeded, stop here and return true
                     if (!extracted.isEmpty()) {
                         return true;
                     }
@@ -151,11 +133,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-        return false; // On n'a pas trouvé l'item demandé
+        return false; // The requested item wasn't found
     }
 
     /**
-     * Helper pour comparer "GraphiteRod" avec "graphite_rod"
+     * Helper to compare "GraphiteRod" with "graphite_rod"
      */
     private boolean isMatching(String registryPath, String configName) {
         String cleanPath = registryPath.replace("_", "").toLowerCase();
@@ -168,28 +150,25 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
      * or not a `Container`).
      */
     @Override
-    public void clearInvalid(Level level) {
+    public void clearInvalid(Level level, BlockPos controllerPos) {
         List<BlockPos> toRemove = new ArrayList<>();
-        for (BlockPos p: positions) {
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
             if (level == null || !level.isLoaded(p)) {
-                toRemove.add(p);
+                toRemove.add(offset);
                 continue;
             }
 
             BlockEntity be = level.getBlockEntity(p);
-            if (be == null || !(be instanceof Container)) toRemove.add(p);
+            if (be == null || !(be instanceof Container)) toRemove.add(offset);
         }
 
         positions.removeAll(toRemove);
     }
 
     @Override
-    public List<BlockPos> getBlocksPosition(Level level) {
-        List<BlockPos> positions = new ArrayList<>();
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        return filterByType(level, controllerPos, ReactorRodInputEntity.class);
 
-        for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) positions.add(p);
-        }
-        return List.copyOf(positions);
     }
 }

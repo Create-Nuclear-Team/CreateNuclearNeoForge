@@ -7,6 +7,8 @@ import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
+import net.nuclearteam.createnuclear.compat.Mods;
+import net.nuclearteam.createnuclear.compat.createdragonsplus.SnowPowderFreezingCompat;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
@@ -67,7 +69,7 @@ public class CreateNuclear {
 
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
 
-        IEventBus forgeEventBus = NeoForge.EVENT_BUS;
+        IEventBus neoForgeEventBus = NeoForge.EVENT_BUS;
 
         REGISTRATE.registerEventListeners(modEventBus);
 
@@ -103,16 +105,15 @@ public class CreateNuclear {
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
-        forgeEventBus.addListener(CNFluids::handleFluidEffect);
+        neoForgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         modEventBus.addListener(EventPriority.HIGHEST, CreateNuclearDatagen::gatherDataHighPriority);
-
-        //DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
         CNRadiationValues.register();
+        Mods.CREATE_DRAGONS_PLUS.executeIfInstalled(() -> SnowPowderFreezingCompat::register);
 
         event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));

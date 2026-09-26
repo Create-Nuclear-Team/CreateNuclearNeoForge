@@ -1,8 +1,7 @@
 package net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf;
 
-import com.mojang.math.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +37,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -135,8 +133,6 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
 
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
-        Holder<Biome> holder = level.getBiome(this.blockPosition());
-
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
@@ -348,7 +344,7 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
     }
 
     public boolean isFood(ItemStack stack) {
-        return stack.is(CNTags.CNItemTags.FUEL.tag);
+        return AnimalUtil.isFood(stack, CNTags.CNItemTags.FUEL.tag);
     }
 
     public int getMaxSpawnClusterSize() {

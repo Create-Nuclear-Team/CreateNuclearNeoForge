@@ -7,7 +7,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.level.Level;
 
-@SuppressWarnings("unused")
 public class CNDamageTypes {
     private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, CreateNuclear.asResource(name));

@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
  * <p>Implementation details:
  * - Empty stacks contribute {@code 0}.
  * - Each non-empty stack contributes a value computed from the numeric item id,
- *   stack count, and the NBT tag's {@code hashCode()} when present. Damage value
+ *   stack count, and the stack's data components' {@code hashCode()}. Damage value
  *   is intentionally excluded: no radiation source reads it, so including it would
  *   only cause needless recomputation on every durability change.
  * - Per-stack contributions are combined using a 31-multiplicative rolling scheme
@@ -46,8 +46,8 @@ public class InventoryHashUtil {
      *         detection but is not collision-resistant.
      * @throws NullPointerException if {@code player} is {@code null}
      * @implNote The algorithm uses {@link Item#getId(net.minecraft.world.item.Item)}
-     *           and basic stack properties (count, tag.hashCode()). It is
-     *           intentionally simple and optimized for speed rather than
+     *           and basic stack properties (count, {@code getComponents().hashCode()}).
+     *           It is intentionally simple and optimized for speed rather than
      *           cryptographic strength.
      */
     public static long compute(Player player) {
@@ -73,8 +73,8 @@ public class InventoryHashUtil {
      * inventory hash.
      *
      * <p>Empty stacks return {@code 0}. For non-empty stacks the returned value
-     * encodes the numeric item id, the stack count, and, when applicable, the
-     * NBT tag's {@code hashCode()}.</p>
+     * encodes the numeric item id, the stack count, and the stack's data
+     * components' {@code hashCode()}.</p>
      *
      * @param stack the item stack to hash; must not be {@code null}
      * @return a {@code long} representing the stack's contribution; {@code 0}

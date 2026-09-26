@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorAlarmManagerI;
 
@@ -23,7 +24,8 @@ public interface IReactorAlarmCoordinator {
      *
      * @param level        the reactor's level
      * @param alarmManager the manager holding the alarm block positions
+     * @param controllerPos the reactor controller's current position
      * @param isDanger     whether the alarms should be powered on
      */
-    void update(Level level, ReactorAlarmManagerI alarmManager, boolean isDanger);
+    void update(Level level, ReactorAlarmManagerI alarmManager, BlockPos controllerPos, boolean isDanger);
 }

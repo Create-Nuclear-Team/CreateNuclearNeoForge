@@ -69,8 +69,6 @@ public class HelmetOverlay  implements HudOverlay {
 
         // Render helmet overlay texture
         RenderHelper.renderFirstPersonOverlay(guiGraphics, HELMET_TEXTURES[index], 1f, 1f);
-        // Render the hotbar behind the helmet overlay
-        //Minecraft.getInstance().gui.renderItemHotbar(12f, graphics);
     }
 
     @Override

@@ -30,6 +30,7 @@ run/crash-reports/
 run/data/
 run/defaultconfigs/
 run/logs/*
+run/debug/*
 run/resourcepacks/
 run/resources/
 run/saves/
@@ -45,7 +46,11 @@ run/gametest
 run/logs
 run/schematics
 run/server
+run/client2
 run/downloads/log.json
 run/command_history.txt
 run/world/
 run/world*/
+run/.sable/*
+run/ponders_watched.json
+run/servers.*
