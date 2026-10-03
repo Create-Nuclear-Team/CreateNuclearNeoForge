@@ -1,0 +1,164 @@
+{
+  "alarm/alarm": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:alarm/alarm"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.alarm/alarm"
+  },
+  "alarm/reactor_alarm": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:alarm/reactor_alarm"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.alarm/reactor_alarm"
+  },
+  "biomes/wasteland": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:biomes/wasteland"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.biomes/wasteland"
+  },
+  "explosion/large_nuclear_explosion": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/large_nuclear_explosion"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/large_nuclear_explosion"
+  },
+  "explosion/main": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/main"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/main"
+  },
+  "explosion/nuclear_explosion": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/nuclear_explosion"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion"
+  },
+  "explosion/nuclear_explosion_rumble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/nuclear_explosion_rumble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion_rumble"
+  },
+  "explosion/ringing": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/ringing"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/ringing"
+  },
+  "explosion/rumble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/rumble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/rumble"
+  },
+  "explosion/shockwave": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/shockwave"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/shockwave"
+  },
+  "geiger/high": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:geiger/high"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.geiger/high"
+  },
+  "geiger/low": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:geiger/low"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.geiger/low"
+  },
+  "geiger/medium": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:geiger/medium"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.geiger/medium"
+  },
+  "reactor/activation": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor/activation"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor/activation"
+  },
+  "reactor/assembly_disassembly/motor_assemble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor/assembly_disassembly/motor_assemble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor/assembly_disassembly/motor_assemble"
+  },
+  "reactor/assembly_disassembly/motor_disassemble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor/assembly_disassembly/motor_disassemble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor/assembly_disassembly/motor_disassemble"
+  },
+  "reactor/running": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor/running"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor/running"
+  },
+  "reactor/shut_off": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor/shut_off"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor/shut_off"
+  }
+}

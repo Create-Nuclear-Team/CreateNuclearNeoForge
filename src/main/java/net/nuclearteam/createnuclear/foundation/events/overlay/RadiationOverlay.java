@@ -1,10 +1,12 @@
 package net.nuclearteam.createnuclear.foundation.events.overlay;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CreateNuclear;
@@ -33,7 +35,7 @@ public class RadiationOverlay extends EasingHudOverlay {
 
     @Override
     public ResourceLocation getOverlayId() {
-        return ResourceLocation.parse("radiation_overlay");
+        return CreateNuclear.asResource("radiation_overlay");
     }
 
     @Override
@@ -44,8 +46,28 @@ public class RadiationOverlay extends EasingHudOverlay {
 
     @Override
     protected void renderWithAlpha(GuiGraphics graphics, float partialTicks, float alpha) {
-        // Render radiation overlay with dynamic coverage and alpha
-        RenderHelper.renderTextureOverlay(graphics, RADIATION_TEXTURE, Math.round(alpha * coverage));
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui || mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR || mc.gameMode.getPlayerMode() == GameType.CREATIVE)
+            return;
+        if (!mc.options.getCameraType().isFirstPerson())
+            return;
+
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
+
+        graphics.flush();
+        RenderSystem.enableBlend();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+
+        graphics.setColor(1f,1f,1f, alpha * coverage);
+        graphics.blit(RADIATION_TEXTURE, 0, 0, -90, 0, 0, width, height, width, height);
+        graphics.flush();
+
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
+        graphics.setColor(1f, 1f, 1f, 1f);
     }
 
     @Override

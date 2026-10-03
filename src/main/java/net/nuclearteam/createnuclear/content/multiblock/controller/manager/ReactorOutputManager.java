@@ -1,0 +1,91 @@
+package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Manager for a reactor's outputs (`ReactorOutput`).
+ * Handles serialization of output positions.
+ */
+public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
+    public static final int RPM_DIVIDER = 32;
+
+    @Override
+    protected String nbtKey() {
+        return "ReactorOutputs";
+    }
+
+    /**
+     * {@inheritDoc}
+     * A tracked position is dropped if its chunk isn't loaded or the block
+     * entity at that position is no longer a {@link ReactorOutputEntity}.
+     */
+    @Override
+    public void clearInvalid(Level level, BlockPos controllerPos) {
+        List<BlockPos> toRemove = new ArrayList<>();
+        for (BlockPos offset : positions) {
+            BlockPos p = controllerPos.offset(offset);
+            if (level == null || !level.isLoaded(p)) {
+                toRemove.add(offset);
+                continue;
+            }
+            BlockEntity be = level.getBlockEntity(p);
+            if (!(be instanceof ReactorOutputEntity)) toRemove.add(offset);
+        }
+        positions.removeAll(toRemove);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Filters the tracked positions down to those currently backed by a
+     * loaded {@link ReactorOutputEntity}.
+     */
+    @Override
+    public List<BlockPos> getBlocksPosition(Level level, BlockPos controllerPos) {
+        return filterByType(level, controllerPos, ReactorOutputEntity.class);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * The total rotation (in RPM, divided down by {@link #RPM_DIVIDER}) is
+     * split as evenly as possible across the tracked outputs, with the
+     * remainder distributed to the first outputs. Each output is set to its
+     * share of the rotation speed if the reactor is assembled, otherwise
+     * stopped.
+     */
+    @Override
+    public void rotateOutputs(Level level, BlockPos controllerPos, boolean assembled, int rotation) {
+        if (positions.isEmpty()) return;
+
+        int totalRpm = rotation / RPM_DIVIDER;
+        int size = positions.size();
+        int remainingRotation = totalRpm % size;
+
+        for (int i = 0; i < size; i++) {
+            int dividedRotation = (totalRpm / size) + (i < remainingRotation ? 1 : 0);
+            BlockPos pos = controllerPos.offset(positions.get(i));
+
+            if (!(level.getBlockState(pos).getBlock() instanceof ReactorOutput block)) continue;
+            ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+            if (entity == null) continue;
+
+            entity.updateSpeed = true;
+            if (dividedRotation > 0) {
+                entity.speed = assembled ? dividedRotation : 0;
+                entity.setSpeedAndUpdate(dividedRotation);
+            } else {
+                entity.setSpeedAndUpdate(0);
+            }
+            entity.updateGeneratedRotation();
+        }
+    }
+}

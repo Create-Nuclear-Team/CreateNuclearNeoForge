@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
  */
 public abstract class EasingHudOverlay implements HudOverlay {
     private float progress = 0f;
-    protected float fadeSpeed = 0.03f;
+    protected float fadeSpeed = 0.01f;
 
     @Override
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {

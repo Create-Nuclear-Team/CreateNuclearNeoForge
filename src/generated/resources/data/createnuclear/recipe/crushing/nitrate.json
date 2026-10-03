@@ -1,0 +1,19 @@
+{
+  "type": "create:crushing",
+  "ingredients": [
+    {
+      "tag": "create:stone_types/limestone"
+    }
+  ],
+  "processing_time": 250,
+  "results": [
+    {
+      "chance": 0.6,
+      "id": "createnuclear:nitrate"
+    },
+    {
+      "chance": 0.4,
+      "id": "createnuclear:lead_nugget"
+    }
+  ]
+}

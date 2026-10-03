@@ -2,7 +2,7 @@
   "parent": "createnuclear:root",
   "criteria": {
     "0": {
-      "trigger": "create:automatic_uranium_builtin"
+      "trigger": "createnuclear:automatic_uranium_builtin"
     }
   },
   "display": {

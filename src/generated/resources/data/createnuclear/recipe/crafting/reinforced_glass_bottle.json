@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "createnuclear:reinforced_glass"
+    }
+  },
+  "pattern": [
+    "G G",
+    " G "
+  ],
+  "result": {
+    "count": 3,
+    "id": "createnuclear:reinforced_glass_bottle"
+  }
+}
