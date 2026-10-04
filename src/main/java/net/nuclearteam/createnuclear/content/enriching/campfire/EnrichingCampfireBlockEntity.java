@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class EnrichingCampfireBlockEntity extends SmartBlockEntity {
     public EnrichingCampfireBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -24,7 +23,6 @@ public class EnrichingCampfireBlockEntity extends SmartBlockEntity {
                 EnrichingCampfireBlock.makeParticles(level, pos);
             }
         }
-        i = state.getValue(EnrichingCampfireBlock.FACING).get2DDataValue();
     }
 
     private void markUpdated() {

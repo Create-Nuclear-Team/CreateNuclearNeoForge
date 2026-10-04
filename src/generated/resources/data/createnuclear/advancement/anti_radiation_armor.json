@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#createnuclear:all_anti_radiation_armors"
+            "items": "#createnuclear:anti_radiation_armor"
           }
         ]
       },
@@ -20,7 +20,7 @@
     },
     "icon": {
       "count": 1,
-      "id": "createnuclear:white_anti_radiation_helmet"
+      "id": "createnuclear:default_anti_radiation_helmet"
     },
     "title": {
       "translate": "advancement.createnuclear.anti_radiation_armor"

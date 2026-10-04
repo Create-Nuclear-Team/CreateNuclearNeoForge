@@ -1,12 +1,13 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.api.data.recipe.MixingRecipeGen;
+import com.simibubi.create.content.processing.recipe.HeatCondition;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 import net.nuclearteam.createnuclear.CNFluids;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,14 +16,27 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
 
     GeneratedRecipe
         STEEL = create("steel", b -> b
-            .require(CNTags.forgeItemTag("dusts/coal"))
+            .require(CNMaterialTags.COAL.dusts())
             .require(Tags.Items.INGOTS_IRON)
             .output(CNItems.STEEL_INGOT)
         ),
 
         URANIUM_FLUID = create("uranium_fluid", b -> b
-            .require(CNTags.forgeItemTag("dusts/uranium"))
+            .require(CNMaterialTags.URANIUM.dusts())
             .output(CNFluids.URANIUM.get(), 25)
+        ),
+
+        THORIUM_FLUID = create("thorium_fluid", b -> b
+                .require(CNMaterialTags.THORIUM.dusts())
+                .output(CNFluids.THORIUM.get(), 25)
+                .requiresHeat(HeatCondition.HEATED)
+        ),
+
+        NITROGEN = create("liquid_nitrogen", b -> b
+            .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
+            .duration(20)
+            .require(Items.ICE)
+            .output(CNFluids.LIQUID_NITROGEN.get(), 100)
         )
     ;
 

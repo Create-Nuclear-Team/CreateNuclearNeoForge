@@ -7,6 +7,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.data.recipe.EnrichedRecipeGen;
 
 import java.util.concurrent.CompletableFuture;
 

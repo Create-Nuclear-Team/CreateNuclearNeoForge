@@ -1,0 +1,28 @@
+{
+  "parent": "createnuclear:reactor_casing",
+  "criteria": {
+    "0": {
+      "trigger": "createnuclear:silence_the_core_builtin"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "color": "#DBA213",
+      "translate": "advancement.createnuclear.silence_the_core.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "createnuclear:reactor_alarm"
+    },
+    "title": {
+      "translate": "advancement.createnuclear.silence_the_core"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "createnuclear:pink_cloth"
+  },
+  "base": {
+    "item": "createnuclear:default_anti_radiation_boots"
+  },
+  "result": {
+    "count": 1,
+    "id": "createnuclear:default_anti_radiation_boots"
+  },
+  "template": []
+}

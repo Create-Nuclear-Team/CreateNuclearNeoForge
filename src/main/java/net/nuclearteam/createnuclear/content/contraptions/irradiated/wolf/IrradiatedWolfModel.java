@@ -10,6 +10,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -136,11 +137,11 @@ public class IrradiatedWolfModel<T extends IrradiatedWolf> extends ColorableAgea
 
 	@Override
 	protected Iterable<ModelPart> headParts() {
-		return null;
+		return List.of(head);
 	}
 
 	@Override
 	protected Iterable<ModelPart> bodyParts() {
-		return null;
+		return List.of(body, mane, leg1, leg2, leg3, leg4, tail);
 	}
 }
