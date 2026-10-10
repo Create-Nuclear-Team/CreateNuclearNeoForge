@@ -4,6 +4,7 @@ import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -17,6 +18,8 @@ import net.nuclearteam.createnuclear.CNDataComponents;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
+import net.nuclearteam.createnuclear.foundation.utility.ClothTagHelper;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
@@ -41,6 +44,10 @@ public class AntiRadiationArmorItem extends ArmorItem {
         );
     }
 
+    @Override
+    public @Nullable ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
+        return ClothTagHelper.getArmorTexturePath(stack, "anti_radiation_suit.png");
+    }
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
