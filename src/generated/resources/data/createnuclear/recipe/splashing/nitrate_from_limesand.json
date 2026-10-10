@@ -8,7 +8,12 @@
   "type": "create:splashing",
   "ingredients": [
     {
-      "item": "tfmg:limesand"
+      "type": "neoforge:compound",
+      "ingredients": [
+        {
+          "item": "tfmg:limesand"
+        }
+      ]
     }
   ],
   "results": [

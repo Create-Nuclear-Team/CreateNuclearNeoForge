@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-10T14:02:20.4728359	CreateNuclear's Processing Recipes
+// 1.21.1	2026-10-10T14:13:23.4782239	CreateNuclear's Processing Recipes
 dda7e53d7d3c598bf66ec80b0b16f3c21ee18951 data/createnuclear/recipe/compacting/thorium_fluid_to_thorium_ingot.json
 22d57898717d1a4dcca1b5be4e4cd6a23ac340c3 data/createnuclear/recipe/compacting/uranium_fluid_to_yellowcake.json
 a11a9d69b96e4cd1b748cab33dabd6a2964ad6ac data/createnuclear/recipe/crushing/coal.json
@@ -22,4 +22,4 @@ e52ccded5e0955ab39320129fce8f78d50f52250 data/createnuclear/recipe/mixing/uraniu
 4e362c3fb35c7a4cf946fda91958fe6b84a59e04 data/createnuclear/recipe/pressing/graphene.json
 0883773497d77efae10821cad8506662f7331e09 data/createnuclear/recipe/snow_powder/cooled_nitrogen_concentrate.json
 282966a4f127d86ed7a46757303d70314d44be47 data/createnuclear/recipe/splashing/crushed_raw_lead.json
-fc29bcbb8232e4946a004d40e494a4942f9b7a38 data/createnuclear/recipe/splashing/nitrate_from_limesand.json
+40420b9297249443c2ed6610659268b5b715ab87 data/createnuclear/recipe/splashing/nitrate_from_limesand.json
