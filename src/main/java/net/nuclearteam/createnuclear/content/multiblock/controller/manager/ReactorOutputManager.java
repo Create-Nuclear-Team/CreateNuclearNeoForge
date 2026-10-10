@@ -78,13 +78,8 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
             ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
             if (entity == null) continue;
 
-            entity.updateSpeed = true;
-            if (dividedRotation > 0) {
-                entity.speed = assembled ? dividedRotation : 0;
-                entity.setSpeedAndUpdate(dividedRotation);
-            } else {
-                entity.setSpeedAndUpdate(0);
-            }
+            int targetSpeed = assembled ? Math.max(dividedRotation, 0) : 0;
+            entity.setSpeedAndUpdate(targetSpeed);
             entity.updateGeneratedRotation();
         }
     }
