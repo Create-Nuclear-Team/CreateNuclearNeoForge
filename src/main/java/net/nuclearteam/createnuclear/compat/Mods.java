@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.compat;
 
+import com.simibubi.create.api.data.recipe.DatagenMod;
 import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.registry.RegisteredObjectsHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,9 +13,10 @@ import net.neoforged.fml.loading.LoadingModList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public enum Mods {
+public enum Mods implements DatagenMod {
     ALEXS_CAVE("alexscaves"),
     CREATE_DRAGONS_PLUS,
+    TFMG,
     SABLE
     ;
 
@@ -84,5 +86,10 @@ public enum Mods {
         if (isLoaded()) {
             toExecute.get().run();
         }
+    }
+
+    @Override
+    public String getId() {
+        return id();
     }
 }

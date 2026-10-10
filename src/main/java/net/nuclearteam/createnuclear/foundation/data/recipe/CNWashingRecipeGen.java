@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
+import com.drmangotea.tfmg.registry.TFMGItems;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.data.recipe.WashingRecipeGen;
 import com.simibubi.create.content.kinetics.fan.processing.SplashingRecipe;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.compat.Mods;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -19,7 +21,13 @@ import java.util.function.UnaryOperator;
 public class CNWashingRecipeGen extends WashingRecipeGen {
 
     GeneratedRecipe
-        CRUSHED_LEAD = moddedCrushedOreCustom(AllItems.CRUSHED_LEAD, CNItems.LEAD_NUGGET::get, AllItems.EXP_NUGGET::get, .5f)
+        CRUSHED_LEAD = moddedCrushedOreCustom(AllItems.CRUSHED_LEAD, CNItems.LEAD_NUGGET::get, AllItems.EXP_NUGGET::get, .5f),
+        NITRATE_FROM_LIMESAND = create("nitrate_from_limesand", b -> b
+            .require(Mods.TFMG, "limesand")
+            .output(.6f, CNItems.NITRATE, 1)
+            .output(.4f, CNItems.LEAD_NUGGET, 1)
+            .whenModLoaded(Mods.TFMG.id())
+        )
     ;
 
     public GeneratedRecipe moddedCrushedOreCustom(ItemEntry<? extends Item> crushed, Supplier<ItemLike> nugget, Supplier<ItemLike> secondary,

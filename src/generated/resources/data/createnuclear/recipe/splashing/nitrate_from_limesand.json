@@ -1,20 +1,21 @@
 {
   "neoforge:conditions": [
     {
-      "type": "neoforge:not",
-      "value": {
-        "type": "neoforge:mod_loaded",
-        "modid": "tfmg"
-      }
+      "type": "neoforge:mod_loaded",
+      "modid": "tfmg"
     }
   ],
-  "type": "create:crushing",
+  "type": "create:splashing",
   "ingredients": [
     {
-      "tag": "create:stone_types/limestone"
+      "type": "neoforge:compound",
+      "ingredients": [
+        {
+          "item": "tfmg:limesand"
+        }
+      ]
     }
   ],
-  "processing_time": 250,
   "results": [
     {
       "chance": 0.6,
