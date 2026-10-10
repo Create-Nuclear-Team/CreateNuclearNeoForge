@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.compat.Mods;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -68,6 +69,7 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
             .duration(250)
             .output(.6f, CNItems.NITRATE, 1)
             .output(.4f, CNItems.LEAD_NUGGET, 1)
+            .whenModMissing(Mods.TFMG.id())
         )
     ;
 

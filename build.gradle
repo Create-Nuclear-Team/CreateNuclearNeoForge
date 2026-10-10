@@ -193,6 +193,10 @@ repositories {
             content { includeGroupAndSubgroups "xaero" }
         }
     } // Xaero's Maven
+    maven {
+        name "Krystals Maven"
+        url "https://krystalsmaven.oreostack.uk/releases" // TFMG
+    }
 }
 
 dependencies {
@@ -224,15 +228,20 @@ dependencies {
         runtimeOnly("xaero.map:xaeroworldmap-neoforge-${minecraft_version}:${xaeros_world_ap_version}")
     }
 
-    compileOnly "maven.modrinth:rNRqFWLv:ts53zFVC"
+    compileOnly("maven.modrinth:rNRqFWLv:ts53zFVC")
     if (project.enable_mobends.toBoolean()) {
-        runtimeOnly "maven.modrinth:rNRqFWLv:ts53zFVC"
-        runtimeOnly "maven.modrinth:architectury-api:1IiqEQGl"
+        runtimeOnly("maven.modrinth:rNRqFWLv:ts53zFVC")
+        runtimeOnly("maven.modrinth:architectury-api:1IiqEQGl")
     }
 
-    compileOnly "maven.modrinth:punchy-fpa:luK5HVTT"
+    compileOnly("maven.modrinth:punchy-fpa:luK5HVTT")
     if (project.enable_punchy.toBoolean()) {
-        runtimeOnly "maven.modrinth:punchy-fpa:luK5HVTT"
+        runtimeOnly("maven.modrinth:punchy-fpa:luK5HVTT")
+    }
+
+    compileOnly("com.drmangotea:tfmg:${minecraft_version}-${tfmg_version}"){ transitive = false }
+    if (project.enable_tfmg.toBoolean()) {
+        runtimeOnly("com.drmangotea:tfmg:${minecraft_version}-${tfmg_version}"){ transitive = false }
     }
 
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
