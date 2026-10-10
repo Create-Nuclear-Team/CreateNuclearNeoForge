@@ -66,13 +66,14 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
     public void rotateOutputs(Level level, BlockPos controllerPos, boolean assembled, int rotation) {
         if (positions.isEmpty()) return;
 
+        List<BlockPos> snapshot = List.copyOf(positions);
         int totalRpm = rotation / RPM_DIVIDER;
-        int size = positions.size();
+        int size = snapshot.size();
         int remainingRotation = totalRpm % size;
 
         for (int i = 0; i < size; i++) {
             int dividedRotation = (totalRpm / size) + (i < remainingRotation ? 1 : 0);
-            BlockPos pos = controllerPos.offset(positions.get(i));
+            BlockPos pos = controllerPos.offset(snapshot.get(i));
 
             if (!(level.getBlockState(pos).getBlock() instanceof ReactorOutput block)) continue;
             ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
