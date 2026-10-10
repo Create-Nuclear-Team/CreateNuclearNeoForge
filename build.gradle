@@ -186,6 +186,13 @@ repositories {
 
     maven { url "https://maven.dragons.plus/releases" } // DragonsPlusMinecraft Maven
     maven { url "https://maven.fallenbreath.me/releases" } // Conditional Mixin
+    repositories {
+        maven {
+            url "https://chocolateminecraft.com/maven"
+            name "Xaero's Maven"
+            content { includeGroupAndSubgroups "xaero" }
+        }
+    } // Xaero's Maven
 }
 
 dependencies {
@@ -214,6 +221,11 @@ dependencies {
     compileOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
     if (project.enable_create_dragons_plus.toBoolean()) {
         runtimeOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    }
+
+    if (project.enable_xaeros_minimap.toBoolean()) {
+        runtimeOnly("xaero.minimap:xaerominimap-neoforge-${minecraft_version}:${xaeros_minimap_version}")
+        runtimeOnly("xaero.map:xaeroworldmap-neoforge-${minecraft_version}:${xaeros_world_ap_version}")
     }
 
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {

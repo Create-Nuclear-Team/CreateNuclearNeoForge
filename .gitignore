@@ -54,3 +54,5 @@ run/world*/
 run/.sable/*
 run/ponders_watched.json
 run/servers.*
+run/XaeroWaypoints*
+run/xaero/*
