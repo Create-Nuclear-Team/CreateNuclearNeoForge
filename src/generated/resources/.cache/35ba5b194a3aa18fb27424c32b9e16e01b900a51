@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-10T14:13:23.4838066	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-10-10T22:14:12.7345148	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -25,6 +25,8 @@ c8479fd99df3917545c86ee3ea9bfe981bf762e7 assets/createnuclear/blockstates/nitrat
 462d22ea4a021cc368721fdb841c8a9b9176c06d assets/createnuclear/blockstates/polished_cut_autunite_slab.json
 76a9a39503654b94cbe01e249292ed280446bbb6 assets/createnuclear/blockstates/polished_cut_autunite_stairs.json
 f628f8c7aa1e150ad2b5a3ce87dbe7f00b462e74 assets/createnuclear/blockstates/polished_cut_autunite_wall.json
+3d900032b0fa3b4f9ad81b9d796714fe13ae7519 assets/createnuclear/blockstates/radiation_gas.json
+10b463b6b5e6318dd73a98197eecb5fb141c5f09 assets/createnuclear/blockstates/radiation_source.json
 8195d52278bf58414faaaec6067905635aaa29d5 assets/createnuclear/blockstates/raw_lead_block.json
 5db59637c8fdd94d90bc9748c10769eb54f97224 assets/createnuclear/blockstates/raw_thorium_block.json
 63aaf78c3e0c16c2f37b069c5392e3d1a93ac058 assets/createnuclear/blockstates/raw_uranium_block.json
@@ -48,8 +50,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-02be24eb6126f2e1f57e46e798da18ecdeb266a4 assets/createnuclear/lang/en_ud.json
-6a0151325e2a8e604e82fac66477cba07c62c563 assets/createnuclear/lang/en_us.json
+1e34d5e975f30875f582fb2f04feea5355146949 assets/createnuclear/lang/en_ud.json
+5f7a83e89eb6b490e9a5910be21360c20fb2b592 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -94,6 +96,8 @@ a251d75552efea796382a4124659f9d39606461b assets/createnuclear/models/block/polis
 3fcae9cce1819111bdab42b8b92a1468394db3b1 assets/createnuclear/models/block/polished_cut_autunite_wall_post.json
 ad989d89e7b80a30e0860fb0f1418013fe3355d2 assets/createnuclear/models/block/polished_cut_autunite_wall_side.json
 b950ac6ca2df77ffe3abd02e13c38567602e5536 assets/createnuclear/models/block/polished_cut_autunite_wall_side_tall.json
+971e3a38949f3e4fcc7b82ea6e6adc6dddac76a6 assets/createnuclear/models/block/radiation_gas.json
+561c9f9a4e153fc648a3c7224812c71c8ac2da5c assets/createnuclear/models/block/radiation_source.json
 cf8b4d604330762358b21b6e079aaab1eb2987f4 assets/createnuclear/models/block/raw_lead_block.json
 de9b4dee9580161263fa8020d326ac5fe4e38ed4 assets/createnuclear/models/block/raw_thorium_block.json
 561c9f9a4e153fc648a3c7224812c71c8ac2da5c assets/createnuclear/models/block/raw_uranium_block.json
@@ -239,6 +243,7 @@ cfc8b9126dc3fe3b993c5e6201533aecc07989c3 assets/createnuclear/models/item/orange
 d3459552745c002eb95585853ddec7b638b4c11f assets/createnuclear/models/item/polished_cut_autunite_stairs.json
 b6c3a22d368bd0796b004ac27b8e453a16e7d14c assets/createnuclear/models/item/polished_cut_autunite_wall.json
 3171211192a2b92005177fd1ee2ce7fbe2592b52 assets/createnuclear/models/item/purple_cloth.json
+d1b727f18be1b9794b1e764c3e35ca26ad268e0c assets/createnuclear/models/item/radiation_source.json
 7da7ddaac39353657166badddc16fe9eb79f1a27 assets/createnuclear/models/item/raw_lead.json
 ba58a4c086d8937d6703795a9d80435c2d450e35 assets/createnuclear/models/item/raw_lead_block.json
 58c3279f0d6dfe7b88f5a85bfce6c1d683bbe2b4 assets/createnuclear/models/item/raw_thorium.json
@@ -443,6 +448,7 @@ e2d7ae9213d3a64a68eaf8e549729e62769b05a1 data/createnuclear/loot_table/blocks/le
 d5fb5ebfe991980abfd6f1932575363d026d8859 data/createnuclear/loot_table/blocks/polished_cut_autunite_slab.json
 8205832fc48bd24351b4b433f92a70a533336f48 data/createnuclear/loot_table/blocks/polished_cut_autunite_stairs.json
 2c3ca9fb7683d1edfdc2e4fcd4b25ab7f40c3ab6 data/createnuclear/loot_table/blocks/polished_cut_autunite_wall.json
+470cc6ecad28253178be99e2f1404e07add54d2f data/createnuclear/loot_table/blocks/radiation_source.json
 66ab1033aebea1383fe3f09c7468f4cd60d8aa25 data/createnuclear/loot_table/blocks/raw_lead_block.json
 7cc60fa9a9bb958907f56b583e27c7f37af2a63e data/createnuclear/loot_table/blocks/raw_thorium_block.json
 0998d5a55f2dc10e85e83dd74bd91d4a3913f61f data/createnuclear/loot_table/blocks/raw_uranium_block.json

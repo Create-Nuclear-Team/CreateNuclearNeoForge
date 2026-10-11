@@ -24,10 +24,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
+import net.nuclearteam.createnuclear.content.radiation.gas.RadiationGasBlock;
+import net.nuclearteam.createnuclear.content.radiation.gas.RadiationSourceBlock;
 import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
@@ -590,6 +593,40 @@ public class CNBlocks {
             CNMaterialTags.STEEL.storageBlocks().items()
         )
         .build()
+        .register();
+
+    public static final BlockEntry<RadiationGasBlock> RADIATION_GAS = CreateNuclear.REGISTRATE
+        .block("radiation_gas", RadiationGasBlock::new)
+        // Pas de initialProperties(Blocks.AIR) : un bloc air() n'est jamais rendu (section de chunk considérée vide)
+        .properties(p -> p
+            .mapColor(MapColor.COLOR_LIGHT_GREEN)
+            .replaceable()
+            .noCollission()
+            .noOcclusion()
+            .noLootTable()
+            .randomTicks()
+            .pushReaction(PushReaction.DESTROY)
+            .isValidSpawn((state, level, pos, type) -> false)
+            .isRedstoneConductor((state, level, pos) -> false)
+            .isSuffocating((state, level, pos) -> false)
+            .isViewBlocking((state, level, pos) -> false)
+        )
+        .blockstate((c, p) -> p.simpleBlock(c.getEntry(), p.models()
+            .withExistingParent(c.getName(), ResourceLocation.withDefaultNamespace("block/cube_all"))
+            .texture("all", p.modLoc("block/radiation_gas"))
+            .texture("particle", p.modLoc("block/radiation_gas"))
+            .renderType("translucent")
+        ))
+        .loot((lt, b) -> {})
+        .register();
+
+    // WIP / debug : émetteur de gaz radioactif pour tester la propagation
+    public static final BlockEntry<RadiationSourceBlock> RADIATION_SOURCE = CreateNuclear.REGISTRATE
+        .block("radiation_source", RadiationSourceBlock::new)
+        .initialProperties(SharedProperties::stone)
+        .properties(p -> p.mapColor(MapColor.COLOR_GREEN).lightLevel(state -> 7))
+        .blockstate((c, p) -> p.simpleBlock(c.getEntry(), p.models().cubeAll(c.getName(), p.modLoc("block/raw_uranium_block"))))
+        .simpleItem()
         .register();
 
     public static void register() {
