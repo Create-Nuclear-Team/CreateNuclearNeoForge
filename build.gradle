@@ -184,7 +184,7 @@ repositories {
         }
     }
 
-    maven { url "https://maven.dragons.plus/releases" } // DragonsPlusMinecraft Maven
+    // Create Dragons Plus vient de Modrinth : le certificat SSL de maven.dragons.plus a expire.
     maven { url "https://maven.fallenbreath.me/releases" } // Conditional Mixin
     repositories {
         maven {
@@ -218,9 +218,9 @@ dependencies {
     runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
 
-    compileOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    compileOnly("maven.modrinth:create-dragons-plus:${create_dragons_plus_version}")
     if (project.enable_create_dragons_plus.toBoolean()) {
-        runtimeOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+        runtimeOnly("maven.modrinth:create-dragons-plus:${create_dragons_plus_version}")
     }
 
     if (project.enable_xaeros_minimap.toBoolean()) {
