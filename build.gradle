@@ -197,6 +197,19 @@ repositories {
         name "Krystals Maven"
         url "https://krystalsmaven.oreostack.uk/releases" // TFMG
     }
+    maven {
+        name = "Latvian Maven"
+        url = "https://maven.latvian.dev/releases" // KubeJS, Rhino
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
+    }
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io" // KubeJS runtime dependency
+        content { includeGroup "com.github.rtyley" }
+    }
 }
 
 dependencies {
@@ -249,6 +262,14 @@ dependencies {
         case "disabled": break
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be JEI or disabled.")
     }
+
+    compileOnly("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
+    compileOnly("dev.latvian.mods:rhino:${rhino_version}")
+    if (project.enable_kubejs.toBoolean()) {
+        runtimeOnly("dev.latvian.mods:kubejs-neoforge:${kubejs_version}")
+        runtimeOnly("dev.latvian.mods:rhino:${rhino_version}")
+    }
+
 
     //annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 }
