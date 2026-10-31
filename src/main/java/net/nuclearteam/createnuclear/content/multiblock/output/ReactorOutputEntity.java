@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
 
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
@@ -31,6 +32,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
     protected float generatedSpeed;
 
+    private boolean kineticsInitialized = false;
+
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -38,10 +41,10 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-
     }
 
     public void setSpeedAndUpdate(int speed) {
+        if (!kineticsInitialized) return;
         if (generatedSpeed == speed) return;
 
         generatedSpeed = (float) speed;
@@ -66,7 +69,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         compound.putFloat("generatedSpeed", generatedSpeed);
     }
 
-     @Override
+    @Override
      public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
 
          float stressBase = calculateAddedStressCapacity();
@@ -93,8 +96,15 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
      }
 
     @Override
+    public void updateGeneratedRotation() {
+        if (!kineticsInitialized) return;
+        super.updateGeneratedRotation();
+    }
+
+    @Override
     public void initialize() {
         super.initialize();
+        kineticsInitialized = true;
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
