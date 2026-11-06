@@ -103,7 +103,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
 
         if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()
-                && heldItem.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) != ReactorBluePrintData.EMPTY){
+                && heldItem.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY).hasRods()){
             withBlockEntityDo(level, pos, be -> {
                 be.getInventoryObject().setStackInSlot(0, heldItem);
                 be.setConfiguredPattern(heldItem);
