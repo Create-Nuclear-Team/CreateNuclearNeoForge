@@ -8,8 +8,7 @@
 # gradle.properties).
 #
 # Usage (Docker):
-#   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff \
-#     -c cliff-release.toml --tag <next-version> -o CHANGELOG_RELEASE.md
+# docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff -c cliff-release.toml --tag <next-version> -o CHANGELOG_RELEASE.md
 #
 #   # preview without writing a tag yet:
 #   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff -c cliff-release.toml --unreleased --tag <next-version>
