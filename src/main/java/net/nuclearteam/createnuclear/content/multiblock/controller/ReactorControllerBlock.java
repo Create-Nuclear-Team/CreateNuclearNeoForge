@@ -31,8 +31,11 @@ import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorCategory;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorTelemetry;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.foundation.telemetry.Telemetry;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -107,6 +110,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             withBlockEntityDo(level, pos, be -> {
                 be.getInventoryObject().setStackInSlot(0, heldItem);
                 be.setConfiguredPattern(heldItem);
+                Telemetry.info(ReactorCategory.STATE).atBlock(ReactorTelemetry.REACTOR, level, pos)
+                        .msg("blueprint inserted")
+                        .emit();
 
                 player.setItemInHand(hand, ItemStack.EMPTY);
             });
@@ -128,12 +134,16 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 player.setItemInHand(hand, blueprint);
                 be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                 be.setConfiguredPattern(ItemStack.EMPTY);
+                Telemetry.info(ReactorCategory.STATE)
+                        .atBlock(ReactorTelemetry.REACTOR, level, pos)
+                        .msg("blueprint removed")
+                        .attr("heat", storedHeat)
+                        .emit();
                 be.getOutputManager().rotateOutputs(be.getLevel(), be.getBlockPos(), be.getAssembled(), 0);
                 be.notifyUpdate();
             });
             // Blueprint removed: the multiblock stays assembled, it just stops producing.
             level.playSound(null, pos, CNSoundEvents.REACTOR_SHUT_OFF.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
-            state.setValue(ASSEMBLED, false);
             return ItemInteractionResult.SUCCESS;
 
         }
@@ -150,7 +160,16 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             return;
 
         if (!isMoving && !state.is(newState.getBlock())) {
-            withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
+            withBlockEntityDo(worldIn, pos, be -> {
+                Telemetry.info(ReactorCategory.ASSEMBLY)
+                        .atBlock(ReactorTelemetry.REACTOR, worldIn, pos)
+                        .msg("controller removed")
+                        .attr("assembled", state.getValue(ASSEMBLED))
+                        .attr("outputs", be.getOutputManager().size())
+                        .emit();
+                be.getOutputManager().rotateOutputs(worldIn, pos, be.getAssembled(), 0);
+                ItemHelper.dropContents(worldIn, pos, be.getInventoryObject());
+            });
             worldIn.removeBlockEntity(pos);
 
             if (worldIn instanceof ServerLevel serverLevel) {
