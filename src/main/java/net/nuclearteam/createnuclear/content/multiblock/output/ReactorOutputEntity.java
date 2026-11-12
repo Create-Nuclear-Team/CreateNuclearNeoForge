@@ -22,7 +22,9 @@ import net.minecraft.util.Mth;
 
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorTelemetry;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
@@ -33,6 +35,17 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     protected float generatedSpeed;
 
     private boolean kineticsInitialized = false;
+
+    /**
+     * Position of the controller that last drove this output, relative to this output (like the
+     * reactor IO managers, so it survives moving the whole multiblock); {@code null} if no
+     * controller drove it since it was placed. Saved.
+     */
+    @Nullable
+    private BlockPos controllerOffset;
+
+    /** Server ticks since this block entity was loaded or placed; for the orphan grace delay. Not saved. */
+    private int ticksSinceLoad;
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -53,20 +66,53 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 		setChanged();
     }
 
+    /**
+     * Records the controller driving this output. Called by {@code ReactorOutputManager#rotateOutputs}.
+     *
+     * @param controllerPos the controller's current world position
+     */
+    public void setController(BlockPos controllerPos) {
+        BlockPos offset = controllerPos.subtract(getBlockPos());
+        if (offset.equals(controllerOffset)) return;
+        controllerOffset = offset;
+        setChanged();
+    }
+
+    /**
+     * Returns the controller that last drove this output.
+     *
+     * @return its world position, or {@code null} if none drove it since it was placed
+     */
+    @Nullable
+    public BlockPos getControllerPos() {
+        return controllerOffset == null ? null : getBlockPos().offset(controllerOffset);
+    }
+
+    /** Server side: lets the reactor telemetry check that a spinning output still has a controller. */
+    @Override
+    public void tick() {
+        super.tick();
+        if (level == null || level.isClientSide) return;
+        if (ticksSinceLoad < Integer.MAX_VALUE) ticksSinceLoad++;
+        ReactorTelemetry.afterOutputTick(level, getBlockPos(), getControllerPos(), generatedSpeed, ticksSinceLoad);
+    }
+
     @Override
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
 
-        // Restore the generated rotation speed
+        // Restore the generated rotation speed and the controller that drove it (absent on older saves)
         generatedSpeed = compound.getFloat("generatedSpeed");
+        controllerOffset = compound.contains("ControllerOffset") ? BlockPos.of(compound.getLong("ControllerOffset")) : null;
     }
 
     @Override
     public void write(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(compound, registries, clientPacket);
 
-        // Persist the generated rotation speed
+        // Persist the generated rotation speed and, once known, the controller offset
         compound.putFloat("generatedSpeed", generatedSpeed);
+        if (controllerOffset != null) compound.putLong("ControllerOffset", controllerOffset.asLong());
     }
 
     @Override
@@ -105,6 +151,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public void initialize() {
         super.initialize();
         kineticsInitialized = true;
+        // The orphan grace delay starts again: the controller may not have ticked yet.
+        ticksSinceLoad = 0;
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {

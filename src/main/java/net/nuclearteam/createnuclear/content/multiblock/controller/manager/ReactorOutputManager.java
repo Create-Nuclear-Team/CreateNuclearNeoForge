@@ -60,7 +60,9 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
      * split as evenly as possible across the tracked outputs, with the
      * remainder distributed to the first outputs. Each output is set to its
      * share of the rotation speed if the reactor is assembled, otherwise
-     * stopped.
+     * stopped. Each loaded output also records this controller
+     * ({@link ReactorOutputEntity#setController}), for the orphan output check
+     * of the reactor telemetry.
      */
     @Override
     public void rotateOutputs(Level level, BlockPos controllerPos, boolean assembled, int rotation) {
@@ -82,6 +84,7 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
             int targetSpeed = assembled ? Math.max(dividedRotation, 0) : 0;
             entity.setSpeedAndUpdate(targetSpeed);
             entity.updateGeneratedRotation();
+            entity.setController(controllerPos);
         }
     }
 }

@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.nuclearteam.createnuclear.infrastructure.command.telemetry.TelemetryCommand;
 
 public class CNCommands {
     // Server Commands
@@ -12,6 +13,7 @@ public class CNCommands {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("cn")
             .requires(cs -> cs.hasPermission(0))
             .then(RadiationInfoCommand.register())
+            .then(TelemetryCommand.register())
         ;
         LiteralCommandNode<CommandSourceStack> createNuclearRoot = dispatcher.register(root);
     }
