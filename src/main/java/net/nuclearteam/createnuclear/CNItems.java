@@ -319,6 +319,8 @@ public class CNItems {
     public static final ItemEntry<DeferredSpawnEggItem> SPAWN_WOLF = CNBuilderTransformers.spawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B, 0x4C422B, "Irradiated Wolf Spawn Egg");
     public static final ItemEntry<DeferredSpawnEggItem> SPAWN_CAT = CNBuilderTransformers.spawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
     public static final ItemEntry<DeferredSpawnEggItem> SPAWN_CHICKEN = CNBuilderTransformers.spawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
+    public static final ItemEntry<DeferredSpawnEggItem> SPAWN_SPIDER_STAGE2 = CNBuilderTransformers.spawnEgg("spider_stage2_irradiated_spawn_egg", CNEntityType.IRRADIATED_SPIDER_STAGE2, 0x2B2A26, 0x00FE04, "Irradiated Spider Spawn Egg");
+    public static final ItemEntry<DeferredSpawnEggItem> SPAWN_SPIDER_STAGE3 = CNBuilderTransformers.spawnEgg("spider_stage3_irradiated_spawn_egg", CNEntityType.IRRADIATED_SPIDER_STAGE3, 0x1E2B1A, 0x00FE04, "Mutated Irradiated Spider Spawn Egg");
 
     public static final ItemEntry<ReactorBluePrintItem> REACTOR_BLUEPRINT = CreateNuclear.REGISTRATE
         .item("reactor_blueprint_item", ReactorBluePrintItem::new)

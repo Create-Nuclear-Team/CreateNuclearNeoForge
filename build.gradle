@@ -194,6 +194,11 @@ repositories {
         }
     } // Xaero's Maven
     maven {
+        name = "GeckoLib"
+        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+        content { includeGroupAndSubgroups "software.bernie" }
+    }
+    maven {
         name "Krystals Maven"
         url "https://krystalsmaven.oreostack.uk/releases" // TFMG
     }
@@ -217,6 +222,7 @@ dependencies {
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
     runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+    implementation("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
 
     compileOnly("maven.modrinth:create-dragons-plus:${create_dragons_plus_version}")
     if (project.enable_create_dragons_plus.toBoolean()) {
@@ -264,7 +270,8 @@ tasks.withType(ProcessResources).configureEach {
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
-            create_version_range: create_version_range, ponder_version: ponder_version
+            create_version_range: create_version_range, ponder_version: ponder_version,
+            geckolib_version: geckolib_version
     ]
     inputs.properties replaceProperties
 

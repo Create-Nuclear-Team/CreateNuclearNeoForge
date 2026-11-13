@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear;
 import com.tterrag.registrate.util.entry.EntityEntry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.CNModelLayers;
@@ -16,6 +17,9 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken.Irr
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.cow.IrradiatedCow;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.cow.IrradiatedCowModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.cow.IrradiatedCowRenderer;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.spider.IrradiatedSpiderRenderer;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.spider.IrradiatedSpiderStage2;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.spider.IrradiatedSpiderStage3;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolf;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
@@ -69,6 +73,26 @@ public class CNEntityType {
         .lang("Irradiated Cow")
         .renderer(() -> IrradiatedCowRenderer::new)
         .attributes(IrradiatedCow::createAttributes)
+        .register();
+
+    public static final EntityEntry<IrradiatedSpiderStage2> IRRADIATED_SPIDER_STAGE2 = CreateNuclear.REGISTRATE
+        .entity("irradiated_spider_stage2", IrradiatedSpiderStage2::new, MobCategory.MONSTER)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(1.6f, 1.0f).clientTrackingRange(8))
+        .lang("Irradiated Spider")
+        .renderer(() -> IrradiatedSpiderRenderer::stage2)
+        .attributes(Spider::createAttributes)
+        .register();
+
+    public static final EntityEntry<IrradiatedSpiderStage3> IRRADIATED_SPIDER_STAGE3 = CreateNuclear.REGISTRATE
+        .entity("irradiated_spider_stage3", IrradiatedSpiderStage3::new, MobCategory.MONSTER)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(1.9f, 1.5f).clientTrackingRange(8))
+        .lang("Mutated Irradiated Spider")
+        .renderer(() -> IrradiatedSpiderRenderer::stage3)
+        .attributes(Spider::createAttributes)
         .register();
 
    public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {

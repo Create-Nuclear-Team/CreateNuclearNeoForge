@@ -1,4 +1,4 @@
-// 1.21.1	2026-10-10T14:13:23.4838066	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2026-11-13T11:14:53.1413609	Registrate Provider for createnuclear [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (blocks), Tags (enchantments), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -48,8 +48,8 @@ b9c915389ea6cf8338d20c48e908591f8baa2108 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-02be24eb6126f2e1f57e46e798da18ecdeb266a4 assets/createnuclear/lang/en_ud.json
-6a0151325e2a8e604e82fac66477cba07c62c563 assets/createnuclear/lang/en_us.json
+f6d6722ee58c2d1e8eb8903baa16094a9b081d58 assets/createnuclear/lang/en_ud.json
+1a42d8513a06e03526f465a6b0ee2f256a2380b9 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -262,6 +262,8 @@ ee9b06de6d4e5f722543a83e5d9f7564ac6d7f70 assets/createnuclear/models/item/reacto
 9b83b53d90891eaf7aa4693eafe2876a831e0be2 assets/createnuclear/models/item/small_autunite_brick_slab.json
 3e80ef1d80473c73a723d3c4b5c1409c7998d70f assets/createnuclear/models/item/small_autunite_brick_stairs.json
 9286e69b3a5215a17ccb178933c2f52a9adb847f assets/createnuclear/models/item/small_autunite_brick_wall.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/spider_stage2_irradiated_spawn_egg.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/spider_stage3_irradiated_spawn_egg.json
 7f33b090f2821bdeb07b2938b1618ad3f309248f assets/createnuclear/models/item/steel_block.json
 bcb30dce2419ce1ec2e043eaff83df82ac8a4bec assets/createnuclear/models/item/steel_ingot.json
 4b0492cf73c071f13538ce485419e46a164c99c7 assets/createnuclear/models/item/steel_nugget.json
@@ -467,6 +469,8 @@ dbcee16408e6631009a004edf424bfddc304c640 data/createnuclear/loot_table/blocks/ur
 fba1a7bdb0835c034aa5ef52ebf589123d41b33e data/createnuclear/loot_table/entities/irradiated_cat.json
 2d8f5d7d7babd2b02ae836846e62daabf84de427 data/createnuclear/loot_table/entities/irradiated_chicken.json
 900719d49cec9385da31bb392649c65f4297288c data/createnuclear/loot_table/entities/irradiated_cow.json
+a8d1076221d5f772ffc07578f8522d03f169d922 data/createnuclear/loot_table/entities/irradiated_spider_stage2.json
+cbde841eb32eb0265c87e3ce9fd198d1e471e55c data/createnuclear/loot_table/entities/irradiated_spider_stage3.json
 f91f43a39c80f583f878ea1a0d944798c05f2388 data/createnuclear/loot_table/entities/irradiated_wolf.json
 ef428465f5d04edfb67c7357bef7936e93800cb0 data/createnuclear/recipe/autunite_from_stone_types_autunite_stonecutting.json
 5988520980fc9ae12384874425e01110816ea779 data/createnuclear/recipe/autunite_pillar_from_stone_types_autunite_stonecutting.json
@@ -609,7 +613,7 @@ fdace7ee58d9860d4549876326a44645f9df2a10 data/createnuclear/recipe/smithing/defa
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/block/enriching_fire_base_blocks.json
 509b5baa813ae0dc3345fd97754e4088132359ec data/createnuclear/tags/block/fan_processing_catalysts/enriched.json
 bc8701774f57ab000a8f0f1d390702175a6cdbb8 data/createnuclear/tags/block/fan_processing_catalysts/snow_powder.json
-ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_type/irradiated_immune.json
+77b7cb714ec1978177f4c1e904c97867a8ac6a41 data/createnuclear/tags/entity_type/irradiated_immune.json
 410aa6d101788f25baa176741887c6f314006f29 data/createnuclear/tags/fluid/nitrogen.json
 dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluid/thorium.json
 bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluid/uranium.json
