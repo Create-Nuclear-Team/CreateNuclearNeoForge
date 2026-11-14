@@ -56,3 +56,17 @@ run/ponders_watched.json
 run/servers.*
 run/XaeroWaypoints*
 run/xaero/*
+
+## kubejs : only keep the demo scripts
+run/kubejs/*
+!run/kubejs/server_scripts/
+!run/kubejs/startup_scripts/
+run/kubejs/server_scripts/*
+run/kubejs/startup_scripts/*
+!run/kubejs/server_scripts/demo/
+!run/kubejs/startup_scripts/demo/
+run/kubejs/server_scripts/demo/*
+run/kubejs/startup_scripts/demo/*
+!run/kubejs/server_scripts/demo/createnuclear.js
+!run/kubejs/startup_scripts/demo/createnuclear.js
+run/local/kubejs/dev.json
