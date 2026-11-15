@@ -301,6 +301,9 @@ tasks.named('jar', Jar).configure {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
+            // Stable coordinates for addons (net.nuclearteam.createnuclear:createnuclear-neoforge),
+            // independent of the checkout directory name.
+            artifactId = 'createnuclear-neoforge'
             artifact jar
         }
     }

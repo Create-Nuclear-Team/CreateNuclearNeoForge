@@ -10,6 +10,8 @@ import net.minecraft.world.level.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,6 +19,7 @@ public class RadiationRegistry {
     private static final Map<Item, Double> ITEM_VALUE = new HashMap<>();
     private static final Map<TagKey<Item>, Double> TAG_VALUE = new HashMap<>();
     private static final Map<ResourceKey<Biome>, Double> BIOME_VALUE = new HashMap<>();
+    private static final List<IRadiationStackProvider> STACK_PROVIDERS = new CopyOnWriteArrayList<>();
 
     private RadiationRegistry() {}
 
@@ -46,8 +49,22 @@ public class RadiationRegistry {
         return 0D;
     }
 
+    /**
+     * Registers a stack-aware radiation source. Safe to call from {@code FMLCommonSetupEvent}.
+     *
+     * @see IRadiationStackProvider
+     */
+    public static void registerStackProvider(IRadiationStackProvider provider) {
+        STACK_PROVIDERS.add(provider);
+    }
+
     public static double getRadiation(ItemStack stack, @Nullable LivingEntity entity) {
-        return get(stack) * stack.getCount();
+        double radiation = get(stack) * stack.getCount();
+        if (stack.isEmpty()) return radiation;
+        for (IRadiationStackProvider provider : STACK_PROVIDERS) {
+            radiation += provider.getRadiation(stack, entity);
+        }
+        return radiation;
     }
     public static double getRadiation(ResourceKey<Biome> biome, @Nullable LivingEntity entity) {
         return get(biome);

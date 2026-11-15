@@ -142,6 +142,11 @@ public class RadiationCapability {
         for (ItemStack stack : player.getInventory().offhand) {
             radiation += getStackRadiation(stack, player);
         }
+        // Worn armor counts too (already part of InventoryHashUtil), so that a radioactive
+        // armor piece keeps irradiating its wearer, like it does for mobs.
+        for (ItemStack stack : player.getInventory().armor) {
+            radiation += getStackRadiation(stack, player);
+        }
         return radiation;
     }
 
