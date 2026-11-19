@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 public enum Mods implements DatagenMod {
     ALEXS_CAVE("alexscaves"),
     CREATE_DRAGONS_PLUS,
+    KUBEJS,
     TFMG,
     SABLE
     ;

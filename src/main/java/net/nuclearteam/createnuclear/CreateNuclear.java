@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
 import net.nuclearteam.createnuclear.compat.Mods;
 import net.nuclearteam.createnuclear.compat.createdragonsplus.SnowPowderFreezingCompat;
+import net.nuclearteam.createnuclear.compat.kubejs.CNKubeJSEvents;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
@@ -114,6 +115,7 @@ public class CreateNuclear {
         CNFluids.registerFluidInteractions();
         CNRadiationValues.register();
         Mods.CREATE_DRAGONS_PLUS.executeIfInstalled(() -> SnowPowderFreezingCompat::register);
+        Mods.KUBEJS.executeIfInstalled(() -> () -> event.enqueueWork(CNKubeJSEvents::postFluidRodStats));
 
         event.enqueueWork(CNOpenPipeEffectHandlers::registerDefaults);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));

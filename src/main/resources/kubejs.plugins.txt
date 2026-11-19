@@ -1,0 +1,1 @@
+net.nuclearteam.createnuclear.compat.kubejs.CNKubeJSPlugin
