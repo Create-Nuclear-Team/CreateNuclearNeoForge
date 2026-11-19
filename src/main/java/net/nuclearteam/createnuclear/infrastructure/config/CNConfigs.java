@@ -8,6 +8,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.nuclearteam.createnuclear.foundation.telemetry.config.TelemetryConfigs;
+import net.nuclearteam.createnuclear.foundation.telemetry.TelemetryRegistry;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.EnumMap;
@@ -59,6 +61,8 @@ public class CNConfigs {
 
         for (Entry<ModConfig.Type, ConfigBase> pair : CONFIGS.entrySet())
             container.registerConfig(pair.getKey(), pair.getValue().specification);
+
+        TelemetryRegistry.bootstrap(container);
     }
 
     @SubscribeEvent
@@ -68,6 +72,8 @@ public class CNConfigs {
                 config.onLoad();
             }
         }
+
+        TelemetryConfigs.onLoad(event.getConfig());
     }
 
     @SubscribeEvent
@@ -77,5 +83,7 @@ public class CNConfigs {
                 config.onReload();
             }
         }
+
+        TelemetryConfigs.onReload(event.getConfig());
     }
 }
