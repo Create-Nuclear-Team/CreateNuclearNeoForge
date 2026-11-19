@@ -16,7 +16,11 @@ import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorCategory;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorTelemetry;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.telemetry.Telemetry;
+import net.nuclearteam.createnuclear.foundation.telemetry.api.TelemetryLevel;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -63,6 +67,17 @@ public final class ReactorAssembler {
         entity.setMultiblockStructure(ReactorAssembler.getStructureBound(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
 
         findAndRegisterSpecialBlocks(entity.getMultiblockPos(), entity, level);
+
+        Telemetry.event(ReactorCategory.ASSEMBLY, wasAssembled ? TelemetryLevel.DEBUG : TelemetryLevel.INFO)
+                .atBlock(ReactorTelemetry.REACTOR, level, pos)
+                .msg(wasAssembled ? "structure rescanned" : "assembled")
+                .attr("type", result.data().name())
+                .attr("size", entity.getMultiblockSize())
+                .attr("outputs", entity.getOutputManager().size())
+                .attr("rod_inputs", entity.getInputManager().size())
+                .attr("fluid_inputs", entity.getInputFluidManager().size())
+                .attr("alarms", entity.getAlarmManager().size())
+                .emit();
     }
 
     public static void disassemble(BlockPos pos, Level level) {
@@ -80,8 +95,16 @@ public final class ReactorAssembler {
         // transition, so no extra guard is needed here.
         level.playSound(null, pos, CNSoundEvents.MOTOR_DISASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
 
+        int outputsBefore = entity.getOutputManager().size();
         entity.setAssembled(false);
         entity.removeIOAll();
+
+        Telemetry.info(ReactorCategory.ASSEMBLY)
+                .atBlock(ReactorTelemetry.REACTOR, level, pos)
+                .msg("disassembled")
+                .attr("outputs_before", outputsBefore)
+                .attr("outputs_after", entity.getOutputManager().size())
+                .emit();
     }
 
     public static void findAndRegisterSpecialBlocks(BoundingBox reactorPos, ReactorControllerBlockEntity entity, Level level) {

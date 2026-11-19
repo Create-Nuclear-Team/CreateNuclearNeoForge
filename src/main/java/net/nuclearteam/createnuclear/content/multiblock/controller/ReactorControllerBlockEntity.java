@@ -37,6 +37,8 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.Reac
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatBalance;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorCategory;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorTelemetry;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
@@ -47,6 +49,7 @@ import java.util.List;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
+import net.nuclearteam.createnuclear.foundation.telemetry.Telemetry;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -98,6 +101,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final IReactorMeltdownMonitor meltdownMonitor;
     /** Drives the alarm blocks based on the danger flag; built in {@link #addBehaviours} since it depends on {@link #advancement}. */
     private IReactorAlarmCoordinator alarmCoordinator;
+
+    // Telemetry only: last values seen, to report transitions (README 1.6). Server side, not saved.
+    /** {@code canRun} of the last tick; {@code null} until the first tick after a load. */
+    private Boolean telemetryCanRun;
+    /** Danger flag of the last tick; {@code null} until the first tick after a load. */
+    private Boolean telemetryDanger;
 
     // service fields are injected; implementations live in separate classes
 
@@ -196,6 +205,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     public ReactorOutputManagerI getOutputManager() {
         return this.outputManager;
+    }
+
+    /** @return the rod input manager; read by {@code ReactorAssembler} for telemetry */
+    public ReactorInputManagerI getInputManager() {
+        return this.inputManager;
+    }
+
+    /** @return the alarm manager; read by {@code ReactorAssembler} for telemetry */
+    public ReactorAlarmManagerI getAlarmManager() {
+        return this.alarmManager;
     }
 
     public void setDisplayState(ReactorDisplayState state) {
@@ -326,6 +345,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         boolean targetActive = isAssembled() && heatCoordinator.canRun(getConfiguredPattern(), getDisplayState(), getInputFluidManager(), level, getAssembled());
 
         if (currentActive != targetActive) {
+            Telemetry.info(ReactorCategory.STATE)
+                    .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                    .msg("ACTIVE changed")
+                    .attr("from", currentActive)
+                    .attr("to", targetActive)
+                    .emit();
             level.setBlock(worldPosition, state.setValue(ReactorControllerBlock.ACTIVE, targetActive), 3);
         }
     }
@@ -343,12 +368,20 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         // heat is not visible here yet, so the alarm/meltdown danger flag is intentionally 1 tick behind.
         int currentHeat = getConfiguredPatternHeat();
         boolean isDanger = alarmCoordinator.computeDanger(currentHeat, this.getMultiblockSize());
+        reportDanger(isDanger, currentHeat);
 
         alarmCoordinator.update(level, alarmManager, getBlockPos(), isDanger);
 
         IReactorMeltdownMonitor.MeltdownState meltdownState = meltdownMonitor.tick(level, getBlockPos(), isDanger);
 
         if (meltdownState == IReactorMeltdownMonitor.MeltdownState.EXPLODE) {
+            Telemetry.warn(ReactorCategory.STATE)
+                    .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                    .msg("meltdown")
+                    .attr("heat", currentHeat)
+                    .attr("size", reactorSize)
+                    .attr("fuel_rods", countFuelRod)
+                    .emit();
             if (level instanceof ServerLevel serverLevel) {
                 this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), getMultiblockPos(), reactorSize, countFuelRod);
             }
@@ -371,6 +404,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         updateReactorStateVisibility();
         handleAssembledState();
+
+        if (ReactorTelemetry.isDue()) {
+            ReactorTelemetry.afterControllerTick(level, worldPosition, new ReactorTelemetry.ControllerSample(
+                    isAssembled(), Boolean.TRUE.equals(telemetryCanRun), isDanger,
+                    getConfiguredPatternHeat(), reactorSize, countFuelRod), outputManager);
+        }
     }
 
     /**
@@ -413,8 +452,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private void resolveEntitiesIfNeeded() {
         if (!needsToResolveEntities)
             return;
-        List<IItemHandler> handlers = inputManager.getItemHandlers(level, getBlockPos());
-        CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
+        Telemetry.debug(ReactorCategory.ASSEMBLY)
+                .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                .msg("inputs resolved after load")
+                .attrLazy("rod_input_handlers", () -> inputManager.getItemHandlers(level, getBlockPos()).size())
+                .attr("rod_inputs", inputManager.size())
+                .attr("outputs", outputManager.size())
+                .emit();
         needsToResolveEntities = false;
         this.setChanged();
     }
@@ -427,7 +471,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      * and outputs rotated according to the heat.
      */
     private void handleAssembledState() {
-        if (!heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled())) {
+        boolean canRun = heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled());
+        reportCanRun(canRun);
+        if (!canRun) {
             heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), heatBalance, heat, inventory, level, isAssembled());
             if (!outputManager.getBlocksPosition(getLevel(), getBlockPos()).isEmpty()) {
                 outputManager.rotateOutputs(getLevel(), getBlockPos(), getAssembled(), 0);
@@ -442,16 +488,79 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         notifyUpdate();
 
         BigFluidStack fluidStack = currentFluidStack();
+        int previousHeat = heat;
         heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, heatBalance, heat, inventory, level, displayState);
+        if (heat != previousHeat)
+            Telemetry.trace(ReactorCategory.HEAT)
+                    .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                    .msg("heat changed")
+                    .attr("from", previousHeat)
+                    .attr("to", heat)
+                    .emit();
         fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, getBlockPos(), fluidBuffer);
         cycleManager.update(configuredPattern, level, inputManager, getBlockPos(), level.getGameTime() % 20 == 0);
 
         if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level, getBlockPos()).isEmpty()) {
             if (Math.abs(heat - lastAppliedOutputHeat) >= ReactorOutputManager.RPM_DIVIDER / 2) {
+                Telemetry.debug(ReactorCategory.OUTPUT)
+                        .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                        .msg("output heat changed")
+                        .attr("from", lastAppliedOutputHeat)
+                        .attr("to", heat)
+                        .attr("outputs", outputManager.size())
+                        .emit();
                 lastAppliedOutputHeat = heat;
             }
             outputManager.rotateOutputs(getLevel(), getBlockPos(), getAssembled(), lastAppliedOutputHeat);
         }
+    }
+
+    // --- telemetry (README 1.6: transitions only; cheap outside a session) ---
+
+    /** Reports a change of {@code canRun}; the first value after a load is only recorded. */
+    private void reportCanRun(boolean canRun) {
+        Boolean previous = telemetryCanRun;
+        telemetryCanRun = canRun;
+        if (previous == null || previous == canRun) return;
+        Telemetry.info(ReactorCategory.STATE)
+                .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                .msg("canRun changed")
+                .attr("from", previous.booleanValue())
+                .attr("to", canRun)
+                .attr("assembled", isAssembled())
+                .attr("rod_inputs", inputManager.size())
+                .attr("fluid_inputs", inputFluidManager.size())
+                .emit();
+    }
+
+    /**
+     * Reports the start (WARN) or end (INFO) of the danger zone. Unlike {@code canRun}, a reactor
+     * already in danger on its first tick after a load is reported, as {@code danger started} with
+     * {@code on_load=true}: it is not a transition, but a danger must never go unseen.
+     */
+    private void reportDanger(boolean danger, int currentHeat) {
+        Boolean previous = telemetryDanger;
+        telemetryDanger = danger;
+        boolean onLoad = previous == null;
+        if (onLoad ? !danger : previous == danger) return;
+        (danger ? Telemetry.warn(ReactorCategory.STATE) : Telemetry.info(ReactorCategory.STATE))
+                .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                .msg(danger ? "danger started" : "danger ended")
+                .attr("heat", currentHeat)
+                .attr("size", reactorSize)
+                .attr("on_load", onLoad)
+                .emit();
+    }
+
+    /** Reports that a tracked IO block was removed from this reactor. */
+    private void reportIoRemoved(String kind, BlockPos pos, int remaining) {
+        Telemetry.info(ReactorCategory.ASSEMBLY)
+                .atBlock(ReactorTelemetry.REACTOR, level, worldPosition)
+                .msg("io removed")
+                .attr("kind", kind)
+                .attr("pos", pos.toShortString())
+                .attr("remaining", remaining)
+                .emit();
     }
 
     private boolean isEmptyConfiguredPattern() {
@@ -468,8 +577,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void removeInput(BlockPos inputPos) {
-        this.inputManager.removeBlock(inputPos.subtract(getBlockPos()));
+        BlockPos offset = inputPos.subtract(getBlockPos());
+        boolean tracked = this.inputManager.contains(offset);
+        this.inputManager.removeBlock(offset);
         this.setChanged();
+        if (tracked) reportIoRemoved("rod_input", inputPos, inputManager.size());
     }
 
     public void addOutput(BlockPos outputPos) {
@@ -478,8 +590,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void removeOutput(BlockPos outputPos) {
-        this.outputManager.removeBlock(outputPos.subtract(getBlockPos()));
+        BlockPos offset = outputPos.subtract(getBlockPos());
+        boolean tracked = this.outputManager.contains(offset);
+        this.outputManager.removeBlock(offset);
         this.setChanged();
+        if (tracked) reportIoRemoved("output", outputPos, outputManager.size());
     }
 
     public void addInputFluid(BlockPos outputPos) {
@@ -488,8 +603,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void removeInputFluid(BlockPos outputPos) {
-        this.inputFluidManager.removeBlock(outputPos.subtract(getBlockPos()));
+        BlockPos offset = outputPos.subtract(getBlockPos());
+        boolean tracked = this.inputFluidManager.contains(offset);
+        this.inputFluidManager.removeBlock(offset);
         this.setChanged();
+        if (tracked) reportIoRemoved("fluid_input", outputPos, inputFluidManager.size());
         // Breaking a fluid input discards its tank contents along with the block entity.
         // Re-evaluate the fluid lock so a different fluid can be accepted once no remaining
         // input still holds liquid — otherwise the controller stays locked to the old fluid.
@@ -502,8 +620,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void removeAlarm(BlockPos alarmPos) {
-        this.alarmManager.removeBlock(alarmPos.subtract(getBlockPos()));
+        BlockPos offset = alarmPos.subtract(getBlockPos());
+        boolean tracked = this.alarmManager.contains(offset);
+        this.alarmManager.removeBlock(offset);
         this.setChanged();
+        if (tracked) reportIoRemoved("alarm", alarmPos, alarmManager.size());
     }
 
     public void removeIOAll() {

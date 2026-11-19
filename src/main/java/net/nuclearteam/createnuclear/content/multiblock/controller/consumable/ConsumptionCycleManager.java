@@ -12,6 +12,9 @@ import net.nuclearteam.createnuclear.CNDataComponents;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintData;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorCategory;
+import net.nuclearteam.createnuclear.content.multiblock.telemetry.ReactorTelemetry;
+import net.nuclearteam.createnuclear.foundation.telemetry.Telemetry;
 
 import java.util.*;
 
@@ -65,6 +68,13 @@ public class ConsumptionCycleManager {
             if (timer.tick()) {
                 timer.getConsumable().consume(manager, level, controllerPos);
                 consumed = true;
+
+                Telemetry.debug(ReactorCategory.FUEL)
+                        .atBlock(ReactorTelemetry.REACTOR, level, controllerPos)
+                        .msg("rod consumed")
+                        .attr("rod", timer.getId())
+                        .attr("count_in_pattern", timer.getCountInPattern())
+                        .emit();
 
                 if (timer.getCountInPattern() > 1) {
                     timer.reset(timer.getMaxTicks(), timer.getCountInPattern());
@@ -152,13 +162,24 @@ public class ConsumptionCycleManager {
         boolean emptyPattern = pattern.getOrDefault(CNDataComponents.REACTOR_BLUE_PRINT_DATA, ReactorBluePrintData.EMPTY) == ReactorBluePrintData.EMPTY;
         if (isEmpty() && !emptyPattern) {
             startCycle(pattern, level);
+            if (!isEmpty()) reportCycle("fuel cycle started", level, controllerPos);
         }
 
         if (!isEmpty()) {
             if (checkPatternChange && hasPatternChanged(pattern, level)) {
                 resetCycle(pattern, level, inputManager);
+                reportCycle("pattern changed, cycle reset", level, controllerPos);
             }
             tick(inputManager, level, controllerPos);
         }
+    }
+
+    /** Reports a cycle start or reset, with the number of rod timers. */
+    private void reportCycle(String message, Level level, BlockPos controllerPos) {
+        Telemetry.info(ReactorCategory.FUEL)
+                .atBlock(ReactorTelemetry.REACTOR, level, controllerPos)
+                .msg(message)
+                .attr("timers", timers.size())
+                .emit();
     }
 }

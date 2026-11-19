@@ -41,6 +41,15 @@ public record ReactorBluePrintData(int countCooledRod, int countFuelRod, Pattern
     );
 
     /**
+     * Whether this blueprint places at least one rod. Closing the blueprint menu always stores
+     * a full 57-slot grid, so a blueprint saved with no rods is not {@link #EMPTY}: only the rod
+     * counts can tell it apart from a configured one.
+     */
+    public boolean hasRods() {
+        return countFuelRod > 0 || countCooledRod > 0;
+    }
+
+    /**
      * Normalized view of {@link #pattern()}. Recomputed on demand, never stored.
      */
     public PatternData[] patternAll(Level level) {

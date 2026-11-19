@@ -56,3 +56,38 @@
 /effect give Dev createnuclear:radiation 300 255
 /kjs
 /kjs eval 12+12
+/weather clear
+/time set day
+/cn telemetry status
+/cn telemetry start
+/cn telemetry status
+/cn telemetry stop
+/cn telemetry modules
+/cn telemetry stop
+/cn telemetry stats
+/cn telemetry stats reactor
+/cn telemetry status
+/cn telemetry start
+/cn telemetry stats reactor
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry stats reactor
+/cn telemetry stop
+/cn telemetry level reactor health error
+/cn telemetry start
+/cn telemetry status
+/cn telemetry stats
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry level reactor assembly debug
+/cn telemetry start
+/cn telemetry level reactor assembly warn
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry stop
+/cn telemetry start
+/cn telemetry stop
